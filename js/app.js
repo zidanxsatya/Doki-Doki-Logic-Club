@@ -97,7 +97,7 @@ function scaffold(id) {
     Snd.sfx('select');
     if (pk >= 3 && D[m.key].poke) { const [t, e] = pick(D[m.key].poke); d.line(t, e) } else talk();
   };
-  const back = () => { Snd.sfx('cancelMenu'); cred.hidden ? go('menu') : showCred(false) };
+  const back = () => { Snd.sfx('cancelMenu'); go('menu') };
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   el.classList.add('on');
   scene = { cleanup() { clearInterval(idle); removeEventListener('pointerdown', act, true); removeEventListener('keydown', act, true); ch.unmount(); d.destroy(); el.innerHTML = ''; document.onkeydown = null } };
