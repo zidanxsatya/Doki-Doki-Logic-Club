@@ -259,3 +259,56 @@ html{scrollbar-color:var(--pink) transparent}
 .bg[data-b=Music_Room]::before{background-image:url(../assets/img/theme/musiclight.webp);opacity:.3}
 @keyframes drift{to{transform:translate3d(2%,1%,0)}}
 @media (prefers-reduced-motion:reduce){.bg::before{animation:none}}
+
+/* ===== MODE CERITA ===== */
+/* menu: tombol CERITA + 4 mode mandiri (5 tombol) */
+.mtitle h1{font-size:54px}.mlist{top:190px;gap:12px}.mbtn{padding:8px 24px 8px 56px}.mbtn b{font-size:30px}.mbtn i{top:18px}
+.mstory{position:relative}.mstory .mbtn{width:100%;box-sizing:border-box}
+.mbtn[data-k=story]{--tp:linear-gradient(120deg,#ff9fcb,#a9dcff)}
+.mre{position:absolute;right:14px;top:50%;translate:0 -50%;z-index:2}
+/* diskusi edukasi: potret statis kiri + area materi besar kanan */
+.pt{position:absolute;left:0;bottom:0;width:420px;height:420px;z-index:2;cursor:pointer}
+.pt img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;opacity:0;transition:opacity .16s ease,transform .22s var(--ease);filter:drop-shadow(0 6px 8px rgba(40,10,40,.3))}
+.story .panel{left:424px;top:58px;width:836px;height:432px}
+.story .dlg{left:410px;width:850px}
+.story .board{height:calc(100% - 66px)}
+.story .startcard{margin-top:18px}
+.contstory{background:var(--pink)!important;color:#fff!important;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(-3px)}}
+.sbar{text-align:center;margin-top:10px}.sbar span{display:inline-block;background:var(--ink);color:#fff;font-weight:bold;font-size:16px;padding:4px 16px;border-radius:999px}
+/* adegan cerita: sprite diam */
+.nar{position:absolute;inset:0;display:flex;justify-content:space-evenly;align-items:flex-end;padding-bottom:100px;z-index:2;pointer-events:none;--ks:.64}
+.ns{filter:brightness(.8) saturate(.88);transition:filter .25s ease}.ns.on{filter:none}
+.ns canvas{display:block;width:auto}
+.narr .dlg{left:175px;width:930px}
+.narr .panel{left:50%;top:120px;translate:-50% 0;width:640px;height:auto;z-index:6}
+.ngo{position:absolute;right:26px;bottom:232px;z-index:7;animation:nudge 1.6s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.contstory,.ngo{animation:none}}
+/* mobile / Android: tata ulang, bukan sekadar mengecilkan */
+.m .mtitle h1{font-size:26px}.m .mtitle h1 br{display:none}.m .mtitle h2{font-size:14px}
+.m .mlist{top:62px;gap:5px}.m .mbtn{padding:2px 12px 2px 36px;border-width:3px}.m .mbtn b{font-size:19px;letter-spacing:1.5px}.m .mbtn span{font-size:11px}.m .mbtn i{top:8px;left:11px;font-size:15px}
+.m .mre{right:8px;font-size:11px;padding:2px 8px}
+.m .pt{left:2px;width:184px;height:184px}
+.m .story .panel{left:190px;top:40px}.m .story .dlg{left:auto;width:580px}
+.m.p .pt{left:-4px;bottom:131px;width:230px;height:230px}
+.m.p .story .dlg{left:6px;width:auto}
+.m .nar{--ks:.34;padding-bottom:84px}.m.p .nar{--ks:.27;padding-bottom:150px}
+.m .narr .dlg{left:50%;right:auto;translate:-50% 0;width:580px}.m.p .narr .dlg{left:50%;width:calc(100% - 12px)}
+.m .narr .panel{top:46px;width:min(560px,92%)}
+.m .ngo{right:8px;bottom:auto;top:40px;font-size:15px;padding:6px 14px}.m.p .ngo{top:auto;bottom:auto;top:36px}
+.m.p .mlist{top:60px}.m.p .setbtn{top:360px}.m.p .mchar{height:calc(100% - 450px)}
+.bg{overflow:hidden}   /* lapisan cahaya (inset negatif) tidak boleh membuat #stage bisa di-scroll */
+/* area materi besar di Mode Cerita: teks lebih besar & kartu hasil ringkas agar tidak tertutup dialog */
+.story .bt{font-size:36px}.story .bb{font-size:25px;line-height:1.35}
+.story .startcard{margin-top:6px;padding:12px 18px;width:min(700px,100%);box-sizing:border-box}
+.story .startcard h2{font-size:34px;margin:0 0 4px}.story .rg{margin:6px 0}.story .rg b{font-size:36px}.story .rg div{padding:2px 12px;min-width:104px}
+.story .score{font-size:56px}.story .grade{font-size:30px;margin:2px 0}.story .startcard p{margin:4px 0}
+.story .startcard .btn.big{font-size:22px;padding:6px 18px;margin:4px 4px 0}
+/* mobile: aturan Mode Cerita harus menang atas aturan desktop di atas */
+.m .story .panel{left:190px;top:40px;width:calc((100% - 198px)/var(--pz));height:calc((100% - 40px - 140px)/var(--pz))}
+.m.p .story .panel{left:6px;top:36px;width:calc((100% - 12px)/var(--pz));height:calc((100% - 36px - 140px - 230px)/var(--pz))}
+.m .story .board{height:calc(100% - 58px)}.m .story .bt{font-size:23px}.m .story .bb{font-size:17px}
+.m .story .startcard{width:min(640px,96%);padding:8px 12px;margin-top:4px}.m .story .startcard h2{font-size:24px}.m .story .rg b{font-size:24px}.m .story .score{font-size:40px}.m .story .grade{font-size:22px}
+.m .story .startcard .btn.big{font-size:16px;padding:5px 12px}.m .story .rg div{min-width:70px}
+.m .narr .panel,.m.p .narr .panel{left:50%;translate:-50% 0;transform:none;width:min(560px,92%);height:auto;overflow:visible;top:44px}
+.m.p .narr .panel{width:min(360px,94%)}.m.p .nar{--ks:.31}

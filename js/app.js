@@ -19,9 +19,9 @@ async function go(id) {
   if (id !== 'menu' && id !== 'settings') await warm;   // aset karakter dimuat di latar belakang setelah MULAI aktif
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
-  if (id === 'menu') { buildMenu(); Snd.music('Lunchbox') }
+  if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('Lunchbox') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
-  else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(M[id].music) }
+  else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(M[id] ? M[id].music : 'Lunchbox') }
   await wait(60); f.classList.remove('on'); busy = false;
 }
 
@@ -29,17 +29,18 @@ async function go(id) {
 function buildMenu() {
   const el = $('#menu');
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><small>TEKNIK KONTROL MEKATRONIKA</small><h1>DOKI DOKI<br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
-  <div class="mlist">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><i>▶</i><b>${m.label}</b><span>${CHARS[m.key].name} · ${m.sub}</span></button>`).join('')}</div>
+  <div class="mlist"><div class="mstory"><button class="mbtn" data-i="s" data-k="story"><i>▶</i><b>CERITA</b><span>${Story.menuSub()}</span></button>${Story.prog().step > 0 ? '<button class="btn sm mre" id="sre">↻ ULANG</button>' : ''}</div>${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><i>▶</i><b>${m.label}</b><span>${CHARS[m.key].name} · ${m.sub}</span></button>`).join('')}</div>
   <div class="mchar"></div>
   <button class="btn setbtn" id="setb">⚙ PENGATURAN</button>`;
   $('.mchar', el).appendChild(together.canvas); together.start(); together.play('t', { loop: true });
   $('#setb').onclick = () => { Snd.sfx('select'); go('settings') };
   const btns = $$('.mbtn', el); let sel = -1;
   const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu') }; // snd=false untuk mouse (suara hover ditangani global)
-  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); go(MODES[i].id) } });
+  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; go(MODES[+b.dataset.i].id) } } });
+  const re = $('#sre', el); if (re) re.onclick = e => { e.stopPropagation(); Snd.sfx('select'); Story.start(true) };
   document.onkeydown = e => {
     if (!el.classList.contains('on')) return;
-    if (e.key === 'ArrowDown') set((sel + 1) % 4); else if (e.key === 'ArrowUp') set((sel + 3) % 4); else if (e.key === 'Enter' && sel >= 0) btns[sel].click();
+    if (e.key === 'ArrowDown') set((sel + 1) % btns.length); else if (e.key === 'ArrowUp') set((sel + btns.length - 1) % btns.length); else if (e.key === 'Enter' && sel >= 0) btns[sel].click();
   };
   scene = { cleanup() { together.stop(); together.canvas.remove(); document.onkeydown = null } };
   el.classList.add('on');
@@ -83,6 +84,7 @@ function buildSettings() {
 
 /* ---------- kerangka scene umum (latar kelas + karakter + dialog) ---------- */
 function scaffold(id) {
+  if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
   el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw"></div><div class="dlg"></div>`;
   ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch), chat = bag(D[m.key].chat);
@@ -110,6 +112,7 @@ const startCard = (S, title, desc, onGo) => {
 
 /* ---------- reaksi karakter saat pemain datang dari bagian lain & terhadap skor terbaik yang tersimpan ---------- */
 const entryExtra = key => {
+  if (Story.on) return [];   // Mode Cerita punya alur sendiri
   const d = D[key], f = d.from && d.from[Journey.prev], b = key === 'natsuki' ? store.get('tkm_latihan_best', 0) : key === 'monika' ? store.get('tkm_eval_best', null) : 0;
   const ln = f ? pick(f) : null, bl = d.enterBest && b ? pick(d.enterBest) : null, bw = bl ? [bl[0].replace('{b}', b), bl[1]] : null;
   return ln && bw ? [Math.random() < .5 ? ln : bw] : ln ? [ln] : bw ? [bw] : [];
@@ -125,40 +128,44 @@ SC.materi = () => {
     <div class="nav"><button class="btn" id="pv">◀ SEBELUMNYA</button><span>${p + 1} / ${MATERI.length}</span><button class="btn" id="nx">SELANJUTNYA ▶</button></div>`;
     const pv = $('#pv'), nx = $('#nx'); pv.disabled = !p; nx.disabled = p === MATERI.length - 1;
     pv.onclick = () => { p--; Snd.sfx('flip_page'); show(flipLine()) }; nx.onclick = () => { p++; Snd.sfx('flip_page'); show(flipLine()) };
+    if (Story.on && p === MATERI.length - 1) { nx.disabled = false; nx.textContent = NEXT_LABEL.materi; nx.classList.add('contstory'); nx.onclick = () => { Snd.sfx('select'); Story.advance() } }   // lanjut cerita hanya setelah halaman terakhir
     const ex = Math.random() < .3 ? S.chat() : [pick(D.sayori.ex[p]), pick(['happy', 'talk', 'cheer'])];
     const extra = []; // tonggak kemajuan: separuh jalan & halaman terakhir
     if (p === 5 && !ms.has('h')) { ms.add('h'); extra.push([pick(D.sayori.half), 'cheer']) }
     if (p === MATERI.length - 1 && !ms.has('e')) { ms.add('e'); extra.push([pick(D.sayori.end), 'happy']) }
-    S.d.say([...intro, ...(seen.has(p) ? [[pick(D.sayori.again), 'happy'], [P.say[0], P.e]] : [[P.say[0], P.e], ex, [P.say[1], P.e]]), ...extra]); seen.add(p);
+    S.d.say([...intro, ...(seen.has(p) ? [[pick(D.sayori.again), 'happy'], [P.say[0], P.e]] : [[P.say[0], P.e], ex, [P.say[1], P.e]]), ...extra, ...SL.materiPage(p, !seen.has(p)), ...(p === MATERI.length - 1 ? SL.materiEnd() : [])]); seen.add(p);
   };
-  show([...entryExtra('sayori'), ...pick(D.sayori.intro)]);
+  show([...entryExtra('sayori'), ...pick(D.sayori.intro), ...SL.enter('materi')]);
 };
 
 /* ---------- SIMULASI (Yuri) ---------- */
 SC.simulasi = () => {
-  const S = scaffold('simulasi'), DY = D.yuri; let g = 'AND', togg = 0; const v = [0, 0], visited = new Set(), combos = {}, full = new Set();
+  const S = scaffold('simulasi'), DY = D.yuri; let g = 'AND', togg = 0; const v = [0, 0], visited = new Set(), combos = {}, full = new Set(); let simOk = false;
+  const gp = () => new Set([...visited, 'AND']).size, met = () => gp() >= 4 && togg >= 6;
   const st = () => g === 'NOT' ? `A=${v[0]}` : `A=${v[0]}, B=${v[1]}`;
   const draw = () => {
     const o = F[g](v[0], v[1]), hl = g === 'NOT' ? v[0] : v[0] * 2 + v[1];
     S.panel.innerHTML = `<div class="tabs">${GL.map(x => `<button class="tab${x === g ? ' on' : ''}" data-g="${x}">${x}</button>`).join('')}</div>
-    <div class="sim"><div class="card big">${gateSVG(g, v[0], g === 'NOT' ? null : v[1], o, true)}<p class="tip">Klik kotak A / B untuk mengubah input · LED menunjukkan output Y</p></div><div class="card">${tt(g, hl)}<p class="fm">${FORM[g]}</p></div></div>`;
+    <div class="sim"><div class="card big">${gateSVG(g, v[0], g === 'NOT' ? null : v[1], o, true)}<p class="tip">Klik kotak A / B untuk mengubah input · LED menunjukkan output Y</p></div><div class="card">${tt(g, hl)}<p class="fm">${FORM[g]}</p></div></div>${Story.on ? `<div class="sbar">${met() ? `<button class="btn big contstory" id="sgo">${NEXT_LABEL.simulasi}</button>` : `<span>${ST.sim.need(gp(), togg)}</span>`}</div>` : ''}`;
+    const sg = $('#sgo', S.panel); if (sg) sg.onclick = () => { Snd.sfx('select'); Story.advance() };
   };
   S.panel.onclick = e => {
     const t = e.target.closest('.tab'), w = e.target.closest('.sw');
     if (t) { // ganti gerbang
-      g = t.dataset.g; draw(); Snd.sfx('select'); const first = !visited.has(g); visited.add(g);
-      S.d.say([[pick(DY.tab).replace('{g}', g), 'talk'], [SIM_SAY[g], 'explain'], ...(first ? [[DY.deep[g], 'happy']] : []), ...(first && new Set([...visited, 'AND']).size === 4 ? [[DY.milestone.gates, 'explain']] : [])]);
+      g = t.dataset.g; const first = !visited.has(g); visited.add(g); draw(); Snd.sfx('select');
+      S.d.say([[pick(DY.tab).replace('{g}', g), 'talk'], [SIM_SAY[g], 'explain'], ...(first ? [[DY.deep[g], 'happy']] : []), ...(first && new Set([...visited, 'AND']).size === 4 ? [[DY.milestone.gates, 'explain']] : []), ...SL.gate(g, first), ...(Story.on && !simOk && met() ? (simOk = true, ST.sim.ok) : [])]);
     } else if (w) { // ubah input: 1 = metronomeBar (aksen), 0 = metronomeBeat
-      const i = +w.dataset.i; v[i] ^= 1; draw(); Snd.sfx(v[i] ? 'metronomeBar' : 'metronomeBeat');
+      const i = +w.dataset.i; v[i] ^= 1; togg++; draw(); Snd.sfx(v[i] ? 'metronomeBar' : 'metronomeBeat');
       const o = F[g](v[0], v[1]), key = g === 'NOT' ? '' + v[0] : '' + v[0] + v[1], set = combos[g] ??= new Set(); set.add(key);
       let line, isFull = false;
       if (set.size === (g === 'NOT' ? 2 : 4) && !full.has(g)) { full.add(g); isFull = true; line = full.size === GL.length ? DY.all : pick(DY.explored).replace('{g}', g) }
       else line = Math.random() < .5 ? pick(DY.insight[g].slice(o ? 1 : 0, o ? 2 : 1)) : pick(o ? DY.on : DY.off).replace('{s}', st()).replace('{y}', o);
-      if (++togg === 8) S.d.line(DY.milestone.toggles, 'happy');
+      if (Story.on && !simOk && met()) { simOk = true; S.d.say(ST.sim.ok) }
+      else if (togg === 8) S.d.line(DY.milestone.toggles, 'happy');
       else if (!isFull && Math.random() < .12) { const [t, e] = S.chat(); S.d.line(t, e) } else S.d.line(line, o ? 'happy' : 'explain');
     }
   };
-  draw(); S.d.say([...entryExtra('yuri'), ...pick(DY.intro), [SIM_SAY.AND, 'explain']]);
+  draw(); S.d.say([...entryExtra('yuri'), ...pick(DY.intro), [SIM_SAY.AND, 'explain'], ...SL.enter('sim')]);
 };
 
 /* ---------- renderer soal (dipakai Latihan & Evaluasi) ---------- */
@@ -204,25 +211,26 @@ SC.latihan = () => {
   const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0); let qs, i, sc, good, bad, wasBad;
   const begin = () => { qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; q() };
   const q = () => {
-    if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.line(pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph') } // komentar kemajuan di tengah latihan
+    if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
     else if (i > 0 && i < N - 1 && Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(i === 0 ? pick(DN.first) : i === N - 1 ? pick(DN.last) : pick(DN.mid), i ? 'talk' : 'smug');
     renderQ(S.panel, qs[i], i, N, { reveal: true, next: () => ++i < N ? q() : end(),
       onPick: (k, prev) => { if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
       sc += ok ? 1 : 0; ok ? (good++, bad = 0) : (bad++, good = 0); const wb = wasBad; wasBad = !ok;
-      if (ok) S.d.line(DN.streakGood[good] ? pick(DN.streakGood[good]) : wb && Math.random() < .6 ? pick(DN.comeback) : pick(DN.praise), pick(['happy', 'smug']));
-      else S.d.line((bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph']));
+      if (ok) S.d.say([[DN.streakGood[good] ? pick(DN.streakGood[good]) : wb && Math.random() < .6 ? pick(DN.comeback) : pick(DN.praise), pick(['happy', 'smug'])], ...SL.lat('ok')]);
+      else S.d.say([[(bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph'])], ...SL.lat('bad')]);
     } });
   };
   const end = () => {
     const prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set('tkm_latihan_best', sc);
     S.panel.innerHTML = `<div class="startcard"><h2>Hasil Latihan</h2><p class="score">${sc} / ${N}</p><p>Skor terbaik: <b>${best()}/${N}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
+    if (Story.on) { Story.record('lat', sc); $('.startcard', S.panel).appendChild(Story.contBtn('latihan')) }
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
-    S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : [])]);
+    S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };
   startCard(S, 'LATIHAN', `${N} soal acak: tentukan output, kenali gerbang, lengkapi tabel kebenaran, dan baca rangkaian.<br>Skor terbaik: <b>${best()}/${N}</b>`, begin);
-  S.d.say([...entryExtra('natsuki'), ...pick(DN.intro)]);
+  S.d.say([...entryExtra('natsuki'), ...pick(DN.intro), ...SL.enter('lat')]);
 };
 
 /* ---------- EVALUASI (Monika) ---------- */
@@ -233,21 +241,22 @@ SC.evaluasi = () => {
   const q = () => {
     if (i === 0) S.d.say(pick(DM.start));
     else if (i === N - 1) S.d.line(pick(DM.last), 'talk');
-    else if (i === N / 2) S.d.line(pick(DM.half), 'happy');
+    else if (i === N / 2) S.d.say([[pick(DM.half), 'happy'], ...SL.eval('half')]);
     else if (Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(pick(DM.q), pick(['talk', 'wink', 'happy']));
     let swaps = 0; // berapa kali pemain mengganti jawaban pada soal ini
     renderQ(S.panel, qs[i], i, N, { reveal: false, onAns: ok => { if (ok) right++ }, next: () => ++i < N ? q() : end(),
-      onPick: (k, prev) => { if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });
+      onPick: (k, prev) => { if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (Story.on && swaps === 2 && prev >= 0 && k !== prev) S.d.say(ST.eval.swap); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });
   };
   const end = () => {
     const wrong = N - right, gr = GRADES.find(g => right >= g.min), prev = best(), rec = prev != null && right > prev; if (prev == null || right > prev) store.set('tkm_eval_best', right);
     S.panel.innerHTML = `<div class="startcard res"><h2>HASIL EVALUASI</h2><div class="rg"><div><b>${right}</b>Benar</div><div><b>${wrong}</b>Salah</div><div><b>${right * 10}</b>Nilai</div><div><b>${right / N * 100}%</b>Persentase</div></div><p class="grade">${gr.t}</p><p>Nilai terbaik: <b>${bestTxt()}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
-    S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : [])]);
+    if (Story.on) { Story.record('ev', right); $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi')) }
+    S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
   startCard(S, 'EVALUASI AKHIR', `${N} soal dari seluruh materi rangkaian logika. Tidak ada petunjuk, tetapi jawaban boleh diganti sebelum lanjut.<br>Nilai terbaik: <b>${bestTxt()}</b>`, begin);
-  S.d.say([...entryExtra('monika'), ...pick(DM.intro)]);
+  S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 
 /* ---------- suara hover: scrollMenu HANYA saat pointer berpindah ke sebuah opsi ---------- */

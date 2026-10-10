@@ -131,11 +131,11 @@ const Snd = {
 /* ---------- Dialogue box (Text_Boxes.png/xml: satu kotak per karakter, label nama sudah menyatu) ---------- */
 const BOX = { sayori: 'Doki Dialogue Sayo0000', yuri: 'Doki Dialogue Yuri0000', natsuki: 'Doki Dialogue Natsu0000', monika: 'Doki Dialogue Moni0000' };
 class Dialogue {
-  constructor(el, ch) {
-    this.el = el; this.ch = ch; this.q = []; this.typing = false; el.style.setProperty('--tc', ch.cfg.dk);
+  constructor(el, ch, cast = null) { // cast (Mode Cerita): { sayori, yuri, natsuki, monika } -> beberapa pembicara; baris dialog boleh [teks, ekspresi, siapa]
+    this.el = el; this.ch = ch; this.cast = cast; this.base = ch.key; this.q = []; this.typing = false; el.style.setProperty('--tc', ch.cfg.dk);
     el.innerHTML = '<canvas class="box"></canvas><div class="tx"><span class="r"></span><span class="h"></span></div><div class="nx">▼</div>';
     this.tx = $('.tx', el); this.r = $('.r', el); this.hd = $('.h', el); this.nx = $('.nx', el);
-    loadAtlas('assets/img/Text_Boxes').then(at => { if (this.dead) return; this.at = at; this.f = at.list.find(x => x.n === BOX[ch.key]); this.paint() });
+    loadAtlas('assets/img/Text_Boxes').then(at => { if (this.dead) return; this.at = at; this.f = at.list.find(x => x.n === BOX[this.ch.key]); this.paint() });
     this.onLayout = () => { this.paint(); this.fit() }; addEventListener('layoutchange', this.onLayout);
     el.onclick = () => this.advance();
   }
@@ -151,9 +151,16 @@ class Dialogue {
   line(t, e) { this.say([[t, e]]) }
   // Teks penuh ditaruh di span tersembunyi sejak awal -> tata letak tetap, kata tidak melompat saat diketik
   next() {
-    const [t0, e] = this.q.shift(), t = t0.replace(/(\w)-(\w)/g, '$1-\u2060$2'); if (e) this.ch.setExpression(e);
+    const [t0, e, who] = this.q.shift(), t = t0.replace(/(\w)-(\w)/g, '$1-\u2060$2'); let sw = false;
+    if (this.cast && (who || this.base) !== this.ch.key) { this.speaker(who || this.base); sw = true }   // ganti pembicara: kotak dialog, warna, potret/sprite
+    if (e) this.ch.setExpression(e); else if (sw || (this.cast && !this.shown)) this.ch.setExpression('neutral'); this.shown = true;
     this.full = t; this.r.textContent = ''; this.hd.textContent = t; this.fit(); let i = 0; this.typing = true; this.nx.style.visibility = 'hidden'; clearInterval(this.iv);
     this.iv = setInterval(() => { i++; this.r.textContent = t.slice(0, i); this.hd.textContent = t.slice(i); if (i >= t.length) this.fin() }, 18);
+  }
+  speaker(k) {
+    this.ch = this.cast[k]; this.el.style.setProperty('--tc', this.ch.cfg.dk);
+    if (this.at) { this.f = this.at.list.find(x => x.n === BOX[k]); this.paint() }
+    this.onSpeaker && this.onSpeaker(k);
   }
   fit() { let s = parseFloat(getComputedStyle(this.tx).getPropertyValue('--fs')) || 24; this.tx.style.fontSize = s + 'px'; while (this.tx.scrollHeight > this.tx.clientHeight + 1 && s > 12) this.tx.style.fontSize = (--s) + 'px' }
   fin() { clearInterval(this.iv); this.r.textContent = this.full; this.hd.textContent = ''; this.typing = false; this.nx.style.visibility = this.q.length ? 'visible' : 'hidden' }

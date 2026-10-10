@@ -8,3 +8,4 @@ Catatan: spritesheet Monika memakai versi terbaru dari repository (versi upload 
 - Font Anton — Vernon Adams, SIL Open Font License 1.1 (via @fontsource/anton)
 
 - `assets/img/theme/*.webp`: dipotong/diperkecil dari Doki Doki Takeover (credits/window_bottom_*, clubroom/clublights, musicroom/Music_RoomLight), Apache 2.0.
+- `assets/img/portraits/*.webp`: potret ekspresi dari Doki Doki Takeover (images/dialogue/portraits), diperkecil ke WebP; hanya karakter individual yang dipakai (`all_*` tidak).

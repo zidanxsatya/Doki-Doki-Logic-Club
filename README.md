@@ -68,3 +68,8 @@ Lihat `CREDITS.md` untuk atribusi asset.
 
 ## Font
 Judul memakai **Anton** (SIL OFL 1.1) di `assets/fonts/anton.woff2`, lisensi di `assets/fonts/Anton-OFL.txt`.
+
+## Mode Cerita vs Mode Mandiri
+- **Cerita** (menu paling atas): Pembukaan → Materi → Simulasi → Latihan → Evaluasi → Akhir cerita + hasil. Keempat karakter ikut di setiap bagian; kemajuan tersimpan (`tkm_story`) dan bisa dilanjutkan / diulang. Tombol lanjut baru muncul setelah halaman materi terakhir / syarat Simulasi terpenuhi / Latihan & Evaluasi selesai.
+- **Mandiri** (Materi/Simulasi/Latihan/Evaluasi di menu): tidak berubah, satu karakter utama per bagian (Sayori, Yuri, Natsuki, Monika), bisa dibuka kapan saja.
+- Tampilan: diskusi edukasi memakai potret statis di kiri (`assets/img/portraits/`, satu gambar per ekspresi) + area materi besar; adegan cerita memakai sprite biasa yang diam dan hanya berganti ekspresi. Naskah ada di `js/story.js`.
