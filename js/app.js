@@ -29,7 +29,7 @@ async function go(id) {
 function buildMenu() {
   const el = $('#menu');
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><small>TEKNIK KONTROL MEKATRONIKA</small><h1>DOKI DOKI<br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
-  <div class="mlist">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}"><i>▶</i><b>${m.label}</b><span>${CHARS[m.key].name} · ${m.sub}</span></button>`).join('')}</div>
+  <div class="mlist">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><i>▶</i><b>${m.label}</b><span>${CHARS[m.key].name} · ${m.sub}</span></button>`).join('')}</div>
   <div class="mchar"></div>
   <button class="btn setbtn" id="setb">⚙ PENGATURAN</button>`;
   $('.mchar', el).appendChild(together.canvas); together.start(); together.play('t', { loop: true });
@@ -57,7 +57,7 @@ function buildSettings() {
   </div>
   <div class="setcard credcard" hidden>
     <p class="cnote">${CREDIT.note}</p>
-    <div class="cgrid">${CREDIT.people.map(c => `<div class="cp"><img src="assets/img/credit/${c.img}.png" alt="" width="72" height="72"><b>${c.name}</b><small>${c.role}</small></div>`).join('')}</div>
+    <div class="cgrid">${CREDIT.people.map(c => `<div class="cp" data-k="${c.img}"><img src="assets/img/credit/${c.img}.png" alt="" width="72" height="72"><b>${c.name}</b><small>${c.role}</small></div>`).join('')}</div>
   </div>
   <button class="credlink" id="scred">Credit</button>`;
   const cred = $('.credcard'), main = $('.setcard:not(.credcard)'), showCred = on => { cred.hidden = !on; main.hidden = on; $('#stitle').textContent = on ? 'CREDIT' : 'PENGATURAN'; $('#scred').textContent = on ? 'Pengaturan' : 'Credit' };
@@ -84,7 +84,7 @@ function buildSettings() {
 /* ---------- kerangka scene umum (latar kelas + karakter + dialog) ---------- */
 function scaffold(id) {
   const m = M[id], el = $('#scene'), ch = chars[m.key];
-  el.innerHTML = `<div class="bg" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw"></div><div class="dlg"></div>`;
+  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw"></div><div class="dlg"></div>`;
   ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch), chat = bag(D[m.key].chat);
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };
