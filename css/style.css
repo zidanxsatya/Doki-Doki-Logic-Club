@@ -243,3 +243,19 @@ html{scrollbar-color:var(--pink) transparent}
 .cp img{width:72px;height:72px;border-radius:14px;border:3px solid var(--ink);margin-bottom:6px}
 .cp b{font-size:17px}.cp small{font-size:13px;font-weight:bold;opacity:.75}
 .m .cgrid{grid-template-columns:repeat(3,1fr);gap:6px}.m .cp img{width:44px;height:44px}.m .cp b{font-size:12px}.m .cp small{font-size:10px}.m .cnote{font-size:11px}
+
+/* tema karakter (Doki Doki Takeover credits/window_bottom_*): tombol menu + kartu credit */
+.mbtn[data-k],.cp[data-k]{--tp:none}
+.mbtn[data-k=sayori],.cp[data-k=sayori]{--tp:url(../assets/img/theme/sayori.webp)}
+.mbtn[data-k=yuri],.cp[data-k=yuri]{--tp:url(../assets/img/theme/yuri.webp)}
+.mbtn[data-k=natsuki],.cp[data-k=natsuki]{--tp:url(../assets/img/theme/natsuki.webp)}
+.mbtn[data-k=monika],.cp[data-k=monika]{--tp:url(../assets/img/theme/monika.webp)}
+.mbtn[data-k]{background:linear-gradient(90deg,#fff 0,#ffffffee 40%,#ffffff55 100%),var(--tp) center 15%/cover,#fff}
+.mbtn[data-k].sel,.mbtn[data-k]:hover{background:linear-gradient(90deg,#fff 0,#ffffffd0 40%,#ffffff22 100%),var(--tp) center 15%/cover,#fff}
+.cp[data-k]{background:linear-gradient(#ffffffd0,#ffffff95),var(--tp) center 10%/cover,var(--soft)}
+/* cahaya lembut di atas latar ruangan (aset Takeover: clublights / Music_RoomLight) */
+.bg::before{content:"";position:absolute;inset:-3%;pointer-events:none;background:center/cover;opacity:.55;animation:drift 14s ease-in-out infinite alternate}
+.bg[data-b=DDLCbg]::before{background-image:url(../assets/img/theme/clublights.webp)}
+.bg[data-b=Music_Room]::before{background-image:url(../assets/img/theme/musiclight.webp);opacity:.3}
+@keyframes drift{to{transform:translate3d(2%,1%,0)}}
+@media (prefers-reduced-motion:reduce){.bg::before{animation:none}}

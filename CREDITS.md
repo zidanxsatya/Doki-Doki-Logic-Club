@@ -6,3 +6,5 @@ Karakter berasal dari **Doki Doki Literature Club** © Team Salvato (https://tea
 Catatan: spritesheet Monika memakai versi terbaru dari repository (versi upload awal tidak cocok dengan XML-nya).
 
 - Font Anton — Vernon Adams, SIL Open Font License 1.1 (via @fontsource/anton)
+
+- `assets/img/theme/*.webp`: dipotong/diperkecil dari Doki Doki Takeover (credits/window_bottom_*, clubroom/clublights, musicroom/Music_RoomLight), Apache 2.0.
