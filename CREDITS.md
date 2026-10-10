@@ -9,3 +9,4 @@ Catatan: spritesheet Monika memakai versi terbaru dari repository (versi upload 
 
 - `assets/img/theme/*.webp`: dipotong/diperkecil dari Doki Doki Takeover (credits/window_bottom_*, clubroom/clublights, musicroom/Music_RoomLight), Apache 2.0.
 - `assets/img/portraits/*.webp`: potret ekspresi dari Doki Doki Takeover (images/dialogue/portraits), diperkecil ke WebP; hanya karakter individual yang dipakai (`all_*` tidak).
+- `assets/img/sprites/*.webp`: frame pertama menucharacters (sayori/yuri/natsuki/monika) dari Doki Doki Takeover, Apache 2.0.

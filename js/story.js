@@ -1,7 +1,7 @@
 /* ===== story.js : MODE CERITA — Materi → Simulasi → Latihan → Evaluasi → akhir cerita, dengan keempat karakter =====
    Dua sistem tampilan (sengaja dipisah):
    - Diskusi edukasi : potret statis di kiri (assets/img/portraits, satu gambar per ekspresi) + area materi besar di kanan.
-   - Adegan cerita   : sprite biasa, DIAM (tanpa idle/gerak), hanya ganti ekspresi dengan transisi halus.
+   - Adegan cerita   : sprite TANPA mikrofon (assets/img/sprites, dari menucharacters Takeover), DIAM; yang berganti hanya pembicara.
    Mode Mandiri (menu: Materi/Simulasi/Latihan/Evaluasi) tidak berubah: Story.on === false.
    Format baris dialog Mode Cerita: [teks, ekspresi, siapa]. Tanpa "siapa" = karakter utama bagian itu. */
 
@@ -20,14 +20,9 @@ const PORT = {
   monika: { neutral: 'neutral', talk: 'neutral', happy: 'ahaha', cheer: 'wah', wink: 'ahh', shock: 'eeh', down: 'upset' }
 };
 const portSrc = (k, e) => `assets/img/portraits/${k}_${PORT[k][e] || 'neutral'}.webp`;
-const preloadPortraits = () => Object.keys(PORT).forEach(k => new Set(Object.values(PORT[k])).forEach(n => { new Image().src = `assets/img/portraits/${k}_${n}.webp` }));
-
-/* ---------- sprite diam: pose = frame terakhir animasi ekspresi (idle = frame pertama), tanpa loop ---------- */
-function stillExpr(ch, e, fade = true) {
-  const a = ch.actor, c = a.canvas, nm = ch.cfg.expr[e] || 'idle';
-  const draw = () => { a.play(nm, { loop: false }); if (nm !== 'idle') a.tick(10); c.style.opacity = 1 };
-  if (fade && c.dataset.on === '1') { c.style.opacity = 0; setTimeout(draw, 130) } else { draw(); c.dataset.on = '1' }
-}
+const PCACHE = {};   // satu objek Image per potret, dibuat sekali & didecode di awal (dulu: new Image() tiap ganti ekspresi + fade 160ms)
+const getPort = src => PCACHE[src] ??= (() => { const i = new Image(); i.src = src; i.decode && i.decode().catch(() => { }); return i })();
+const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set(Object.values(PORT[k])).forEach(n => getPort(`assets/img/portraits/${k}_${n}.webp`))); Object.keys(CHARS).forEach(k => getPort(`assets/img/sprites/${k}.webp`)) };
 
 /* ---------- kemajuan cerita (localStorage: tkm_story) ---------- */
 Story.prog = () => store.get(Story.key, { step: 0, done: false, lat: null, ev: null });
@@ -39,13 +34,14 @@ Story.menuSub = () => { const p = Story.prog(); return p.step > 0 ? `Lanjutkan: 
 
 /* ---------- potret kiri (layout diskusi edukasi) ---------- */
 function makeCast(ptEl) {
-  const img = $('img', ptEl), cast = {}; let cur = '';
+  const img = $('img', ptEl), nm = $('.pn', ptEl), cast = {}; let cur = '';
   Object.keys(CHARS).forEach(k => cast[k] = {
     key: k, cfg: CHARS[k],
     setExpression(e) {
-      const src = portSrc(k, e), who = ptEl.dataset.k !== k; if (src === cur) return; cur = src; ptEl.dataset.k = k;
-      img.style.opacity = 0; img.style.transform = who ? 'translateX(-14px)' : 'translateX(0)';
-      const n = new Image(); n.onload = n.onerror = () => { if (cur !== src) return; img.src = src; img.getBoundingClientRect(); img.style.opacity = 1; img.style.transform = 'none' }; n.src = src;
+      const src = portSrc(k, e), who = ptEl.dataset.k !== k; if (src === cur) return; cur = src;
+      if (who) { ptEl.dataset.k = k; nm.textContent = CHARS[k].name; ptEl.style.setProperty('--pc', CHARS[k].color); ptEl.style.setProperty('--pd', CHARS[k].dk); ptEl.style.setProperty('--pp', `url(../assets/img/theme/${k}.webp)`) }
+      const show = () => { if (cur !== src) return; img.src = src; if (who) { img.classList.remove('in'); void img.offsetWidth; img.classList.add('in') } };   // gambar sudah di cache -> tampil di frame yang sama; dialog tidak menunggu
+      const g = getPort(src); g.complete && g.naturalWidth ? show() : (g.decode ? g.decode().then(show, show) : (g.onload = show))
     }
   });
   return cast;
@@ -55,7 +51,7 @@ function makeCast(ptEl) {
 Story.scaffold = id => {
   const m = M[id], el = $('#scene'), n = STEPS.indexOf(id), tot = 4, no = [1, 3, 5, 7].indexOf(n) + 1;
   el.classList.add('story');
-  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">Cerita ${no}/${tot} · klik potret untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="pt"><img alt=""></div><div class="dlg"></div>`;
+  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">Cerita ${no}/${tot} · klik potret untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="pt"><span class="pn"></span><img alt=""></div><div class="dlg"></div>`;
   const cast = makeCast($('.pt', el)), d = new Dialogue($('.dlg', el), cast[m.key], cast), bags = {}, chatOf = k => (bags[k] ??= bag(D[k].chat))();
   const chat = bag(D[m.key].chat);
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const k = d.ch.key, [t, e] = chatOf(k); d.say([[t, e, k]]) };
@@ -70,17 +66,16 @@ Story.scaffold = id => {
 };
 
 /* ---------- adegan cerita: sprite diam + dialog multi-karakter ---------- */
+const NPOS = { 1: [50], 2: [40, 60], 3: [31, 50, 69], 4: [24, 42, 59, 77] };   // pusat tiap karakter (% lebar layar) menurut jumlah karakter
+const NH = { sayori: 687, yuri: 782, natsuki: 628, monika: 793 };               // tinggi sprite (px asli, sudah dipangkas) -> tinggi relatif tetap
 function narrScene(id) {
-  const A = ST[id], el = $('#scene'), keys = ['sayori', 'yuri', 'natsuki', 'monika'], lines = typeof A.lines === 'function' ? A.lines() : A.lines;
+  const A = ST[id], el = $('#scene'), lines = typeof A.lines === 'function' ? A.lines() : A.lines;
+  const keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => lines.some(l => l[2] === k)), pos = NPOS[keys.length];
   el.classList.add('narr');
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
-  <div class="nar">${keys.map(k => `<div class="ns" data-k="${k}"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
-  const cast = {};
-  keys.forEach(k => {
-    const ch = chars[k], c = ch.actor.canvas, slot = $(`.ns[data-k=${k}]`, el);
-    c.style.height = `calc(${c.height * ch.cfg.sc}px * var(--ks))`; c.dataset.on = ''; slot.appendChild(c); stillExpr(ch, 'neutral', false);
-    cast[k] = { key: k, cfg: ch.cfg, setExpression: e => stillExpr(ch, e) };
-  });
+  <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
+  // sprite tanpa mikrofon (menucharacters Takeover) hanya punya satu pose -> posisi & skala tetap, tidak ada gerak; yang berganti hanya pembicara & kotak dialog
+  const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression() { } });
   const d = new Dialogue($('.dlg', el), cast[lines[0][2]], cast); d.base = lines[0][2];
   d.onSpeaker = k => $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k));
   const goBtn = $('.ngo', el); let finished = false;
@@ -91,7 +86,7 @@ function narrScene(id) {
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === lines[0][2]));
   el.classList.add('on');
-  scene = { cleanup() { clearInterval(watch); d.destroy(); keys.forEach(k => { const c = chars[k].actor.canvas; c.style.height = c.height * CHARS[k].sc + 'px'; c.style.opacity = ''; c.remove() }); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
+  scene = { cleanup() { clearInterval(watch); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
 }
 
 /* =====================================================================================

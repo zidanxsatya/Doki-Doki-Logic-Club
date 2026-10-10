@@ -267,8 +267,13 @@ html{scrollbar-color:var(--pink) transparent}
 .mbtn[data-k=story]{--tp:linear-gradient(120deg,#ff9fcb,#a9dcff)}
 .mre{position:absolute;right:14px;top:50%;translate:0 -50%;z-index:2}
 /* diskusi edukasi: potret statis kiri + area materi besar kanan */
-.pt{position:absolute;left:0;bottom:0;width:420px;height:420px;z-index:2;cursor:pointer}
-.pt img{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;opacity:0;transition:opacity .16s ease,transform .22s var(--ease);filter:drop-shadow(0 6px 8px rgba(40,10,40,.3))}
+.pt{position:absolute;left:14px;top:58px;width:384px;height:648px;box-sizing:border-box;z-index:2;cursor:pointer;overflow:hidden;border:5px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);background:linear-gradient(#ffffff55,#ffffff00 45%),var(--pp,none) center top/cover,var(--pc,#ffe3f0)}
+.pt::after{content:'';position:absolute;inset:0;border-radius:15px;box-shadow:inset 0 0 0 3px #ffffffb0;pointer-events:none}
+.pn{position:absolute;left:12px;top:12px;z-index:2;font:24px Anton,Impact,sans-serif;letter-spacing:2px;color:#fff;background:var(--pd,var(--ink));padding:3px 14px 2px;border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+.pt img{position:absolute;left:50%;bottom:0;width:472px;height:472px;max-width:none;translate:-50% 0;display:block;filter:drop-shadow(0 4px 6px rgba(40,10,40,.3))}
+.pt[data-k=sayori] img{width:560px;height:560px;translate:-50% 0}.pt[data-k=yuri] img{width:560px;height:560px;translate:-49% 0}.pt[data-k=natsuki] img{width:490px;height:490px;translate:-54% 0}.pt[data-k=monika] img{width:456px;height:456px;translate:-55% 0}   /* lebar disesuaikan bbox tiap potret supaya tidak terpotong di bingkai */
+.pt img.in{animation:pin .14s var(--ease)}
+@keyframes pin{from{opacity:.35;transform:translateX(-10px)}}
 .story .panel{left:424px;top:58px;width:836px;height:432px}
 .story .dlg{left:410px;width:850px}
 .story .board{height:calc(100% - 66px)}
@@ -277,9 +282,9 @@ html{scrollbar-color:var(--pink) transparent}
 @keyframes nudge{50%{transform:translateY(-3px)}}
 .sbar{text-align:center;margin-top:10px}.sbar span{display:inline-block;background:var(--ink);color:#fff;font-weight:bold;font-size:16px;padding:4px 16px;border-radius:999px}
 /* adegan cerita: sprite diam */
-.nar{position:absolute;inset:0;display:flex;justify-content:space-evenly;align-items:flex-end;padding-bottom:100px;z-index:2;pointer-events:none;--ks:.64}
-.ns{filter:brightness(.8) saturate(.88);transition:filter .25s ease}.ns.on{filter:none}
-.ns canvas{display:block;width:auto}
+.nar{position:absolute;inset:0;z-index:2;pointer-events:none;--ks:.68;--by:96px}
+.ns{position:absolute;left:var(--x);bottom:var(--by);translate:-50% 0;filter:brightness(.82) saturate(.9);transition:filter .12s ease}.ns.on{filter:none}
+.ns img{display:block;width:auto;height:calc(var(--h) * 1px * var(--ks));max-width:none}
 .narr .dlg{left:175px;width:930px}
 .narr .panel{left:50%;top:120px;translate:-50% 0;width:640px;height:auto;z-index:6}
 .ngo{position:absolute;right:26px;bottom:232px;z-index:7;animation:nudge 1.6s ease-in-out infinite}
@@ -288,11 +293,13 @@ html{scrollbar-color:var(--pink) transparent}
 .m .mtitle h1{font-size:26px}.m .mtitle h1 br{display:none}.m .mtitle h2{font-size:14px}
 .m .mlist{top:62px;gap:5px}.m .mbtn{padding:2px 12px 2px 36px;border-width:3px}.m .mbtn b{font-size:19px;letter-spacing:1.5px}.m .mbtn span{font-size:11px}.m .mbtn i{top:8px;left:11px;font-size:15px}
 .m .mre{right:8px;font-size:11px;padding:2px 8px}
-.m .pt{left:2px;width:184px;height:184px}
+.m .pt{left:3px;top:auto;bottom:4px;width:182px;height:240px;border-width:3px;border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
+.m .pt::after{border-radius:11px;box-shadow:inset 0 0 0 2px #ffffffb0}.m .pn{font-size:16px;left:6px;top:6px;padding:2px 9px 1px}
+.m .pt img{width:206px;height:206px}
 .m .story .panel{left:190px;top:40px}.m .story .dlg{left:auto;width:580px}
-.m.p .pt{left:-4px;bottom:131px;width:230px;height:230px}
+.m.p .pt{left:6px;bottom:134px;width:170px;height:214px}.m.p .pt img{width:180px;height:180px}
 .m.p .story .dlg{left:6px;width:auto}
-.m .nar{--ks:.34;padding-bottom:84px}.m.p .nar{--ks:.27;padding-bottom:150px}
+.m .nar{--ks:.38;--by:92px}.m.p .nar{--ks:.34;--by:150px}
 .m .narr .dlg{left:50%;right:auto;translate:-50% 0;width:580px}.m.p .narr .dlg{left:50%;width:calc(100% - 12px)}
 .m .narr .panel{top:46px;width:min(560px,92%)}
 .m .ngo{right:8px;bottom:auto;top:40px;font-size:15px;padding:6px 14px}.m.p .ngo{top:auto;bottom:auto;top:36px}
@@ -311,4 +318,8 @@ html{scrollbar-color:var(--pink) transparent}
 .m .story .startcard{width:min(640px,96%);padding:8px 12px;margin-top:4px}.m .story .startcard h2{font-size:24px}.m .story .rg b{font-size:24px}.m .story .score{font-size:40px}.m .story .grade{font-size:22px}
 .m .story .startcard .btn.big{font-size:16px;padding:5px 12px}.m .story .rg div{min-width:70px}
 .m .narr .panel,.m.p .narr .panel{left:50%;translate:-50% 0;transform:none;width:min(560px,92%);height:auto;overflow:visible;top:44px}
-.m.p .narr .panel{width:min(360px,94%)}.m.p .nar{--ks:.31}
+.m.p .narr .panel{width:min(360px,94%)}
+
+/* teks dialog tidak terpotong: outline huruf (stroke 5px) menjorok ~2.5px keluar kotak glyph, sedangkan .tx memakai overflow:hidden.
+   Padding + margin negatif melebarkan area potong tanpa menggeser posisi teks. */
+.tx{padding:5px 8px;margin:-5px -8px}
