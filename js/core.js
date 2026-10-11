@@ -116,6 +116,12 @@ const Snd = {
     if (b && c && c.state === 'running') { const s = c.createBufferSource(); s.buffer = b; this.g.gain.value = clamp01(this.sv); s.connect(this.g); s.start(0); return }   // volume SFX dari Pengaturan
     const a = new Audio(`assets/audio/${n}.ogg`); a.volume = clamp01(this.sv); a.play().catch(() => { });   // cadangan (perilaku lama) bila Web Audio belum siap
   },
+  tick() { // tick ketikan dialog: bip sintetis ~35 ms (tanpa file), volume mengikuti slider SFX, diam saat mute / AudioContext belum aktif
+    const c = this.ac; if (this.muted || this.sv <= 0 || !c || c.state !== 'running') return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.type = 'triangle'; o.frequency.value = 480 + Math.random() * 90;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.07 * clamp01(this.sv), t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .035);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .04);
+  },
   music(n) {
     if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, st = g < 1 || this.mg < 1 ? .015 : .05;   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & crossfade lebih halus
     const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; this.mg = g; a.play().catch(() => { });
@@ -155,7 +161,7 @@ class Dialogue {
     if (this.cast && (who || this.base) !== this.ch.key) { this.speaker(who || this.base); sw = true }   // ganti pembicara: kotak dialog, warna, potret/sprite
     if (e) this.ch.setExpression(e); else if (sw || (this.cast && !this.shown)) this.ch.setExpression('neutral'); this.shown = true;
     this.full = t; this.r.textContent = ''; this.hd.textContent = t; this.fit(); let i = 0; this.typing = true; this.nx.style.visibility = 'hidden'; clearInterval(this.iv);
-    this.iv = setInterval(() => { i++; this.r.textContent = t.slice(0, i); this.hd.textContent = t.slice(i); if (i >= t.length) this.fin() }, 18);
+    this.iv = setInterval(() => { i++; this.r.textContent = t.slice(0, i); this.hd.textContent = t.slice(i); if (i % 3 === 1 && t[i - 1] !== ' ') Snd.tick(); if (i >= t.length) this.fin() }, 18);
   }
   speaker(k) {
     this.ch = this.cast[k]; this.el.style.setProperty('--tc', this.ch.cfg.dk);

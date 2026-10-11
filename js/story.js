@@ -68,13 +68,30 @@ Story.scaffold = id => {
 /* ---------- adegan cerita: sprite diam + dialog multi-karakter ---------- */
 const NPOS = { 1: [50], 2: [40, 60], 3: [31, 50, 69], 4: [24, 42, 59, 77] };   // pusat tiap karakter (% lebar layar) menurut jumlah karakter
 const NH = { sayori: 687, yuri: 782, natsuki: 628, monika: 793 };               // tinggi sprite (px asli, sudah dipangkas) -> tinggi relatif tetap
+/* idle adegan pembuka: frame asli sheet menucharacters (tanpa mikrofon, 6 pose unik/karakter) diputar bolak-balik ~8 fps; posisi & skala sama dengan sprite diam */
+const IDLE = { sayori: ['Sayori BG', -3], yuri: ['Yuri BG', 0], natsuki: ['Natsu BG', -6.5], monika: ['Moni BG', -7] }, IDLE_SEQ = [0, 2, 4, 6, 8, 6, 4, 2];   // [awalan frame, selisih tengah bbox vs sel (px asli)]
+function idleAnim(el, keys) {
+  let iv = 0, dead = false;
+  Promise.all(keys.map(k => loadAtlas(`assets/img/idle/${k}`))).then(atl => {
+    if (dead) return;
+    const cv = keys.map((k, i) => {
+      const fr = atl[i].list.filter(f => f.n.startsWith(IDLE[k][0])), c = document.createElement('canvas'), x = c.getContext('2d'), w = fr[0].w, h = fr[0].h; c.width = w; c.height = h;
+      c.style.cssText = `--ch:${h};--o:${IDLE[k][1]}`;
+      const draw = n => { const f = fr[IDLE_SEQ[n % 8]]; x.clearRect(0, 0, w, h); x.drawImage(atl[i].img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h) };
+      draw(0); const im = $(`.ns[data-k=${k}] img`, el); im && im.replaceWith(c); return n => draw(n + i * 2);
+    });
+    let n = 0; iv = setInterval(() => { n++; cv.forEach(d => d(n)) }, 125);
+  }).catch(() => { });   // aset gagal -> tetap sprite diam
+  return () => { dead = true; clearInterval(iv) };
+}
 function narrScene(id) {
   const A = ST[id], el = $('#scene'), lines = typeof A.lines === 'function' ? A.lines() : A.lines;
   const keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => lines.some(l => l[2] === k)), pos = NPOS[keys.length];
   el.classList.add('narr');
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
   <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
-  // sprite tanpa mikrofon (menucharacters Takeover) hanya punya satu pose -> posisi & skala tetap, tidak ada gerak; yang berganti hanya pembicara & kotak dialog
+  // sprite diam tanpa mikrofon (menucharacters Takeover); hanya adegan pembuka yang beranimasi idle (idleAnim); yang berganti hanya pembicara & kotak dialog
+  const stopIdle = id === 'n_intro' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? idleAnim(el, keys) : () => { };
   const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression() { } });
   const d = new Dialogue($('.dlg', el), cast[lines[0][2]], cast); d.base = lines[0][2];
   d.onSpeaker = k => $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k));
@@ -86,7 +103,7 @@ function narrScene(id) {
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === lines[0][2]));
   el.classList.add('on');
-  scene = { cleanup() { clearInterval(watch); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
+  scene = { cleanup() { clearInterval(watch); stopIdle(); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
 }
 
 /* =====================================================================================

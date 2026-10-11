@@ -331,3 +331,4 @@ body:not(.m) .cw[data-k=sayori],body:not(.m) .cw[data-k=yuri]{bottom:18px}
 .story[data-sec=materi] .pt[data-k=monika] img{translate:-49% 0}
 body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .story[data-sec=materi] .pt[data-k=natsuki] img{translate:-54% -12px}   /* Natsuki sedikit naik (ukuran tetap) */
+.ns canvas{display:block;position:relative;left:calc(var(--o) * 1px * var(--ks));height:calc(var(--ch) * 1px * var(--ks));width:auto;max-width:none}   /* idle adegan pembuka */
