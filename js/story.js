@@ -27,7 +27,7 @@ const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set(Object.v
 /* ---------- kemajuan cerita (localStorage: tkm_story) ---------- */
 Story.prog = () => store.get(Story.key, { step: 0, done: false, lat: null, ev: null });
 Story.save = p => store.set(Story.key, p);
-Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); go(STEPS[p.step]) };
+Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadFaces(); go(STEPS[p.step]) };
 Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, STEPS.length - 1); Story.save(p); Story.on = true; go(STEPS[p.step]) };
 Story.index = () => STEPS.indexOf(Journey.last);
 Story.menuSub = () => { const p = Story.prog(); return p.step > 0 ? `Lanjutkan: ${STEP_NAME[STEPS[p.step]]}` : p.done ? `Selesai · nilai ${p.ev * 10} · main lagi` : 'Belajar bareng semua karakter' };
@@ -68,21 +68,35 @@ Story.scaffold = id => {
 /* ---------- adegan cerita: sprite diam + dialog multi-karakter ---------- */
 const NPOS = { 1: [50], 2: [40, 60], 3: [31, 50, 69], 4: [24, 42, 59, 77] };   // pusat tiap karakter (% lebar layar) menurut jumlah karakter
 const NH = { sayori: 687, yuri: 782, natsuki: 628, monika: 793 };               // tinggi sprite (px asli, sudah dipangkas) -> tinggi relatif tetap
-/* idle adegan pembuka: frame asli sheet menucharacters (tanpa mikrofon, 6 pose unik/karakter) diputar bolak-balik ~8 fps; posisi & skala sama dengan sprite diam */
-const IDLE = { sayori: ['Sayori BG', -3], yuri: ['Yuri BG', 0], natsuki: ['Natsu BG', -6.5], monika: ['Moni BG', -7] }, IDLE_SEQ = [0, 2, 4, 6, 8, 6, 4, 2];   // [awalan frame, selisih tengah bbox vs sel (px asli)]
-function idleAnim(el, keys) {
-  let iv = 0, dead = false;
-  Promise.all(keys.map(k => loadAtlas(`assets/img/idle/${k}`))).then(atl => {
+/* sprite adegan cerita = canvas: badan = frame asli sheet menucharacters (tanpa mikrofon, idle ~8 fps hanya di adegan pembuka) + lapisan WAJAH terpisah (assets/img/story/face_*.png: baris = ekspresi, kolom = 5 frame idle).
+   Ganti ekspresi hanya menggambar ulang wajah; frame badan tidak di-reset. Selisih tengah bbox vs sel (px asli) ada di IDLE[k][1]. */
+const IDLE = { sayori: ['Sayori BG', -3], yuri: ['Yuri BG', 0], natsuki: ['Natsu BG', -6.5], monika: ['Moni BG', -7] }, IDLE_SEQ = [0, 2, 4, 6, 8, 6, 4, 2];   // [awalan frame, offset]
+const FACE = { sayori: [47, 122, 140, 118], yuri: [81, 138, 104, 76], natsuki: [138, 173, 146, 113], monika: [211, 153, 124, 136] };   // [x, y, w, h] sel wajah di dalam frame
+// label ekspresi dialog -> baris di face_*.png (urutan baris = urutan ekspresi pada lembar sumber, kiri-kanan / atas-bawah); label tak terdaftar = wajah asli
+const XMAP = {
+  sayori: { happy: 3, cheer: 0, sad: 5, down: 5, shock: 1, shy: 4, wink: 2 },
+  yuri: { explain: 0, down: 1, shock: 2, shy: 3, happy: 4 },
+  natsuki: { angry: 0, smug: 1, happy: 1, shock: 2, hmph: 3, shy: 3, down: 4 },
+  monika: { happy: 0, cheer: 1, down: 2, wink: 3, shock: 4 }
+};
+const preloadFaces = () => Object.keys(FACE).forEach(k => { loadAtlas(`assets/img/idle/${k}`); loadImg(`assets/img/story/face_${k}.png`) });
+function liveSprites(el, keys, idle) {
+  let iv = 0, dead = false, n = 0; const row = {}, draws = {};
+  Promise.all(keys.map(k => Promise.all([loadAtlas(`assets/img/idle/${k}`), loadImg(`assets/img/story/face_${k}.png`)]))).then(res => {
     if (dead) return;
-    const cv = keys.map((k, i) => {
-      const fr = atl[i].list.filter(f => f.n.startsWith(IDLE[k][0])), c = document.createElement('canvas'), x = c.getContext('2d'), w = fr[0].w, h = fr[0].h; c.width = w; c.height = h;
-      c.style.cssText = `--ch:${h};--o:${IDLE[k][1]}`;
-      const draw = n => { const f = fr[IDLE_SEQ[n % 8]]; x.clearRect(0, 0, w, h); x.drawImage(atl[i].img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h) };
-      draw(0); const im = $(`.ns[data-k=${k}] img`, el); im && im.replaceWith(c); return n => draw(n + i * 2);
+    keys.forEach((k, i) => {
+      const [atl, face] = res[i], fr = atl.list.filter(f => f.n.startsWith(IDLE[k][0])), c = document.createElement('canvas'), x = c.getContext('2d'), w = fr[0].w, h = fr[0].h, [fx, fy, fw, fh] = FACE[k];
+      c.width = w; c.height = h; c.style.cssText = `--ch:${h};--o:${IDLE[k][1]}`;
+      draws[k] = () => {
+        const q = idle ? IDLE_SEQ[(n + i * 2) % 8] : 0, f = fr[q], r = row[k] ?? -1;
+        x.clearRect(0, 0, w, h); x.drawImage(atl.img, f.x, f.y, f.w, f.h, 0, 0, w, h);
+        if (r >= 0) x.drawImage(face, (q / 2) * fw, r * fh, fw, fh, fx, fy, fw, fh);
+      };
+      draws[k](); const im = $(`.ns[data-k=${k}] img`, el); im && im.replaceWith(c);
     });
-    let n = 0; iv = setInterval(() => { n++; cv.forEach(d => d(n)) }, 125);
+    if (idle) iv = setInterval(() => { n++; keys.forEach(k => draws[k]()) }, 125);
   }).catch(() => { });   // aset gagal -> tetap sprite diam
-  return () => { dead = true; clearInterval(iv) };
+  return { set(k, e) { row[k] = XMAP[k][e] ?? -1; draws[k] && draws[k]() }, stop() { dead = true; clearInterval(iv) } };
 }
 function narrScene(id) {
   const A = ST[id], el = $('#scene'), lines = typeof A.lines === 'function' ? A.lines() : A.lines;
@@ -91,8 +105,8 @@ function narrScene(id) {
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
   <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
   // sprite diam tanpa mikrofon (menucharacters Takeover); hanya adegan pembuka yang beranimasi idle (idleAnim); yang berganti hanya pembicara & kotak dialog
-  const stopIdle = id === 'n_intro' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? idleAnim(el, keys) : () => { };
-  const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression() { } });
+  const live = liveSprites(el, keys, id === 'n_intro' && !matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression(e) { live.set(k, e) } });
   const d = new Dialogue($('.dlg', el), cast[lines[0][2]], cast); d.base = lines[0][2];
   const vis = new Set(A.reveal ? [lines[0][2]] : keys), place = () => { const ks = keys.filter(k => vis.has(k)); ks.forEach((k, i) => $(`.ns[data-k=${k}]`, el).style.setProperty('--x', NPOS[ks.length][i] + '%')); $$('.ns', el).forEach(n => n.classList.toggle('off', !vis.has(n.dataset.k))) };
   if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
@@ -105,7 +119,7 @@ function narrScene(id) {
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === lines[0][2]));
   el.classList.add('on');
-  scene = { cleanup() { clearInterval(watch); stopIdle(); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
+  scene = { cleanup() { clearInterval(watch); live.stop(); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
 }
 
 /* =====================================================================================
@@ -121,9 +135,9 @@ const ST = {
       L('s', 'Hmm, yang lain mana ya? ...Ah, itu dia! Natsuki!', 'talk'),
       L('n', 'Sayori! Kamu belum selesai nyiapin meja, tahu! ...Eh? Siapa dia? Oh, yang mau ikut belajar itu?', 'angry'),
       L('n', 'Aku Natsuki. Kalau mau belajar, jangan setengah-setengah, ya. Aku bikin kartu soal sendiri, lho. B-bukan khusus buat Sayori!', 'hmph'),
-      L('s', 'Natsuki, jangan galak dulu~ Dia kan baru datang!', 'sad'),
+      L('s', 'Natsuki, jangan galak dulu~ Dia kan baru datang!', 'shy'),
       L('y', 'M-maaf, aku terlambat... Aku Yuri. Semalam aku merangkum catatan gerbang logika. Kalau mau, boleh dipinjam.', 'shy'),
-      L('s', 'Wah, Yuri baik banget! Aku pinjam duluan, ya!', 'cheer'),
+      L('s', 'Wah, Yuri baik banget! Aku pinjam duluan, ya!', 'wink'),
       L('m', 'Sepertinya semua sudah berkumpul. Selamat datang! Aku Monika, ketua klub ini.', 'talk'),
       L('m', 'Hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Aturannya cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang paham menjelaskan.', 'happy'),
       L('y', 'Aku sudah menyusun urutannya: materi dasar dulu, lalu simulasi gerbang logika, latihan soal, dan terakhir evaluasi akhir.', 'explain'),
@@ -151,7 +165,7 @@ const ST = {
       L('s', 'Aduh, deg-degan...', 'sad'),
       L('y', 'Tenang. Tadi kamu sudah melihat pola tiap gerbang sendiri. Kalau ragu, bayangkan tabel kebenarannya.', 'talk'),
       L('n', 'Aku sudah menyiapkan delapan soal. Beberapa lumayan licik, jadi bersiaplah.', 'smug'),
-      L('s', 'Licik?! Natsuki jangan menakut-nakuti dong!', 'sad'),
+      L('s', 'Licik?! Natsuki jangan menakut-nakuti dong!', 'shock'),
       L('m', 'Latihan itu tempat yang boleh salah. Jawabanmu juga masih bisa diganti sebelum dicek.', 'happy'),
       L('n', 'Bukan berarti boleh asal-asalan, ya! Ayo mulai!', 'hmph')
     ]
