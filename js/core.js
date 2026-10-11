@@ -91,8 +91,8 @@ class Character {
 /* ---------- Audio: satu musik aktif, fade antar halaman ---------- */
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const Snd = {
-  m: null, cur: null, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
-  fade(a, to, cb) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * .05) }, 40) },
+  m: null, cur: null, mg: 1, MG: { A_Story_of_Everyday_Life: .55, A_Wonderful_Happening: .55 }, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
+  fade(a, to, cb, st = .05) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * st) }, 40) },
   // ---- SFX latensi rendah: semua file didecode SEKALI di awal (preload) lalu diputar lewat Web Audio (tanpa membuat objek Audio per bunyi) ----
   async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page', 'confirmMenu']) {
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;   // decode tanpa AudioContext -> tidak butuh gestur pengguna
@@ -117,11 +117,11 @@ const Snd = {
     const a = new Audio(`assets/audio/${n}.ogg`); a.volume = clamp01(this.sv); a.play().catch(() => { });   // cadangan (perilaku lama) bila Web Audio belum siap
   },
   music(n) {
-    if (this.cur === n) return; this.cur = n; const old = this.m;
-    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; a.play().catch(() => { });
-    this.fade(a, () => this.mv); if (old) this.fade(old, 0, () => old.pause());
+    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, st = g < 1 || this.mg < 1 ? .015 : .05;   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & crossfade lebih halus
+    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; this.mg = g; a.play().catch(() => { });
+    this.fade(a, () => this.mv * g, null, st); if (old) this.fade(old, 0, () => old.pause(), st);
   },
-  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv }, // hanya memengaruhi musik latar
+  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv * this.mg }, // hanya memengaruhi musik latar
   setSfx(v) { this.sv = clamp01(v) },                                         // hanya memengaruhi efek suara
   mute() { this.muted = !this.muted; if (this.m) this.m.muted = this.muted; return this.muted }
 };

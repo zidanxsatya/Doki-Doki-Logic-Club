@@ -8,6 +8,7 @@ const M = {
   latihan: { id: 'latihan', label: 'LATIHAN', key: 'natsuki', music: 'natsc', bg: 'Music_Room', sub: 'Asah kemampuanmu' },
   evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room', sub: '10 soal penilaian akhir' }
 };
+const SM = { n_intro: 'A_Story_of_Everyday_Life', materi: 'A_Wonderful_Happening' };   // lagu khusus Mode Cerita: pembuka & diskusi materi
 const MODES = [M.materi, M.simulasi, M.latihan, M.evaluasi];
 const Journey = { prev: null, last: null }; // mode terakhir yang dikunjungi, agar karakter bisa bereaksi saat pemain berpindah bagian
 
@@ -21,7 +22,7 @@ async function go(id) {
   $$('.screen').forEach(s => s.classList.remove('on'));
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
-  else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(M[id] ? M[id].music : 'Lunchbox') }
+  else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : 'Lunchbox')) }
   await wait(60); f.classList.remove('on'); busy = false;
 }
 
