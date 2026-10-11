@@ -94,7 +94,9 @@ function narrScene(id) {
   const stopIdle = id === 'n_intro' && !matchMedia('(prefers-reduced-motion: reduce)').matches ? idleAnim(el, keys) : () => { };
   const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression() { } });
   const d = new Dialogue($('.dlg', el), cast[lines[0][2]], cast); d.base = lines[0][2];
-  d.onSpeaker = k => $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k));
+  const vis = new Set(A.reveal ? [lines[0][2]] : keys), place = () => { const ks = keys.filter(k => vis.has(k)); ks.forEach((k, i) => $(`.ns[data-k=${k}]`, el).style.setProperty('--x', NPOS[ks.length][i] + '%')); $$('.ns', el).forEach(n => n.classList.toggle('off', !vis.has(n.dataset.k))) };
+  if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
+  d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
   const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) A.card($('#panel', el)); goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
   const watch = setInterval(() => { if (!d.typing && !d.q.length && d.shown) { done(); clearInterval(watch) } }, 200);
@@ -111,21 +113,23 @@ function narrScene(id) {
    ===================================================================================== */
 const ST = {
   n_intro: {
-    bg: 'DDLCbg', title: 'Klik kotak dialog untuk lanjut', go: 'MULAI BELAJAR: MATERI ▶',
+    bg: 'DDLCbg', title: 'Klik kotak dialog untuk lanjut', go: 'MULAI BELAJAR: MATERI ▶', reveal: true,   // karakter masuk satu per satu saat pertama kali bicara
     lines: [
-      L('s', 'Akhirnyaaa kamu datang! Aku udah nungguin dari tadi, lho!', 'happy'),
-      L('s', 'Hari ini ujian Teknik Kontrol Mekatronika, kan? Rangkaian logika... aku sendiri belum paham-paham amat, ehehe.', 'talk'),
-      L('n', 'Belum paham?! Kamu bilang begitu sejak minggu lalu, tahu!', 'angry'),
-      L('s', 'Habisnya angka 0 sama 1 itu bikin pusing~', 'sad'),
-      L('y', 'A-anu... semalam aku merangkum catatan ringkas gerbang logika. Kalau mau, Sayori boleh meminjamnya.', 'shy'),
-      L('n', 'Aku juga bikin kartu soal sendiri, lho. B-bukan khusus buat Sayori, ya! Cuma kebetulan kelebihan.', 'hmph'),
-      L('m', 'Makanya hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Kita belajar bareng sampai kalian berdua siap.', 'talk'),
+      L('s', 'Ah, kamu datang! Hai hai! Aku Sayori. Kamu yang mau belajar buat ujian Teknik Kontrol Mekatronika, kan?', 'happy'),
+      L('s', 'Jujur, rangkaian logika itu bikin kepalaku muter-muter... Makanya aku ngajak teman-teman klubku buat belajar bareng. Ayo, ikut aku!', 'talk'),
+      L('s', 'Nah, ini klubku! Biasanya kami baca puisi dan makan camilan di sini. Hari ini ruangannya kita pakai buat belajar. Duduk di mana aja, ya!', 'happy'),
+      L('s', 'Hmm, yang lain mana ya? ...Ah, itu dia! Natsuki!', 'talk'),
+      L('n', 'Sayori! Kamu belum selesai nyiapin meja, tahu! ...Eh? Siapa dia? Oh, yang mau ikut belajar itu?', 'angry'),
+      L('n', 'Aku Natsuki. Kalau mau belajar, jangan setengah-setengah, ya. Aku bikin kartu soal sendiri, lho. B-bukan khusus buat Sayori!', 'hmph'),
+      L('s', 'Natsuki, jangan galak dulu~ Dia kan baru datang!', 'sad'),
+      L('y', 'M-maaf, aku terlambat... Aku Yuri. Semalam aku merangkum catatan gerbang logika. Kalau mau, boleh dipinjam.', 'shy'),
+      L('s', 'Wah, Yuri baik banget! Aku pinjam duluan, ya!', 'cheer'),
+      L('m', 'Sepertinya semua sudah berkumpul. Selamat datang! Aku Monika, ketua klub ini.', 'talk'),
+      L('m', 'Hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Aturannya cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang paham menjelaskan.', 'happy'),
       L('y', 'Aku sudah menyusun urutannya: materi dasar dulu, lalu simulasi gerbang logika, latihan soal, dan terakhir evaluasi akhir.', 'explain'),
       L('n', 'Bagian latihan soal aku yang pegang! Jangan harap aku lembek, ya.', 'smug'),
-      L('s', 'Eh, tapi kamu juga ikut belajar, kan? Kita berempat, ya! Jangan sampai ada yang ketinggalan.', 'happy'),
-      L('m', 'Aturan klub ini cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang sudah paham menjelaskan.', 'happy'),
       L('m', 'Urutannya rapi banget, ya? Seolah-olah ada yang sudah menyusun jalan ceritanya untuk kita. Ahaha, abaikan saja ucapanku barusan.', 'wink'),
-      L('s', 'Pokoknya aku di sampingmu! Ayo mulai dari Materi!', 'cheer')
+      L('s', 'Pokoknya kamu nggak sendirian! Ayo mulai dari Materi!', 'cheer')
     ]
   },
   n_1: {
