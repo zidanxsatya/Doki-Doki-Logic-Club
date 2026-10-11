@@ -271,7 +271,7 @@ html{scrollbar-color:var(--pink) transparent}
 .pt::after{content:'';position:absolute;inset:0;border-radius:15px;box-shadow:inset 0 0 0 3px #ffffffb0;pointer-events:none}
 .pn{position:absolute;left:12px;top:12px;z-index:2;font:24px Anton,Impact,sans-serif;letter-spacing:2px;color:#fff;background:var(--pd,var(--ink));padding:3px 14px 2px;border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .pt img{position:absolute;left:50%;bottom:0;width:472px;height:472px;max-width:none;translate:-50% 0;display:block;filter:drop-shadow(0 4px 6px rgba(40,10,40,.3))}
-.pt[data-k=sayori] img{width:560px;height:560px;translate:-50% 0}.pt[data-k=yuri] img{width:560px;height:560px;translate:-49% 0}.pt[data-k=natsuki] img{width:490px;height:490px;translate:-54% 0}.pt[data-k=monika] img{width:549px;height:549px;translate:-54% 0}   /* lebar disesuaikan bbox tiap potret supaya tidak terpotong di bingkai */
+.pt[data-k=sayori] img{width:560px;height:560px;translate:-50% 0}.pt[data-k=yuri] img{width:560px;height:560px;translate:-49% 0}.pt[data-k=natsuki] img{width:455px;height:455px;translate:-54% 0}.pt[data-k=monika] img{width:549px;height:549px;translate:-50% 0}   /* lebar disesuaikan bbox tiap potret supaya tidak terpotong di bingkai */
 .pt img.in{animation:pin .14s var(--ease)}
 @keyframes pin{from{opacity:.35;transform:translateX(-10px)}}
 .story .panel{left:424px;top:58px;width:836px;height:432px}
@@ -323,3 +323,6 @@ html{scrollbar-color:var(--pink) transparent}
 /* teks dialog tidak terpotong: outline huruf (stroke 5px) menjorok ~2.5px keluar kotak glyph, sedangkan .tx memakai overflow:hidden.
    Padding + margin negatif melebarkan area potong tanpa menggeser posisi teks. */
 .tx{padding:5px 8px;margin:-5px -8px}
+
+/* Mode Mandiri (desktop): Sayori & Yuri (sprite paling tinggi) sedikit lebih rendah */
+body:not(.m) .cw[data-k=sayori],body:not(.m) .cw[data-k=yuri]{bottom:18px}

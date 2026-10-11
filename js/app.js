@@ -86,7 +86,7 @@ function buildSettings() {
 function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
-  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw"></div><div class="dlg"></div>`;
+  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
   ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch), chat = bag(D[m.key].chat);
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };
