@@ -19,7 +19,7 @@ async function go(id) {
   if (id !== 'menu' && id !== 'settings') await warm;   // aset karakter dimuat di latar belakang setelah MULAI aktif
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
-  if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('Lunchbox') }
+  if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
   else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(M[id] ? M[id].music : 'Lunchbox') }
   await wait(60); f.classList.remove('on'); busy = false;
@@ -286,5 +286,5 @@ document.addEventListener('pointermove', e => {
     warm.catch(err => { msg.textContent = 'Gagal memuat asset.'; console.error(err) });
     msg.remove(); btn.disabled = false;
   } catch (err) { msg.textContent = 'Gagal memuat asset. Buka lewat GitHub Pages atau server lokal (python -m http.server), bukan dengan klik ganda file.'; console.error(err) }
-  btn.onclick = () => { Snd.sfx('select'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go('menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser)
+  btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go('menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser)
 })();

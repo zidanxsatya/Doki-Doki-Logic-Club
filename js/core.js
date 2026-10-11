@@ -94,7 +94,7 @@ const Snd = {
   m: null, cur: null, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
   fade(a, to, cb) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * .05) }, 40) },
   // ---- SFX latensi rendah: semua file didecode SEKALI di awal (preload) lalu diputar lewat Web Audio (tanpa membuat objek Audio per bunyi) ----
-  async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page']) {
+  async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page', 'confirmMenu']) {
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;   // decode tanpa AudioContext -> tidak butuh gestur pengguna
     const oc = new OC(2, 1, 44100);
     await Promise.all(names.map(async n => {

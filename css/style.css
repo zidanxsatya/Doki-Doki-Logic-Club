@@ -326,3 +326,7 @@ html{scrollbar-color:var(--pink) transparent}
 
 /* Mode Mandiri (desktop): Sayori & Yuri (sprite paling tinggi) sedikit lebih rendah */
 body:not(.m) .cw[data-k=sayori],body:not(.m) .cw[data-k=yuri]{bottom:18px}
+/* Penyesuaian kecil per konteks: hanya diskusi MATERI Mode Cerita (Natsuki sedikit lebih besar, Monika sedikit ke kanan) & Sayori di Materi Mode Mandiri (desktop) */
+.story[data-sec=materi] .pt[data-k=natsuki] img{width:472px;height:472px}
+.story[data-sec=materi] .pt[data-k=monika] img{translate:-49% 0}
+body:not(.m) .cw[data-k=sayori]{bottom:10px}
