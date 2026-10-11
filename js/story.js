@@ -117,9 +117,13 @@ const ST = {
       L('s', 'Hari ini ujian Teknik Kontrol Mekatronika, kan? Rangkaian logika... aku sendiri belum paham-paham amat, ehehe.', 'talk'),
       L('n', 'Belum paham?! Kamu bilang begitu sejak minggu lalu, tahu!', 'angry'),
       L('s', 'Habisnya angka 0 sama 1 itu bikin pusing~', 'sad'),
+      L('y', 'A-anu... semalam aku merangkum catatan ringkas gerbang logika. Kalau mau, Sayori boleh meminjamnya.', 'shy'),
+      L('n', 'Aku juga bikin kartu soal sendiri, lho. B-bukan khusus buat Sayori, ya! Cuma kebetulan kelebihan.', 'hmph'),
       L('m', 'Makanya hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Kita belajar bareng sampai kalian berdua siap.', 'talk'),
       L('y', 'Aku sudah menyusun urutannya: materi dasar dulu, lalu simulasi gerbang logika, latihan soal, dan terakhir evaluasi akhir.', 'explain'),
       L('n', 'Bagian latihan soal aku yang pegang! Jangan harap aku lembek, ya.', 'smug'),
+      L('s', 'Eh, tapi kamu juga ikut belajar, kan? Kita berempat, ya! Jangan sampai ada yang ketinggalan.', 'happy'),
+      L('m', 'Aturan klub ini cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang sudah paham menjelaskan.', 'happy'),
       L('m', 'Urutannya rapi banget, ya? Seolah-olah ada yang sudah menyusun jalan ceritanya untuk kita. Ahaha, abaikan saja ucapanku barusan.', 'wink'),
       L('s', 'Pokoknya aku di sampingmu! Ayo mulai dari Materi!', 'cheer')
     ]
@@ -130,6 +134,8 @@ const ST = {
       L('y', 'Seluruh materinya sudah kamu lewati. Dasar seperti itu sering diremehkan, padahal semuanya bertumpu di sana.', 'happy'),
       L('s', 'Aku juga ngerasa makin paham! ...mungkin. Sedikit.', 'happy'),
       L('n', 'Sedikit? Hmph. Tapi ya, lumayan lah.', 'smug'),
+      L('y', 'Tadi aku sempat khawatir penjelasanku terlalu panjang. Syukurlah kamu tetap mengikutinya sampai habis.', 'shy'),
+      L('s', 'Kalau Yuri yang menjelaskan, aku jadi ingat terus! Terutama 0 itu mati, 1 itu hidup.', 'cheer'),
       L('y', 'Bagian berikutnya favoritku: Simulasi. Kamu bisa mengubah input dan melihat sendiri bagaimana tiap gerbang bereaksi.', 'explain'),
       L('m', 'Kali ini bukan sekadar membaca. Kamu yang menekan tombolnya. Ayo ke Simulasi!', 'talk')
     ]
@@ -140,6 +146,8 @@ const ST = {
       L('n', 'Oke, sudah puas mainin gerbang? Sekarang giliranku menguji kemampuanmu!', 'smug'),
       L('s', 'Aduh, deg-degan...', 'sad'),
       L('y', 'Tenang. Tadi kamu sudah melihat pola tiap gerbang sendiri. Kalau ragu, bayangkan tabel kebenarannya.', 'talk'),
+      L('n', 'Aku sudah menyiapkan delapan soal. Beberapa lumayan licik, jadi bersiaplah.', 'smug'),
+      L('s', 'Licik?! Natsuki jangan menakut-nakuti dong!', 'sad'),
       L('m', 'Latihan itu tempat yang boleh salah. Jawabanmu juga masih bisa diganti sebelum dicek.', 'happy'),
       L('n', 'Bukan berarti boleh asal-asalan, ya! Ayo mulai!', 'hmph')
     ]
@@ -151,6 +159,8 @@ const ST = {
       L('s', 'Kamu pasti bisa! Aku sudah siapin permen keberuntungan!', 'cheer'),
       L('n', 'Permen apanya... Tapi, ya, jangan gugup. Kamu sudah jauh lebih baik dibanding tadi pagi. B-bukan berarti aku khawatir, ya!', 'hmph'),
       L('y', 'Sepuluh soal, tanpa petunjuk. Tapi kamu sudah membawa semua bekalnya.', 'shy'),
+      L('s', 'Habis ujian, kita makan cupcake bareng, ya? Natsuki pasti sudah menyiapkannya!', 'happy'),
+      L('n', 'C-cupcake? Memang sudah kubuat. Tapi itu hadiah untuk yang mengerjakan dengan baik, ya!', 'hmph'),
       L('m', 'Setelah ini, cerita kita sampai ke ujungnya. Kerjakan dengan tenang, ya.', 'wink')
     ]
   },
@@ -164,6 +174,9 @@ const ST = {
         ...(hi ? [L('s', 'Tuh kaaan! Aku bilang juga apa! Kamu hebat banget!!', 'cheer'), L('n', 'Hmph... lumayan. Eh, bagus. Bagus banget, maksudku. Jangan geer!', 'hmph'), L('y', 'Pemahamanmu sudah kuat. Kamu bisa menjelaskan ini ke orang lain sekarang.', 'happy')]
           : mid ? [L('s', 'Wah, sudah bagus lho! Tinggal dirapikan sedikit lagi!', 'happy'), L('n', 'Tidak buruk. Yang salah itu bisa dilatih lagi, kan? Latihanku selalu terbuka.', 'smug'), L('y', 'Kesalahanmu adalah petunjuk bagian mana yang perlu dibaca ulang. Tidak ada yang sia-sia.', 'explain')]
             : [L('s', 'Nggak apa-apa! Kita ulang bareng-bareng, aku temani!', 'happy'), L('y', 'Satu kali percobaan bukan ukuran kemampuanmu. Materi dan Simulasi bisa kamu buka kapan saja.', 'talk'), L('n', 'Jangan menyerah! Aku masih punya setumpuk soal... dan aku nggak akan kasihan, ya. Hmph!', 'angry')]),
+        hi ? L('n', 'Cupcake-nya buat kalian semua. Yang paling besar buat kamu. Hmph, anggap saja bonus!', 'smug')
+          : mid ? L('n', 'Cupcake-nya tetap ada, kok. Tapi untuk dapat dua, kamu harus latihan sekali lagi!', 'smug')
+            : L('n', 'Cupcake-nya kusimpan dulu. Kita ulang belajarnya, baru kita makan bareng. Janji!', 'hmph'),
         L('s', 'Hari ini seru banget. Terima kasih sudah belajar bareng aku!', 'cheer'),
         L('m', 'Terima kasih sudah menemani kami sampai akhir cerita ini. Kamu tahu kan, kamu boleh kembali kapan pun. Sampai jumpa lagi!', 'wink')
       ];
@@ -186,7 +199,9 @@ const ST = {
       4: [L('s', 'OR itu baik hati! Satu aja yang hidup, hasilnya ikut hidup!', 'cheer')],
       5: [L('m', 'NOT unik: satu-satunya gerbang dasar yang hanya punya satu input.', 'talk')],
       6: [L('y', 'NAND disebut gerbang universal: semua gerbang lain bisa dibangun hanya dari NAND.', 'explain'), L('s', 'Wow, satu gerbang bisa jadi semuanya? Keren~', 'cheer')],
+      7: [L('s', 'NOR itu NOT OR, ya? Jadi kebalikannya OR! ...aku sudah mulai hafal polanya, lho.', 'happy')],
       8: [L('n', 'XOR itu soal "beda atau sama?". Beda: nyala. Sama: mati. Gampang!', 'talk')],
+      9: [L('y', 'XNOR hanya menyala jika kedua input sama. Cara mudah mengingatnya: ia lawan dari XOR.', 'explain'), L('n', 'Nah, itu baru ringkasan yang enak. Catat, Sayori!', 'smug')],
       10: [L('m', 'Tabel kebenaran adalah catatan lengkap semua kemungkinan. Di Simulasi nanti, tabelnya akan hidup di depan matamu.', 'happy')]
     },
     end: [L('m', 'Itu halaman terakhirnya. Kamu sudah melihat semua materi satu per satu.', 'happy'), L('s', 'Hore! Sekarang kita pindah ke Simulasi bareng Yuri!', 'cheer')]
