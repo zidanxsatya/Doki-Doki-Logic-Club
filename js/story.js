@@ -71,11 +71,11 @@ const NH = { sayori: 687, yuri: 782, natsuki: 628, monika: 793 };               
 /* sprite adegan cerita = canvas: badan = frame asli sheet menucharacters (tanpa mikrofon, idle ~8 fps hanya di adegan pembuka) + lapisan WAJAH terpisah (assets/img/story/face_*.png: baris = ekspresi, kolom = 5 frame idle).
    Ganti ekspresi hanya menggambar ulang wajah; frame badan tidak di-reset. Selisih tengah bbox vs sel (px asli) ada di IDLE[k][1]. */
 const IDLE = { sayori: ['Sayori BG', -3], yuri: ['Yuri BG', 0], natsuki: ['Natsu BG', -6.5], monika: ['Moni BG', -7] }, IDLE_SEQ = [0, 2, 4, 6, 8, 6, 4, 2];   // [awalan frame, offset]
-const FACE = { sayori: [47, 122, 140, 118], yuri: [81, 138, 104, 76], natsuki: [138, 173, 146, 113], monika: [211, 153, 124, 136] };   // [x, y, w, h] sel wajah di dalam frame
+const FACE = { sayori: [51, 135, 127, 100], yuri: [85, 156, 90, 54], natsuki: [145, 185, 127, 95], monika: [217, 175, 112, 105] };   // [x, y, w, h] sel wajah di dalam frame
 // label ekspresi dialog -> baris di face_*.png (urutan baris = urutan ekspresi pada lembar sumber, kiri-kanan / atas-bawah); label tak terdaftar = wajah asli
 const XMAP = {
   sayori: { happy: 3, cheer: 0, sad: 5, down: 5, shock: 1, shy: 4, wink: 2 },
-  yuri: { explain: 0, down: 1, shock: 2, shy: 3, happy: 4 },
+  yuri: { shy: 0, happy: 0, down: 1 },
   natsuki: { angry: 0, smug: 1, happy: 1, shock: 2, hmph: 3, shy: 3, down: 4 },
   monika: { happy: 0, cheer: 1, down: 2, wink: 3, shock: 4 }
 };
@@ -105,7 +105,7 @@ function narrScene(id) {
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
   <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
   // sprite diam tanpa mikrofon (menucharacters Takeover); hanya adegan pembuka yang beranimasi idle (idleAnim); yang berganti hanya pembicara & kotak dialog
-  const live = liveSprites(el, keys, id === 'n_intro' && !matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const live = liveSprites(el, keys, false);   // sprite diam: wajah berganti tanpa gerak badan (idle dimatikan; set true untuk adegan tertentu bila perlu)
   const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression(e) { live.set(k, e) } });
   const d = new Dialogue($('.dlg', el), cast[lines[0][2]], cast); d.base = lines[0][2];
   const vis = new Set(A.reveal ? [lines[0][2]] : keys), place = () => { const ks = keys.filter(k => vis.has(k)); ks.forEach((k, i) => $(`.ns[data-k=${k}]`, el).style.setProperty('--x', NPOS[ks.length][i] + '%')); $$('.ns', el).forEach(n => n.classList.toggle('off', !vis.has(n.dataset.k))) };
