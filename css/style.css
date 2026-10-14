@@ -333,3 +333,14 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .story[data-sec=materi] .pt[data-k=natsuki] img{translate:-54% -12px}   /* Natsuki sedikit naik (ukuran tetap) */
 .ns canvas{display:block;position:relative;left:calc(var(--o) * 1px * var(--ks));height:calc(var(--ch) * 1px * var(--ks));width:auto;max-width:none}   /* idle adegan pembuka */
 .ns{transition:filter .12s ease,left .45s ease,opacity .35s ease}.ns.off{opacity:0}   /* karakter masuk bertahap di adegan pembuka */
+
+/* ===== Perbaikan mobile (lebar 320-430): tabel lebar, target sentuh, teks kecil ===== */
+.m .tt.wide{font-size:16px}.m .tt.wide th,.m .tt.wide td{padding:2px 5px;min-width:0;border-width:2px}
+.m .btn.sm{font-size:14px;padding:7px 12px;min-height:36px}
+.m .tab{padding:9px 0;font-size:15px}
+.m .seg .btn{padding:9px 8px;font-size:14px}
+.m .opt{padding:11px 8px}
+.m .mbtn span{font-size:13px}.m .srow small{font-size:13px}.m .qh{font-size:14px}.m .credlink{font-size:13px;padding:6px 12px}
+.m .nav .btn{padding:8px 12px;min-height:38px}
+.m #mute{width:38px;height:38px}
+.m .top .btn.sm{padding:5px 10px;min-height:0}
