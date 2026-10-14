@@ -91,10 +91,10 @@ class Character {
 /* ---------- Audio: satu musik aktif, fade antar halaman ---------- */
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const Snd = {
-  m: null, cur: null, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
-  fade(a, to, cb) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * .05) }, 40) },
+  m: null, cur: null, mg: 1, MG: { A_Story_of_Everyday_Life: .55, A_Wonderful_Happening: .55 }, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
+  fade(a, to, cb, st = .05) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * st) }, 40) },
   // ---- SFX latensi rendah: semua file didecode SEKALI di awal (preload) lalu diputar lewat Web Audio (tanpa membuat objek Audio per bunyi) ----
-  async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page']) {
+  async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page', 'confirmMenu']) {
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;   // decode tanpa AudioContext -> tidak butuh gestur pengguna
     const oc = new OC(2, 1, 44100);
     await Promise.all(names.map(async n => {
@@ -116,12 +116,18 @@ const Snd = {
     if (b && c && c.state === 'running') { const s = c.createBufferSource(); s.buffer = b; this.g.gain.value = clamp01(this.sv); s.connect(this.g); s.start(0); return }   // volume SFX dari Pengaturan
     const a = new Audio(`assets/audio/${n}.ogg`); a.volume = clamp01(this.sv); a.play().catch(() => { });   // cadangan (perilaku lama) bila Web Audio belum siap
   },
-  music(n) {
-    if (this.cur === n) return; this.cur = n; const old = this.m;
-    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; a.play().catch(() => { });
-    this.fade(a, () => this.mv); if (old) this.fade(old, 0, () => old.pause());
+  tick() { // tick ketikan dialog: bip sintetis ~35 ms (tanpa file), volume mengikuti slider SFX, diam saat mute / AudioContext belum aktif
+    const c = this.ac; if (this.muted || this.sv <= 0 || !c || c.state !== 'running') return;
+    const o = c.createOscillator(), g = c.createGain(), t = c.currentTime; o.type = 'triangle'; o.frequency.value = 480 + Math.random() * 90;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.07 * clamp01(this.sv), t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .035);
+    o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .04);
   },
-  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv }, // hanya memengaruhi musik latar
+  music(n) {
+    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, st = g < 1 || this.mg < 1 ? .015 : .05;   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & crossfade lebih halus
+    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; this.mg = g; a.play().catch(() => { });
+    this.fade(a, () => this.mv * g, null, st); if (old) this.fade(old, 0, () => old.pause(), st);
+  },
+  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv * this.mg }, // hanya memengaruhi musik latar
   setSfx(v) { this.sv = clamp01(v) },                                         // hanya memengaruhi efek suara
   mute() { this.muted = !this.muted; if (this.m) this.m.muted = this.muted; return this.muted }
 };
@@ -131,11 +137,11 @@ const Snd = {
 /* ---------- Dialogue box (Text_Boxes.png/xml: satu kotak per karakter, label nama sudah menyatu) ---------- */
 const BOX = { sayori: 'Doki Dialogue Sayo0000', yuri: 'Doki Dialogue Yuri0000', natsuki: 'Doki Dialogue Natsu0000', monika: 'Doki Dialogue Moni0000' };
 class Dialogue {
-  constructor(el, ch) {
-    this.el = el; this.ch = ch; this.q = []; this.typing = false; el.style.setProperty('--tc', ch.cfg.dk);
+  constructor(el, ch, cast = null) { // cast (Mode Cerita): { sayori, yuri, natsuki, monika } -> beberapa pembicara; baris dialog boleh [teks, ekspresi, siapa]
+    this.el = el; this.ch = ch; this.cast = cast; this.base = ch.key; this.q = []; this.typing = false; el.style.setProperty('--tc', ch.cfg.dk);
     el.innerHTML = '<canvas class="box"></canvas><div class="tx"><span class="r"></span><span class="h"></span></div><div class="nx">▼</div>';
     this.tx = $('.tx', el); this.r = $('.r', el); this.hd = $('.h', el); this.nx = $('.nx', el);
-    loadAtlas('assets/img/Text_Boxes').then(at => { if (this.dead) return; this.at = at; this.f = at.list.find(x => x.n === BOX[ch.key]); this.paint() });
+    loadAtlas('assets/img/Text_Boxes').then(at => { if (this.dead) return; this.at = at; this.f = at.list.find(x => x.n === BOX[this.ch.key]); this.paint() });
     this.onLayout = () => { this.paint(); this.fit() }; addEventListener('layoutchange', this.onLayout);
     el.onclick = () => this.advance();
   }
@@ -151,9 +157,16 @@ class Dialogue {
   line(t, e) { this.say([[t, e]]) }
   // Teks penuh ditaruh di span tersembunyi sejak awal -> tata letak tetap, kata tidak melompat saat diketik
   next() {
-    const [t0, e] = this.q.shift(), t = t0.replace(/(\w)-(\w)/g, '$1-\u2060$2'); if (e) this.ch.setExpression(e);
+    const [t0, e, who] = this.q.shift(), t = t0.replace(/(\w)-(\w)/g, '$1-\u2060$2'); let sw = false;
+    if (this.cast && (who || this.base) !== this.ch.key) { this.speaker(who || this.base); sw = true }   // ganti pembicara: kotak dialog, warna, potret/sprite
+    if (e) this.ch.setExpression(e); else if (sw || (this.cast && !this.shown)) this.ch.setExpression('neutral'); this.shown = true;
     this.full = t; this.r.textContent = ''; this.hd.textContent = t; this.fit(); let i = 0; this.typing = true; this.nx.style.visibility = 'hidden'; clearInterval(this.iv);
-    this.iv = setInterval(() => { i++; this.r.textContent = t.slice(0, i); this.hd.textContent = t.slice(i); if (i >= t.length) this.fin() }, 18);
+    this.iv = setInterval(() => { i++; this.r.textContent = t.slice(0, i); this.hd.textContent = t.slice(i); if (i % 3 === 1 && t[i - 1] !== ' ') Snd.tick(); if (i >= t.length) this.fin() }, 18);
+  }
+  speaker(k) {
+    this.ch = this.cast[k]; this.el.style.setProperty('--tc', this.ch.cfg.dk);
+    if (this.at) { this.f = this.at.list.find(x => x.n === BOX[k]); this.paint() }
+    this.onSpeaker && this.onSpeaker(k);
   }
   fit() { let s = parseFloat(getComputedStyle(this.tx).getPropertyValue('--fs')) || 24; this.tx.style.fontSize = s + 'px'; while (this.tx.scrollHeight > this.tx.clientHeight + 1 && s > 12) this.tx.style.fontSize = (--s) + 'px' }
   fin() { clearInterval(this.iv); this.r.textContent = this.full; this.hd.textContent = ''; this.typing = false; this.nx.style.visibility = this.q.length ? 'visible' : 'hidden' }
