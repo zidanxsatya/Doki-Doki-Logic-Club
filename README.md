@@ -1,78 +1,73 @@
-# Doki Doki Logic Club (Web Game Edukasi VN)
-Mata pelajaran: Teknik Kontrol Mekatronika – Rangkaian Logika
+# Doki Doki Logic Club
 
-Game edukasi bergaya Visual Novel, murni HTML + CSS + JavaScript (tanpa backend/database/library).
-Menu: **MATERI** (Sayori) · **SIMULASI** (Yuri) · **LATIHAN** (Natsuki) · **EVALUASI** (Monika).
+Game visual novel untuk belajar rangkaian logika, dibuat sebagai media pembelajaran mata pelajaran **Teknik Kontrol Mekatronika (TKM)**. Pemain belajar gerbang logika bersama empat karakter dari *Doki Doki Literature Club*: membaca materi, mencoba gerbang secara langsung, mengerjakan latihan, lalu mengikuti evaluasi.
+
+## Isi pelajaran
+
+Materi mencakup dua belas halaman: pengertian rangkaian logika, konsep input dan output, logika 0 dan 1, gerbang AND, OR, NOT, NAND, NOR, XOR, XNOR, tabel kebenaran, dan cara membaca rangkaian yang menggabungkan beberapa gerbang.
+
+## Cara bermain
+
+Menu utama punya lima pilihan.
+
+| Pilihan | Pemandu | Isi |
+|---|---|---|
+| Cerita | Keempat karakter | Alur lengkap dari pembukaan sampai hasil akhir. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
+| Materi | Sayori | Dua belas halaman materi dengan diagram gerbang dan tabel kebenaran. |
+| Simulasi | Yuri | Tujuh gerbang yang bisa dicoba. Klik kotak input A atau B untuk mengubahnya, lalu lihat output pada lampu LED dan tabel kebenaran. |
+| Latihan | Natsuki | Delapan soal acak per sesi: membaca rangkaian, melengkapi tabel kebenaran, mengenali gerbang, dan soal konsep. Soal dibangkitkan ulang setiap sesi. |
+| Evaluasi | Monika | Sepuluh soal penilaian akhir dengan kategori nilai dari "Perlu Belajar Lagi" sampai "Sangat Baik". |
+
+Di Mode Cerita, tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulasi terpenuhi, serta Latihan dan Evaluasi selesai. Keempat mode lain bisa dibuka kapan saja dari menu.
+
+### Pengaturan
+
+- **Volume Musik** dan **Volume Efek Suara** adalah dua slider yang terpisah.
+- **Mode Tampilan**: jendela atau fullscreen (tidak tersedia di Safari iPhone dan iPad).
+- **Tata Letak**: otomatis, desktop, atau mobile. Tata letak mobile mendukung potret dan lanskap; mode otomatis memilih mobile pada layar sentuh kecil.
+- Semua pengaturan tersimpan di browser.
 
 ## Menjalankan
-- **GitHub Pages**: upload seluruh isi folder ini ke repository → Settings → Pages → Branch `main` / root.
-- **Lokal**: `python -m http.server 8000` lalu buka http://localhost:8000 (jangan klik-ganda `index.html`, browser memblokir `fetch` untuk file lokal).
 
-## Struktur
+**Lewat GitHub Pages.** Unggah seluruh isi folder ke repositori, lalu buka *Settings > Pages* dan pilih branch `main` dengan folder root.
+
+**Di komputer sendiri.** Jalankan server statis dari folder proyek, lalu buka alamatnya di browser:
+
 ```
-index.html            kerangka halaman
-css/style.css         seluruh tampilan
-js/core.js            atlas XML, Actor/Character, Audio, Dialogue, gambar gerbang logika
-js/content.js         isi materi, bank soal latihan, 10 soal evaluasi, kategori nilai  <- edit konten di sini
-js/settings.js        pengaturan tersimpan (localStorage) + layout adaptif desktop/mobile
-js/dialogue.js        semua dialog karakter per kepribadian  <- edit gaya bicara di sini (kelompok "chat" = obrolan bebas)
-js/app.js             menu, navigasi, dan 4 mode
-assets/img|audio|data PNG+XML atlas, musik/SFX (.ogg), konfigurasi JSON karakter
+python -m http.server 8000
 ```
 
-## API karakter
-```js
-const c = chars.sayori;           // sayori | yuri | natsuki | monika
-c.setExpression('happy');         // ekspresi (ditahan di pose akhir)
-c.playAnimation('singLEFT');      // animasi sekali, lalu kembali idle
-c.idle();
+Buka `http://localhost:8000`. Jangan membuka `index.html` dengan klik ganda, karena browser memblokir pemuatan berkas lokal yang dipakai game.
+
+## Struktur proyek
+
 ```
-Daftar ekspresi tiap karakter ada di `CHARS` (js/core.js).
+index.html          kerangka halaman
+css/style.css       seluruh tampilan, termasuk tata letak mobile (kelas .m dan .p)
+js/core.js          pemuat atlas, karakter, audio, mesin dialog, gambar gerbang logika
+js/content.js       materi, bank soal latihan, soal evaluasi, kategori nilai, data credit
+js/dialogue.js      dialog tiap karakter menurut kepribadiannya
+js/story.js         naskah dan alur Mode Cerita, pilihan ekspresi
+js/settings.js      pengaturan tersimpan dan penyesuaian layout
+js/app.js           menu, navigasi, dan keempat mode mandiri
+assets/             gambar, audio, font, dan konfigurasi karakter
+tests/              skrip pemeriksaan kurikulum (Node.js)
+```
 
-## localStorage
-`tkm_eval_best` (benar terbaik Evaluasi, 0–10) dan `tkm_latihan_best` (skor terbaik Latihan).
+Isi pelajaran diubah di `js/content.js`, gaya bicara karakter di `js/dialogue.js`, dan naskah cerita di `js/story.js`.
 
-## Menambah soal
-- Evaluasi: tambah objek `{q, o:[...], a:indexJawabanBenar}` di `EVAL` (`js/content.js`).
-- Latihan: tambah ke `CONCEPT`, atau buat generator baru di `QGEN`.
+### Data yang disimpan di browser
 
-Lihat `CREDITS.md` untuk atribusi asset.
+| Kunci | Isi |
+|---|---|
+| `tkm_settings` | Volume, mode tampilan, tata letak |
+| `tkm_story` | Kemajuan Mode Cerita |
+| `tkm_latihan_best` | Skor terbaik Latihan |
+| `tkm_eval_best` | Jumlah benar terbaik di Evaluasi (0 sampai 10) |
 
-## Dialog & SFX
-- Dialog ada di `js/dialogue.js` (objek `D`). Tiap kelompok berupa array, satu kalimat dipilih acak. Format baris: `[teks, ekspresi]`.
-- SFX (`assets/audio`):
-  - `scrollMenu` : hanya saat pointer hover ke sebuah opsi/tombol (dan panah keyboard di menu utama)
-  - `select` : klik/pilih apa pun yang tidak punya SFX khusus (menu, MULAI, LANJUT, ULANGI, tab gerbang, CEK JAWABAN, lanjut dialog)
-  - `openOS` : memilih opsi jawaban di Latihan & Evaluasi
-  - `metronomeBar` / `metronomeBeat` : kotak input A/B di Simulasi (jadi 1 / jadi 0)
-  - `flip_page` : pindah halaman Materi
-  - `cancelMenu` : kembali ke menu (tombol MENU / Esc)
+## Atribusi dan hak cipta
 
-## Kotak dialog, latar, dan obrolan bebas
-- Kotak dialog memakai `Text_Boxes.png/xml` (satu kotak per karakter, label nama sudah menyatu).
-- Latar: `DDLCbg` (Materi, Simulasi) dan `Music_Room` (Latihan, Evaluasi).
-- Obrolan bebas: klik karakter, atau diam ~25 detik, maka karakter bicara di luar topik pelajaran (`D.<karakter>.chat`).
+Game ini memakai karakter, grafis, musik, dan efek suara dari proyek Doki Doki Takeover. Hak atas semuanya tetap milik pembuat aslinya.
 
-## Pengaturan (menu utama -> PENGATURAN)
-- **Volume Musik** dan **Volume Efek Suara** adalah dua slider terpisah (`Snd.mv` = musik latar, `Snd.sv` = SFX). Mengubah satu tidak memengaruhi yang lain.
-- **Mode Tampilan**: Jendela / Desktop Fullscreen (Fullscreen API; tidak tersedia di iPhone/iPad Safari).
-- **Tata Letak**: Otomatis / Desktop / Mobile-Android. Satu game yang sama; layout mobile mengatur ulang UI, kotak dialog, tombol, menu, posisi karakter, dan isi konten
-  (landscape dan potret). Mode Otomatis memilih mobile pada layar sentuh kecil.
-- Semua pengaturan tersimpan di `localStorage` (`tkm_settings`) dan dipulihkan saat halaman dibuka lagi.
-
-## Dialog tambahan
-- `D.<karakter>.from` : reaksi saat pemain datang dari bagian lain; `enterBest` : reaksi pada skor terbaik tersimpan; `poke` : klik karakter berulang cepat.
-- Reaksi kemajuan/tindakan: Sayori (balik halaman cepat, separuh materi, halaman terakhir), Yuri (milestone simulasi), Natsuki (comeback, tengah latihan, soal tabel),
-  Monika (ganti jawaban berkali-kali, komentar antar-karakter di hasil akhir).
-
-
-## Font
-Judul memakai **Anton** (SIL OFL 1.1) di `assets/fonts/anton.woff2`, lisensi di `assets/fonts/Anton-OFL.txt`.
-
-## Mode Cerita vs Mode Mandiri
-- **Cerita** (menu paling atas): Pembukaan → Materi → Simulasi → Latihan → Evaluasi → Akhir cerita + hasil. Keempat karakter ikut di setiap bagian; kemajuan tersimpan (`tkm_story`) dan bisa dilanjutkan / diulang. Tombol lanjut baru muncul setelah halaman materi terakhir / syarat Simulasi terpenuhi / Latihan & Evaluasi selesai.
-- **Mandiri** (Materi/Simulasi/Latihan/Evaluasi di menu): tidak berubah, satu karakter utama per bagian (Sayori, Yuri, Natsuki, Monika), bisa dibuka kapan saja.
-- Tampilan: diskusi edukasi memakai potret statis di kiri (`assets/img/portraits/`, satu gambar per ekspresi) + area materi besar; adegan cerita memakai sprite biasa yang diam dan hanya berganti ekspresi. Naskah ada di `js/story.js`.
-
-## Aset sprite tanpa mikrofon
-Adegan cerita memakai `assets/img/sprites/*.webp` (frame pertama `menucharacters/*` dari Doki Doki Takeover, dipangkas dari XML atlasnya; dicek bahwa semua frame berisi karakter). Aset ini hanya punya satu pose per karakter, jadi di adegan cerita yang berganti hanya pembicara/kotak dialog. Potret diskusi edukasi (`assets/img/portraits`) tetap yang lama (sebagian memegang mikrofon).
+- **Doki Doki Literature Club** dibuat oleh **Dan Salvato** dan Team Salvato. Karakter Sayori, Yuri, Natsuki, dan Monika adalah milik mereka. Proyek ini mengikuti [IP Guidelines Team Salvato](https://teamsalvato.com/ip-guidelines): non-komersial dan gratis. Dukung karya aslinya di [teamsalvato.com](https://teamsalvato.com).
+- **Doki Doki Takeover** dibuat oleh **Jorge-SunSpirit** dan kontributornya. Sprite, potret, latar, musik, dan efek suara dalam game ini berasal dari [repositori Doki Doki Takeover](https://github.com/Jorge-SunSpirit/Doki-Doki-Takeover) yang berlisensi Apache 2.0. Teks lisensinya ada di [`LICENSE-DokiDokiTakeover.txt`](LICENSE-DokiDokiTakeover.txt).
