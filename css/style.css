@@ -396,8 +396,8 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .st i{position:static;opacity:1;width:32px;height:32px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:grid;place-items:center;font:800 15px Nunito,sans-serif;font-style:normal}
 .st.cur i{background:#ffd54a}.st.done i{background:var(--pink);color:#fff}
 .ln{flex:1;height:3px;background:#b6c8e4;margin:15px 6px 0;border-radius:2px}
-.mre{right:26px;top:auto;bottom:16px;translate:none;z-index:3}
-.mstory.cont .pbtn{right:112px}
+.mre{right:30px;top:28px;bottom:auto;translate:none;z-index:3;font:800 20px Nunito,sans-serif;height:50px;padding:0 24px;border-width:4px;border-radius:14px;box-shadow:0 4px 0 var(--ink)}
+.mstory.cont .pbtn{right:154px}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:21px 20px}
 .mgrid .mbtn{height:136px;padding:15px 16px 12px 102px}
 .mgrid .mbtn b{font-size:32px}
@@ -418,8 +418,8 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .m .setbtn{left:12px;right:auto;top:8px;font-size:13px}.m.p .setbtn{top:8px;left:12px;right:auto}
 .m .mlist,.m.p .mlist{left:14px;right:14px;width:auto;top:118px}
 .m .mstory{margin-bottom:8px}.m .mstory .mbtn{height:112px;padding:10px 14px}.m .mstory .mbtn b{font-size:22px}.m .mstory .mbtn .sub{font-size:11px}
-.m .pbtn{right:12px;top:10px;font-size:12px;padding:6px 12px;border-width:3px;box-shadow:0 3px 0 var(--ink)}.m .mstory.cont .pbtn{right:66px}
-.m .mre{right:12px;bottom:auto;top:10px;font-size:12px;padding:6px 10px;min-height:0}
+.m .pbtn{right:12px;top:10px;font-size:12px;padding:6px 12px;border-width:3px;box-shadow:0 3px 0 var(--ink)}.m .mstory.cont .pbtn{right:100px}
+.m .mre{right:16px;bottom:auto;top:13px;font-size:12px;height:36px;padding:0 10px;min-height:0;border-width:3px;box-shadow:0 3px 0 var(--ink)}
 .m .steps{left:14px;right:14px;bottom:6px}.m .st{font-size:9px;min-width:44px}.m .st i{width:22px;height:22px;font-size:11px;border-width:2px}.m .ln{margin-top:10px}
 .m .mgrid{grid-template-columns:1fr;gap:6px}.m .mgrid .mbtn{height:auto;min-height:66px;padding:6px 12px 6px 62px}
 .m .mgrid .mbtn b{font-size:20px;letter-spacing:1.5px}.m .mbtn .sub{font-size:11px}.m .av{left:10px;top:7px;width:42px;height:42px;border-width:2px}
@@ -571,3 +571,16 @@ body.m{--cs:.6}
 .m .schips span{font-size:14px;padding:0 12px}.m .tip{font-size:11px;margin:2px 0 0}
 .m .gb .card .gate{max-width:300px;margin:0 auto;display:block}.m.p .gb .card .gate{max-width:none}
 .m .card.big .gate{max-width:420px}.m.p .card.big .gate{max-width:none}
+
+/* hasil cerita: tombol aksi sejajar di footer panel */
+.rfoot{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;align-items:center}
+.narr .rfoot .ngo{position:static;animation:none}
+.rfoot .btn{font-size:22px;padding:6px 18px;margin:0}.m .rfoot .btn{font-size:15px;padding:5px 12px}
+.narr .panel{top:108px}
+.m .narr .rg{flex-wrap:nowrap;gap:8px}.m .narr .rg div{min-width:0;flex:1;padding:4px 6px}.m.p .narr .rg b{font-size:30px}.m.p .narr .startcard.res h2{font-size:34px;padding-top:14px}
+.m:not(.p) .narr .panel{top:36px}
+.m:not(.p) .narr .startcard{padding-bottom:10px}
+.m:not(.p) .narr .startcard.res h2{font-size:26px;padding:8px 0 0;margin:0 0 2px}
+.m:not(.p) .narr .rg{margin:4px 22px}.m:not(.p) .narr .rg b{font-size:26px}.m:not(.p) .narr .rg div{padding:1px 8px;font-size:12px}
+.m:not(.p) .narr .grade{font-size:18px;margin:2px 22px 4px}
+.m.p .narr .rg div{font-size:11px;white-space:nowrap;padding:4px 2px}

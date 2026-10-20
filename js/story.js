@@ -17,7 +17,7 @@ const PORT = {
   sayori: { neutral: 'neutral', calm: 'neutral', happy: 'happ', talk: 'wah', cheer: 'yeah', sad: 'concern', shock: 'ooh', down: 'concern' },
   yuri: { neutral: 'neutral', breath: 'neutral', shy: 'blush', talk: 'smile', happy: 'happy', explain: 'ahaha', shock: 'ahh', down: 'ehh' },
   natsuki: { neutral: 'neutral', smug: 'happy', talk: 'wah', happy: 'wah', angry: 'angy', hmph: 'hmmph', shock: 'what', down: 'sick' },
-  monika: { neutral: 'neutral', talk: 'neutral', happy: 'ahaha', cheer: 'wah', wink: 'ahh', shock: 'eeh', down: 'upset' }
+  monika: { neutral: 'neutral', talk: 'neutral', happy: 'ahaha', cheer: 'ahh', wink: 'ahh', shock: 'eeh', down: 'upset' }
 };
 /* label ekspresi -> kumpulan potret/sprite yang berputar (Story saja), supaya label yang sama tidak selalu menampilkan wajah yang sama.
    Isi kumpulan disesuaikan watak: Sayori ceria & jahil, Yuri pemalu & pemikir, Natsuki ekspresif & tsundere, Monika percaya diri & hangat. null (sprite) = sprite asli. */
@@ -25,7 +25,7 @@ const POOL = {
   sayori: { talk: ['wah', 'neutral', 'happ'], happy: ['happ', 'yeah', 'wah'], cheer: ['yeah', 'wah', 'ooh'], calm: ['neutral', 'happ'], playful: ['wah', 'yeah'], wink: ['yeah'], pout: ['grumpy'], sad: ['concern', 'ehh'], down: ['concern', 'ehh'], worry: ['ehh', 'concern'], shy: ['ehh', 'neutral'] },
   yuri: { talk: ['smile', 'neutral'], explain: ['ahaha', 'smile', 'neutral'], happy: ['happy', 'smile'], shy: ['blush', 'ehh'], calm: ['neutral', 'smile'], down: ['ehh', 'blush'] },
   natsuki: { talk: ['wah', 'neutral', 'happy'], smug: ['happy', 'neutral'], happy: ['wah', 'happy'], angry: ['angy', 'sick'], hmph: ['hmmph', 'neutral'], grump: ['hmmph', 'angy'], shy: ['hmmph', 'neutral'], down: ['sick'] },
-  monika: { talk: ['neutral', 'ahaha'], happy: ['ahaha', 'wah'], cheer: ['wah', 'ahaha'], calm: ['neutral', 'ahaha'], wink: ['ahh'], down: ['upset', 'eeh'], shy: ['eeh', 'ahaha'] }
+  monika: { talk: ['neutral', 'ahaha'], happy: ['ahaha', 'ahh'], cheer: ['ahh', 'ahaha'], calm: ['neutral', 'ahaha'], wink: ['ahh'], down: ['upset', 'eeh'], shy: ['eeh', 'ahaha'] }
 };
 const CYC = {}, nextOf = (pool, key) => pool[CYC[key] = ((CYC[key] ?? -1) + 1) % pool.length];
 const portSrc = (k, e) => { const pl = POOL[k][e] || PORT[k][e] && [PORT[k][e]]; return `assets/img/portraits/${k}_${pl ? nextOf(pl, k + e) : 'neutral'}.webp` };
@@ -99,7 +99,7 @@ function narrScene(id) {
   if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
   d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
-  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) A.card($('#panel', el)); goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
+  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el)); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
   const watch = setInterval(() => { if (!d.typing && !d.q.length && d.shown) { done(); clearInterval(watch) } }, 200);
   d.say(lines, done);
   const back = () => { Snd.sfx('cancelMenu'); go('menu') };
@@ -203,7 +203,7 @@ const ST = {
     },
     card: panel => {
       const p = Story.prog(), r = p.ev ?? 0, g = GRADES.find(x => r >= x.min);
-      panel.innerHTML = `<div class="startcard res"><h2>HASIL CERITA</h2><div class="rg"><div><b>${p.lat ?? '-'}</b>Latihan /8</div><div><b>${r * 10}</b>Evaluasi</div><div><b>${r / EVAL.length * 100}%</b>Benar</div></div><p class="grade">${g.t}</p><button class="btn" id="again">↻ MAIN CERITA LAGI</button></div>`;
+      panel.innerHTML = `<div class="startcard res"><h2>HASIL CERITA</h2><div class="rg"><div><b>${p.lat ?? '-'}</b>Latihan /8</div><div><b>${r * 10}</b>Evaluasi</div><div><b>${r / EVAL.length * 100}%</b>Benar</div></div><p class="grade">${g.t}</p><div class="rfoot"><button class="btn" id="again">↻ MAIN CERITA LAGI</button></div></div>`;
       $('#again', panel).onclick = () => { Snd.sfx('select'); Story.start(true) };
     }
   },
