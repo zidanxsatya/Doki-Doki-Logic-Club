@@ -29,10 +29,13 @@ async function go(id) {
 /* ---------- menu utama ---------- */
 function buildMenu() {
   const el = $('#menu');
-  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><small>TEKNIK KONTROL MEKATRONIKA</small><h1>DOKI DOKI<br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
-  <div class="mlist"><div class="mstory"><button class="mbtn" data-i="s" data-k="story"><i>▶</i><b>CERITA</b><span>${Story.menuSub()}</span></button>${Story.prog().step > 0 ? '<button class="btn sm mre" id="sre">↻ ULANG</button>' : ''}</div>${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><i>▶</i><b>${m.label}</b><span>${CHARS[m.key].name} · ${m.sub}</span></button>`).join('')}</div>
+  const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? 9 : 0, nowI = [1, 3, 5, 7].find(x => x >= cur);
+  const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = [1, 3, 5, 7][k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
+  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '8 soal acak per sesi', evaluasi: 'Nilai & kategori' };
+  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><small>TEKNIK KONTROL MEKATRONIKA</small><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
+  <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
-  <button class="btn setbtn" id="setb">⚙ PENGATURAN</button>`;
+  <button class="btn setbtn" id="setb">PENGATURAN</button><div class="mkeys"><kbd>↑↓</kbd> pilih menu <kbd>Enter</kbd> buka</div>`;
   $('.mchar', el).appendChild(together.canvas); together.start(); together.play('t', { loop: true });
   $('#setb').onclick = () => { Snd.sfx('select'); go('settings') };
   const btns = $$('.mbtn', el); let sel = -1;
@@ -59,7 +62,7 @@ function buildSettings() {
   </div>
   <div class="setcard credcard" hidden>
     <p class="cnote">${CREDIT.note}</p>
-    <div class="cgrid">${CREDIT.people.map(c => `<div class="cp" data-k="${c.img}"><img src="assets/img/credit/${c.img}.png" alt="" width="72" height="72"><b>${c.name}</b><small>${c.role}</small></div>`).join('')}</div>
+    ${(card => `<h3 class="clab">KARAKTER PEMANDU</h3><div class="cgrid">${CREDIT.people.slice(0, 4).map(card).join('')}</div><h3 class="clab">PEMBUAT ASET</h3><div class="cgrid cmk">${CREDIT.people.slice(4).map(card).join('')}</div>`)(c => `<div class="cp" data-k="${c.img}"><img src="assets/img/credit/${c.img}.png" alt="" width="72" height="72"><span class="ct"><b>${c.name}</b><small>${c.role}</small></span></div>`)}
   </div>
   <button class="credlink" id="scred">Credit</button>`;
   const cred = $('.credcard'), main = $('.setcard:not(.credcard)'), showCred = on => { cred.hidden = !on; main.hidden = on; $('#stitle').textContent = on ? 'CREDIT' : 'PENGATURAN'; $('#scred').textContent = on ? 'Pengaturan' : 'Credit' };
@@ -87,7 +90,7 @@ function buildSettings() {
 function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
-  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">💬 klik karakter untuk ngobrol</i></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
+  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
   ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch), chat = bag(D[m.key].chat);
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };
@@ -106,8 +109,10 @@ function scaffold(id) {
   scene = { cleanup() { clearInterval(idle); removeEventListener('pointerdown', act, true); removeEventListener('keydown', act, true); ch.unmount(); d.destroy(); el.innerHTML = ''; document.onkeydown = null } };
   return { ch, d, panel: $('#panel'), chat };
 }
+const IC = { out: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>', gate: '<svg viewBox="0 0 16 16"><path d="M5 3.5l7 4.5-7 4.5z"/></svg>', tab: '<svg viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 8h11M8 2.5v11"/></svg>', wire: '<svg viewBox="0 0 16 16"><path d="M2 5h6v6h4"/><circle cx="13" cy="11" r="1.4" fill="currentColor"/></svg>', best: '<svg viewBox="0 0 16 16"><path d="M8 1.8l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.4l-3.9 2.2.9-4.3-3.2-3 4.3-.5z" fill="#ffd54a" stroke="none"/></svg>' };
+const chipRow = a => `<div class="chips">${a.map(([i, t]) => `<span class="chip">${i ? IC[i] : ''}${t}</span>`).join('')}</div>`;
 const startCard = (S, title, desc, onGo) => {
-  S.panel.innerHTML = `<div class="startcard"><h2>${title}</h2><p>${desc}</p><button class="btn big" id="go">MULAI ▶</button></div>`;
+  S.panel.innerHTML = `<div class="startcard sc" data-k="${S.ch.key}"><h2>${title}</h2><div class="scb">${desc}</div><button class="btn big" id="go">MULAI</button></div>`;
   $('#go').onclick = () => { Snd.sfx('select'); onGo() };
 };
 
@@ -126,7 +131,7 @@ SC.materi = () => {
   const show = (intro = []) => {
     const P = MATERI[p];
     S.panel.innerHTML = `<div class="board"><div class="bt">${p + 1}. ${P.t}</div><div class="bb">${P.html}</div></div>
-    <div class="nav"><button class="btn" id="pv">◀ SEBELUMNYA</button><span>${p + 1} / ${MATERI.length}</span><button class="btn" id="nx">SELANJUTNYA ▶</button></div>`;
+    <div class="nav"><button class="btn" id="pv">◀ SEBELUMNYA</button><span>${p + 1} / ${MATERI.length}</span><button class="btn" id="nx">SELANJUTNYA ▶</button><div class="qs" aria-hidden="true">${MATERI.map((_, k) => `<i class="${k < p ? 'done' : k === p ? 'cur' : ''}"></i>`).join('')}</div></div>`;
     const pv = $('#pv'), nx = $('#nx'); pv.disabled = !p; nx.disabled = p === MATERI.length - 1;
     pv.onclick = () => { p--; Snd.sfx('flip_page'); show(flipLine()) }; nx.onclick = () => { p++; Snd.sfx('flip_page'); show(flipLine()) };
     if (Story.on && p === MATERI.length - 1) { nx.disabled = false; nx.textContent = NEXT_LABEL.materi; nx.classList.add('contstory'); nx.onclick = () => { Snd.sfx('select'); Story.advance() } }   // lanjut cerita hanya setelah halaman terakhir
@@ -147,7 +152,7 @@ SC.simulasi = () => {
   const draw = () => {
     const o = F[g](v[0], v[1]), hl = g === 'NOT' ? v[0] : v[0] * 2 + v[1];
     S.panel.innerHTML = `<div class="tabs">${GL.map(x => `<button class="tab${x === g ? ' on' : ''}" data-g="${x}">${x}</button>`).join('')}</div>
-    <div class="sim"><div class="card big">${gateSVG(g, v[0], g === 'NOT' ? null : v[1], o, true)}<p class="tip">Klik kotak A / B untuk mengubah input · LED menunjukkan output Y</p></div><div class="card">${tt(g, hl)}<p class="fm">${FORM[g]}</p></div></div>${Story.on ? `<div class="sbar">${met() ? `<button class="btn big contstory" id="sgo">${NEXT_LABEL.simulasi}</button>` : `<span>${ST.sim.need(gp(), togg)}</span>`}</div>` : ''}`;
+    <div class="sim"><div class="card big">${gateSVG(g, v[0], g === 'NOT' ? null : v[1], o, true)}<div class="schips"><span class="${v[0] ? 'on' : ''}">A = ${v[0]}</span>${g === 'NOT' ? '' : `<span class="${v[1] ? 'on' : ''}">B = ${v[1]}</span>`}<em>→</em><span class="y ${o ? 'on' : ''}">Y = ${o}</span></div><p class="tip">Klik saklar A / B untuk mengubah input · LED menunjukkan output Y</p></div><div class="card">${tt(g, hl)}<p class="fm">${FORM[g]}</p></div></div>${Story.on ? `<div class="sbar">${met() ? `<button class="btn big contstory" id="sgo">${NEXT_LABEL.simulasi}</button>` : `<span>${ST.sim.need(gp(), togg)}</span>`}</div>` : ''}`;
     const sg = $('#sgo', S.panel); if (sg) sg.onclick = () => { Snd.sfx('select'); Story.advance() };
   };
   S.panel.onclick = e => {
@@ -171,15 +176,15 @@ SC.simulasi = () => {
 
 /* ---------- renderer soal (dipakai Latihan & Evaluasi) ---------- */
 function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
-  panel.innerHTML = `<div class="qh">Soal ${i + 1} / ${n}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
+  panel.innerHTML = `<div class="qhd"><div class="qh">Soal ${i + 1} / ${n}</div>${reveal ? `<div class="qs" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
   const o = $('.qo', panel), f = $('.qf', panel); let locked = false;
   const done = ok => { locked = true; onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
   if (Q.kind === 'tt') {
-    const st = Array(Q.n).fill(-1), A = Q.g === 'NOT';
+    const st = Array(Q.n).fill(-1), A = Q.g === 'NOT'; o.classList.add('ttq');
     o.innerHTML = `<table class="tt"><tr><th>A</th>${A ? '' : '<th>B</th>'}<th>Y</th></tr>${st.map((_, r) => `<tr><td>${A ? r : r >> 1}</td>${A ? '' : `<td>${r & 1}</td>`}<td><button class="cell" data-i="${r}">?</button></td></tr>`).join('')}</table><button class="btn" id="chk">CEK JAWABAN</button>`;
     o.onclick = e => {
       if (locked) return; const c = e.target.closest('.cell');
-      if (c) { const r = +c.dataset.i; st[r] = st[r] < 1 ? st[r] + 1 : 0; c.textContent = st[r]; Snd.sfx('openOS') }
+      if (c) { const r = +c.dataset.i; st[r] = st[r] < 1 ? st[r] + 1 : 0; c.textContent = st[r]; c.classList.add('set'); Snd.sfx('openOS') }
       else if (e.target.id === 'chk') { Snd.sfx('select');
         if (st.includes(-1)) { e.target.textContent = 'ISI SEMUA DULU!'; return }
         $$('.cell', o).forEach((c, r) => c.classList.add(st[r] === Q.ans[r] ? 'ok' : 'bad')); e.target.remove(); done(st.every((x, r) => x === Q.ans[r]));
@@ -224,13 +229,13 @@ SC.latihan = () => {
   };
   const end = () => {
     const prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set('tkm_latihan_best', sc);
-    S.panel.innerHTML = `<div class="startcard"><h2>Hasil Latihan</h2><p class="score">${sc} / ${N}</p><p>Skor terbaik: <b>${best()}/${N}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>Hasil Latihan</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside"><div class="stars" aria-label="${sc} dari ${N} bintang">${Array.from({ length: N }, (_, k) => `<i class="${k < sc ? 'on' : ''}">★</i>`).join('')}</div><p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p><button class="btn big" id="go">ULANGI ↻</button></div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
     if (Story.on) { Story.record('lat', sc); $('.startcard', S.panel).appendChild(Story.contBtn('latihan')) }
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };
-  startCard(S, 'LATIHAN', `${N} soal acak: tentukan output, kenali gerbang, lengkapi tabel kebenaran, dan baca rangkaian.<br>Skor terbaik: <b>${best()}/${N}</b>`, begin);
+  startCard(S, 'LATIHAN', `${chipRow([['out', 'Tentukan output'], ['gate', 'Kenali gerbang'], ['tab', 'Tabel kebenaran'], ['wire', 'Baca rangkaian']])}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>`, begin);
   S.d.say([...entryExtra('natsuki'), ...pick(DN.intro), ...SL.enter('lat')]);
 };
 
@@ -251,12 +256,12 @@ SC.evaluasi = () => {
   };
   const end = () => {
     const wrong = N - right, gr = GRADES.find(g => right >= g.min), prev = best(), rec = prev != null && right > prev; if (prev == null || right > prev) store.set('tkm_eval_best', right);
-    S.panel.innerHTML = `<div class="startcard res"><h2>HASIL EVALUASI</h2><div class="rg"><div><b>${right}</b>Benar</div><div><b>${wrong}</b>Salah</div><div><b>${right * 10}</b>Nilai</div><div><b>${right / N * 100}%</b>Persentase</div></div><p class="grade">${gr.t}</p><p>Nilai terbaik: <b>${bestTxt()}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
+    S.panel.innerHTML = `<div class="startcard sc res"><h2>HASIL EVALUASI</h2><div class="rg"><div class="rb ok"><span>Benar</span><b>${right}</b></div><div class="rb bad"><span>Salah</span><b>${wrong}</b></div></div><p class="grade">${gr.t}</p><p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
     if (Story.on) { Story.record('ev', right); $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi')) }
     S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
-  startCard(S, 'EVALUASI AKHIR', `${N} soal dari seluruh materi rangkaian logika. Tidak ada petunjuk, tetapi jawaban boleh diganti sebelum lanjut.<br>Nilai terbaik: <b>${bestTxt()}</b>`, begin);
+  startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti']])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
   S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 
