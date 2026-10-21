@@ -92,7 +92,9 @@ class Character {
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const Snd = {
   m: null, cur: null, mg: 1, MG: { A_Story_of_Everyday_Life: .55, A_Wonderful_Happening: .55 }, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
-  fade(a, to, cb, st = .05) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * st) }, 40) },
+  // fade berbasis waktu pada pengali per-lagu a._k (0..1); volume nyata = _k * slider musik * gain lagu -> slider tetap berlaku di tengah transisi
+  apply(a) { a.volume = clamp01(a._k * this.mv * a._g) },
+  fade(a, k1, cb, ms = 900) { clearInterval(a._iv); const k0 = a._k, t0 = performance.now(); a._iv = setInterval(() => { const t = Math.min(1, (performance.now() - t0) / ms); a._k = k0 + (k1 - k0) * t * t * (3 - 2 * t); this.apply(a); if (t >= 1) { clearInterval(a._iv); cb && cb() } }, 30) },
   // ---- SFX latensi rendah: semua file didecode SEKALI di awal (preload) lalu diputar lewat Web Audio (tanpa membuat objek Audio per bunyi) ----
   async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page', 'confirmMenu']) {
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;   // decode tanpa AudioContext -> tidak butuh gestur pengguna
@@ -123,11 +125,12 @@ const Snd = {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .04);
   },
   music(n) {
-    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, st = g < 1 || this.mg < 1 ? .015 : .05;   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & crossfade lebih halus
-    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; this.mg = g; a.play().catch(() => { });
-    this.fade(a, () => this.mv * g, null, st); if (old) this.fade(old, 0, () => old.pause(), st);
+    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, slow = g < 1 || (old && old._g < 1);   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & fade lebih lambat
+    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a._k = 0; a._g = g; a.muted = this.muted; this.apply(a); this.m = a; this.mg = g; a.play().catch(() => { });
+    if (old) { clearTimeout(old._to); this.fade(old, 0, () => { old.pause() }, slow ? 700 : 500) }   // lagu lama keluar dulu, lagu baru masuk setelah lagu lama setengah turun: tanpa celah sunyi, tanpa dua lagu penuh bertumpuk
+    a._to = setTimeout(() => this.fade(a, 1, null, slow ? 1500 : 1000), old ? 300 : 0);
   },
-  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv * this.mg }, // hanya memengaruhi musik latar
+  setMusic(v) { this.mv = clamp01(v); if (this.m) this.apply(this.m) }, // hanya memengaruhi musik latar (lagu yang sedang fade-out ikut lewat apply di tiap langkah fade)
   setSfx(v) { this.sv = clamp01(v) },                                         // hanya memengaruhi efek suara
   mute() { this.muted = !this.muted; if (this.m) this.m.muted = this.muted; return this.muted }
 };

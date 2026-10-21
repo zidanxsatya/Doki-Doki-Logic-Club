@@ -584,3 +584,14 @@ body.m{--cs:.6}
 .m:not(.p) .narr .rg{margin:4px 22px}.m:not(.p) .narr .rg b{font-size:26px}.m:not(.p) .narr .rg div{padding:1px 8px;font-size:12px}
 .m:not(.p) .narr .grade{font-size:18px;margin:2px 22px 4px}
 .m.p .narr .rg div{font-size:11px;white-space:nowrap;padding:4px 2px}
+
+/* hover & fokus tombol LANJUTKAN / MULAI CERITA di menu (tanpa menggeser layout: hanya transform) */
+.pbtn{transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s}
+.mbtn .pbtn:hover{background:#ff95c4;transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+.mbtn .pbtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
+.mbtn:focus-visible .pbtn{background:#ff95c4;outline:3px solid var(--blue);outline-offset:3px}
+.m .mbtn .pbtn:hover{box-shadow:0 5px 0 var(--ink)}.m .mbtn .pbtn:active{box-shadow:0 1px 0 var(--ink)}
+
+/* kartu pembuka Latihan & Evaluasi: header memudar ke isi panel, tanpa garis pemisah */
+.startcard.sc[data-k=natsuki] h2,.startcard.sc[data-k=monika] h2{position:relative;isolation:isolate;background:none;border-bottom:0}
+.startcard.sc[data-k=natsuki] h2::before,.startcard.sc[data-k=monika] h2::before{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(#ffffffb0,#ffffff55),var(--tp) center 25%/cover,var(--soft);-webkit-mask-image:linear-gradient(#000 35%,transparent);mask-image:linear-gradient(#000 35%,transparent)}
