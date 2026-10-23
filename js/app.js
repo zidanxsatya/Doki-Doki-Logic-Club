@@ -22,7 +22,7 @@ async function go(id) {
   $$('.screen').forEach(s => s.classList.remove('on'));
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
-  else { Journey.prev = Journey.last; Journey.last = id; SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : 'Lunchbox')) }
+  else { if (id !== 'simpick') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
   await wait(60); f.classList.remove('on'); busy = false;
 }
 
@@ -40,7 +40,7 @@ function buildMenu() {
   $('#setb').onclick = () => { Snd.sfx('select'); go('settings') };
   const btns = $$('.mbtn', el); let sel = -1;
   const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu') }; // snd=false untuk mouse (suara hover ditangani global)
-  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; go(MODES[+b.dataset.i].id) } } });
+  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
   const re = $('#sre', el); if (re) re.onclick = e => { e.stopPropagation(); Snd.sfx('select'); Story.start(true) };
   document.onkeydown = e => {
     if (!el.classList.contains('on')) return;
@@ -103,7 +103,7 @@ function scaffold(id) {
     Snd.sfx('select');
     if (pk >= 3 && D[m.key].poke) { const [t, e] = pick(D[m.key].poke); d.line(t, e) } else talk();
   };
-  const back = () => { Snd.sfx('cancelMenu'); go('menu') };
+  const back = () => { Snd.sfx('cancelMenu'); go(id === 'simulasi' ? 'simpick' : 'menu') };   // Simulasi Dasar mandiri kembali ke pemilih mode
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   el.classList.add('on');
   scene = { cleanup() { clearInterval(idle); removeEventListener('pointerdown', act, true); removeEventListener('keydown', act, true); ch.unmount(); d.destroy(); el.innerHTML = ''; document.onkeydown = null } };

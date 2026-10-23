@@ -182,11 +182,12 @@ const F = { AND: (a, b) => a & b, OR: (a, b) => a | b, NOT: a => +!a, NAND: (a, 
 const GL = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
 const FORM = { AND: 'Y = A · B', OR: 'Y = A + B', NOT: 'Y = Ā', NAND: 'Y = ¬(A · B)', NOR: 'Y = ¬(A + B)', XOR: 'Y = A ⊕ B', XNOR: 'Y = ¬(A ⊕ B)' };
 const INK = '#4a2040', wc = v => v == null ? INK : v ? '#18b04a' : '#b9a9c8';
+const gBody = g => g === 'NOT' ? 'M52 15V85L118 50Z' : /AND/.test(g) ? 'M52 15H92A35 35 0 0 1 92 85H52Z' : 'M47 15Q82 15 130 50Q82 85 47 85Q70 50 47 15Z';   // bentuk badan gerbang (dipakai juga oleh Simulasi+)
 // a,b,o: 0/1 atau null (tidak diketahui). sw=true -> saklar input bisa diklik (.sw[data-i])
 // Nama gerbang selalu di ATAS gerbang (bukan di dalam badan gerbang). Gaya: Materi (a null) = LED kuning, Latihan (a angka, o null) = keluaran "?", Simulasi (sw) = saklar + LED menyala.
 function gateSVG(g, a, b, o, sw) {
   const two = g !== 'NOT', neg = /^(NAND|NOR|XNOR|NOT)$/.test(g), ys = two ? [32, 68] : [50], vs = [a, b], known = a != null;
-  const body = g === 'NOT' ? 'M52 15V85L118 50Z' : /AND/.test(g) ? 'M52 15H92A35 35 0 0 1 92 85H52Z' : 'M47 15Q82 15 130 50Q82 85 47 85Q70 50 47 15Z';
+  const body = gBody(g);
   const tip = g === 'NOT' ? 118 : /AND/.test(g) ? 127 : 130, ox = tip + (neg ? 12 : 0), gx = g === 'NOT' ? 85 : 88;
   let s = '<svg class="gate' + (sw ? ' sim' : '') + '" viewBox="-52 -22 340 130">';
   ys.forEach((y, i) => {
