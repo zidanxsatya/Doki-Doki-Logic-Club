@@ -653,3 +653,19 @@ body.m{--cs:.6}
 .m:not(.p) .xtt{font-size:12px}.m:not(.p) .xtt th,.m:not(.p) .xtt td{padding:0 6px}.m:not(.p) .xmsg{font-size:10px;line-height:1.25;margin-top:3px}
 .m:not(.p) .xtools .btn{font-size:11px;padding:2px 4px;border-radius:10px}.m:not(.p) .xtg{font-size:14px}.m:not(.p) .xy{font-size:12px;padding:1px 6px}
 .m:not(.p) .xcard{padding:4px 8px}.m:not(.p) .xlab{margin-bottom:2px}
+
+/* Simulasi+: pilihan 2 / 3 input (terminal C) */
+.xlab{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.xseg{display:inline-flex;gap:0;border:2px solid var(--ink);border-radius:999px;overflow:hidden;letter-spacing:0}
+.xmode{font:800 11px Nunito,sans-serif;color:var(--ink);background:#fff;border:0;padding:2px 9px;cursor:pointer;transition:background-color .16s}
+.xmode+.xmode{border-left:2px solid var(--ink)}.xmode.on{background:var(--pink)}.xmode:hover:not(.on){background:var(--soft)}.xmode:focus-visible{outline:3px solid var(--blue);outline-offset:-3px}
+.xrow{flex-wrap:wrap}.xtg[hidden]{display:none}.xtg{min-width:60px}
+.m .xmode{font-size:9px;padding:1px 6px}.m .xtg{min-width:46px}
+
+.n3 .xtt{font-size:16px}.n3 .xtt th,.n3 .xtt td{padding:1px 8px}.n3 .xtg{font-size:16px;min-width:0;padding:2px 0}.n3 .xy{font-size:15px;padding:1px 10px}.n3 .xrow{gap:6px}.n3 .xmsg{font-size:12px;margin-top:6px}
+.m .n3 .xtt{font-size:13px}.m .n3 .xtt th,.m .n3 .xtt td{padding:0 6px}.m .n3 .xtg{font-size:13px}.m .n3 .xy{font-size:12px}
+.m:not(.p) .n3 .xtt{font-size:11px}.m:not(.p) .n3 .xtt th,.m:not(.p) .n3 .xtt td{padding:0 4px}.m:not(.p) .n3 .xtg{font-size:12px;border-width:2px}.m:not(.p) .n3 .xmsg{font-size:9.5px;margin-top:2px}.m:not(.p) .n3 .xtools .btn{font-size:10px;padding:1px 4px}.m:not(.p) .n3 .xcard{padding:3px 8px}
+.m:not(.p) .xtools .btn{min-height:0}.m:not(.p) .xtools{gap:3px}
+.m:not(.p) .xtools{flex-direction:row;gap:3px}.m:not(.p) .xtools .btn{width:auto;flex:1;font-size:9px;line-height:1.1;padding:2px 2px;border-radius:8px;white-space:normal}
+.xtg{white-space:nowrap}.m.p .xtg{padding:2px 0;font-size:13px;min-width:0}.m.p .n3 .xtg{font-size:11px;border-width:2px}.m.p .xio .xrow{gap:4px}
+.m.p .xio .xy{flex:1 1 100%;text-align:center}.m.p .n3 .xtg{font-size:12px}

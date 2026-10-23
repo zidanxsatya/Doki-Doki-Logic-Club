@@ -37,40 +37,40 @@ SC.simplus = () => {
     <div class="xpal" aria-label="Palet gerbang">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}</div>
     <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret gerbang dari palet ke sini.<br>Lalu tarik kabel dari A, B, atau output gerbang ke kaki input gerbang, dan dari output gerbang ke Y.</p><div class="xtoast" role="status" aria-live="polite"></div></div>
     <div class="xside">
-      <div class="xcard xio"><div class="xlab">INPUT</div><div class="xrow"><button class="xtg" data-i="0" aria-pressed="false"></button><button class="xtg" data-i="1" aria-pressed="false"></button><span class="xy" id="xy"></span></div></div>
-      <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN Y</div><table class="tt xtt"><tr><th>A</th><th>B</th><th>Y</th></tr>${[0, 1, 2, 3].map(r => `<tr data-r="${r}"><td>${r >> 1}</td><td>${r & 1}</td><td class="xyc"></td></tr>`).join('')}</table><p class="xmsg" id="xmsg"></p></div>
+      <div class="xcard xio"><div class="xlab">INPUT<span class="xseg" role="group" aria-label="Jumlah input"><button class="xmode on" data-n="2" aria-pressed="true">2 INPUT</button><button class="xmode" data-n="3" aria-pressed="false">3 INPUT</button></span></div><div class="xrow"><button class="xtg" data-i="0" aria-pressed="false"></button><button class="xtg" data-i="1" aria-pressed="false"></button><button class="xtg" data-i="2" aria-pressed="false" hidden></button><span class="xy" id="xy"></span></div></div>
+      <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN Y</div><table class="tt xtt" id="xtt"></table><p class="xmsg" id="xmsg"></p></div>
       <div class="xcard xtools"><button class="btn sm" id="xdw" disabled>HAPUS KABEL</button><button class="btn sm" id="xdg" disabled>HAPUS GERBANG</button><button class="btn sm" id="xcl" disabled>KOSONGKAN</button></div>
     </div>
   </div>`;
   const svg = $('#xsvg', el), cv = $('.xcv', el), pal = $('.xpal', el), toast = $('.xtoast', el), stg = $('#stage');
-  const G = [], W = []; let nid = 0, wid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0; const ab = [0, 0];
+  const G = [], W = []; let nid = 0, wid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, nin = 2, tblN = 0; const ab = [0, 0, 0];   // nin = jumlah input aktif (2: A,B; 3: A,B,C)
   const gate = id => G.find(n => n.id === id), into = (id, pin) => W.find(w => w.to.t === 'g' && w.to.id === id && w.to.pin === pin), yw = () => W.find(w => w.to.t === 'y');
 
   /* evaluasi: null = belum diketahui (kaki kosong merambat; tidak pernah dianggap 0) */
-  const evalAt = (a, b) => {
-    const memo = {}, v = s => s.t === 'in' ? (s.k ? b : a) : gv(s.id);
+  const evalAt = vals => {
+    const memo = {}, v = s => s.t === 'in' ? vals[s.k] : gv(s.id);
     const gv = id => { if (id in memo) return memo[id]; memo[id] = null; const n = gate(id), ins = (n.type === 'NOT' ? [0] : [0, 1]).map(p => { const w = into(id, p); return w ? v(w.from) : null }); return memo[id] = ins.includes(null) ? null : F[n.type](...ins) };
     return { v, gv };
   };
-  const yVal = (a, b) => { const w = yw(); return w ? evalAt(a, b).v(w.from) : null };
+  const yVal = vals => { const w = yw(); return w ? evalAt(vals).v(w.from) : null };
 
   /* posisi */
-  const term = () => ({ A: { x: 78, y: ch * .3 }, B: { x: 78, y: ch * .7 }, Y: { x: cw - 78, y: ch / 2 } });
+  const IN = 'ABC', term = () => { const f = nin === 3 ? [.2, .5, .8] : [.3, .7, 0], t = { Y: { x: cw - 78, y: ch / 2 } }; for (let i = 0; i < nin; i++) t[IN[i]] = { x: 78, y: ch * f[i] }; return t };
   const gp = n => { const o = gGeo(n.type), w = (o.xo - o.xi) * K, tx = n.x - w / 2; return { o, w, tx, ins: o.ys.map(y => ({ x: tx, y: n.y + (y - 50) * K })), out: { x: tx + w, y: n.y } } };
   const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(104 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(58, Math.min(ch - 40, n.y)) };
   const pinMap = () => {
-    const t = term(), m = { A: { kind: 'src', ...t.A, d: { t: 'in', k: 0 } }, B: { kind: 'src', ...t.B, d: { t: 'in', k: 1 } }, Y: { kind: 'dst', ...t.Y, d: { t: 'y' } } };
+    const t = term(), m = { Y: { kind: 'dst', ...t.Y, d: { t: 'y' } } }; for (let i = 0; i < nin; i++) m[IN[i]] = { kind: 'src', ...t[IN[i]], d: { t: 'in', k: i } };
     G.forEach(n => { const p = gp(n); m[`g${n.id}o`] = { kind: 'src', ...p.out, d: { t: 'g', id: n.id } }; p.ins.forEach((q, i) => m[`g${n.id}i${i}`] = { kind: 'dst', ...q, d: { t: 'g', id: n.id, pin: i } }) });
     Object.keys(m).forEach(k => m[k].key = k); return m;
   };
-  const keyOf = d => d.t === 'in' ? 'AB'[d.k] : d.t === 'y' ? 'Y' : d.pin === undefined ? `g${d.id}o` : `g${d.id}i${d.pin}`;
+  const keyOf = d => d.t === 'in' ? IN[d.k] : d.t === 'y' ? 'Y' : d.pin === undefined ? `g${d.id}o` : `g${d.id}i${d.pin}`;
   const nearest = (pm, p, r, skip) => { let best = null, bd = r; for (const k in pm) { if (k === skip) continue; const d = Math.hypot(pm[k].x - p.x, pm[k].y - p.y); if (d < bd) { bd = d; best = k } } return best };
   const pt = e => { const q = new DOMPoint(e.clientX, e.clientY).matrixTransform(svg.getScreenCTM().inverse()); return { x: q.x, y: q.y } };
 
   /* aturan koneksi */
   const downstream = id => { const s = new Set([id]); let moved = true; while (moved) { moved = false; W.forEach(w => { if (w.from.t === 'g' && s.has(w.from.id) && w.to.t === 'g' && !s.has(w.to.id)) { s.add(w.to.id); moved = true } }) } return s };
   const why = (a, b) => {   // alasan penolakan, atau null bila sambungan sah
-    if (a.kind === b.kind) return a.kind === 'src' ? 'Ditolak: A, B, dan output gerbang hanya boleh disambung ke kaki input atau Y.' : 'Ditolak: kaki input tidak bisa disambung ke kaki input lain.';
+    if (a.kind === b.kind) return a.kind === 'src' ? 'Ditolak: terminal input (A/B/C) dan output gerbang hanya boleh disambung ke kaki input atau Y.' : 'Ditolak: kaki input tidak bisa disambung ke kaki input lain.';
     const s = a.kind === 'src' ? a : b, d = a.kind === 'src' ? b : a;
     if (s.d.t === 'g' && d.d.t === 'g' && downstream(d.d.id).has(s.d.id)) return 'Ditolak: sambungan ini membuat putaran (siklus) yang tidak bisa dihitung.';
     return null;
@@ -95,14 +95,20 @@ SC.simplus = () => {
     else { const id = sel.id; for (let i = W.length - 1; i >= 0; i--) if ((W[i].from.t === 'g' && W[i].from.id === id) || (W[i].to.t === 'g' && W[i].to.id === id)) W.splice(i, 1); G.splice(G.findIndex(n => n.id === id), 1) }   // kabel yang menempel ikut dihapus
     sel = null; Snd.sfx('cancelMenu'); render();
   };
-  const toggleIn = i => { ab[i] ^= 1; Snd.sfx(ab[i] ? 'metronomeBar' : 'metronomeBeat'); render() };
+  const toggleIn = i => { if (i >= nin) return; ab[i] ^= 1; Snd.sfx(ab[i] ? 'metronomeBar' : 'metronomeBeat'); render() };
+
+  const setN = n => {
+    if (n === nin) return; let cut = 0;
+    if (n === 2) { for (let i = W.length - 1; i >= 0; i--) if (W[i].from.t === 'in' && W[i].from.k === 2) { W.splice(i, 1); cut++ } ab[2] = 0; sel = null }   // input C dihapus: kabel dari C ikut dihapus
+    nin = n; Snd.sfx('select'); say(n === 3 ? 'Input C ditambahkan: tabel kebenaran jadi 8 baris.' : cut ? `Kembali ke 2 input: ${cut} kabel dari C dihapus.` : 'Kembali ke 2 input.', 'info'); render();
+  };
 
   /* gambar */
   const wpath = (a, b) => `M${a.x} ${a.y}L${b.x} ${b.y}`;   // kabel garis lurus dari pin ke pin
   const vtxt = v => v == null ? '?' : v;
   const render = () => {
     if (!cw) return;
-    const pm = pinMap(), ev = evalAt(ab[0], ab[1]), t = term(); let h = '';
+    const pm = pinMap(), ev = evalAt(ab), t = term(); let h = '';
     W.forEach(w => {
       const a = pm[keyOf(w.from)], b = pm[keyOf(w.to)], v = ev.v(w.from), d = wpath(a, b), on = sel && sel.k === 'w' && sel.id === w.id;
       h += `<g class="xw" data-w="${w.id}">${on ? `<path d="${d}" stroke="#ff7eb6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>` : ''}<path d="${d}" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${v == null ? '#cdbfd6' : wc(v)}" stroke-width="3.6" fill="none" stroke-linecap="round"${v == null ? ' stroke-dasharray="7 6"' : ''}/><path class="xwh" d="${d}" stroke="transparent" stroke-width="20" fill="none"/></g>`;
@@ -111,9 +117,9 @@ SC.simplus = () => {
       const p = gp(n), on = sel && sel.k === 'g' && sel.id === n.id, nx = p.tx + ((n.type === 'NOT' ? 85 : 88) - 30) * K;
       h += `<g class="xg${on ? ' on' : ''}" data-g="${n.id}">${on ? `<rect x="${p.tx - 12}" y="${n.y - 35 * K - 28}" width="${p.w + 24}" height="${70 * K + 36}" rx="12" fill="#ff7eb61f" stroke="#ff7eb6" stroke-width="2.5" stroke-dasharray="6 4"/>` : ''}<rect x="${p.tx - 8}" y="${n.y - 35 * K - 6}" width="${p.w + 16}" height="${70 * K + 12}" fill="transparent"/>${gGfx(n.type, p.tx, n.y, K)}<rect x="${nx - 24}" y="${n.y - 35 * K - 24}" width="48" height="17" rx="8.5" fill="${INK}"/><text x="${nx}" y="${n.y - 35 * K - 11}" font-size="11.5" font-weight="800" fill="#fff" text-anchor="middle">${n.type}</text></g>`;
     });
-    // terminal A, B (kiri) dan Y (kanan)
-    ['A', 'B'].forEach((k, i) => { const q = t[k], v = ab[i]; h += `<g class="xt" data-t="${i}"><path d="M${q.x - 30} ${q.y}H${q.x}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${q.x - 36}" cy="${q.y}" r="17" fill="${INK}"/><text x="${q.x - 36}" y="${q.y + 6}" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${q.x - 36}" y="${q.y + 36}" font-size="13" font-weight="800" fill="${INK}" text-anchor="middle">${k} = ${v}</text></g>` });
-    const yv = yVal(ab[0], ab[1]), yl = yw();
+    // terminal A, B, (C) di kiri dan Y di kanan
+    IN.slice(0, nin).split('').forEach((k, i) => { const q = t[k], v = ab[i]; h += `<g class="xt" data-t="${i}"><path d="M${q.x - 30} ${q.y}H${q.x}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${q.x - 36}" cy="${q.y}" r="17" fill="${INK}"/><text x="${q.x - 36}" y="${q.y + 6}" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${q.x - 36}" y="${q.y + 36}" font-size="13" font-weight="800" fill="${INK}" text-anchor="middle">${k} = ${v}</text></g>` });
+    const yv = yVal(ab), yl = yw();
     h += `<path d="M${t.Y.x} ${t.Y.y}H${t.Y.x + 30}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${t.Y.x + 36}" cy="${t.Y.y}" r="17" fill="${yv ? '#ff8fb0' : yv === 0 ? '#e6dcf5' : '#fff'}" stroke="${INK}" stroke-width="3"${yv == null ? ' stroke-dasharray="5 4"' : ''} style="${yv ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="${t.Y.x + 36}" y="${t.Y.y + 6}" font-size="17" font-weight="800" fill="${INK}" text-anchor="middle">Y</text><text x="${t.Y.x + 36}" y="${t.Y.y + 36}" font-size="13" font-weight="800" fill="${yv ? '#ff4d6d' : INK}" text-anchor="middle">${yl ? `Y = ${vtxt(yv)}` : 'Y kosong'}</text>`;
     // pin
     const cand = drag && drag.k === 'wire' ? nearest(pm, drag.p, 24, drag.from.key) : null;
@@ -134,11 +140,16 @@ SC.simplus = () => {
     sync(yv);
   };
   const sync = yv => {
-    $$('.xtg', el).forEach((b, i) => { b.textContent = `${'AB'[i]} = ${ab[i]}`; b.setAttribute('aria-pressed', ab[i]); b.classList.toggle('on', !!ab[i]) });
+    $('.xp', el).classList.toggle('n3', nin === 3);
+    $$('.xmode', el).forEach(b => { const on = +b.dataset.n === nin; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on) });
+    $$('.xtg', el).forEach((b, i) => { b.hidden = i >= nin; b.textContent = `${IN[i]} = ${ab[i]}`; b.setAttribute('aria-pressed', ab[i]); b.classList.toggle('on', !!ab[i]) });
     const xy = $('#xy', el); xy.textContent = `Y = ${vtxt(yv)}`; xy.className = 'xy' + (yv ? ' on' : yv == null ? ' na' : '');
-    $$('.xtt tr[data-r]', el).forEach(tr => { const r = +tr.dataset.r, y = yVal(r >> 1, r & 1), c = tr.lastElementChild; c.textContent = y == null ? '–' : y; c.classList.toggle('na', y == null); tr.classList.toggle('hl', r === ab[0] * 2 + ab[1]) });
+    const rows = 1 << nin, bit = (r, i) => (r >> (nin - 1 - i)) & 1;   // baris r: A = bit tertinggi
+    if (tblN !== nin) { tblN = nin; $('#xtt', el).innerHTML = `<tr>${IN.slice(0, nin).split('').map(k => `<th>${k}</th>`).join('')}<th>Y</th></tr>` + Array.from({ length: rows }, (_, r) => `<tr data-r="${r}">${IN.slice(0, nin).split('').map((_, i) => `<td>${bit(r, i)}</td>`).join('')}<td class="xyc"></td></tr>`).join('') }
+    const cur = ab.slice(0, nin).reduce((a, v) => a * 2 + v, 0);
+    $$('#xtt tr[data-r]', el).forEach(tr => { const r = +tr.dataset.r, y = yVal(Array.from({ length: 3 }, (_, i) => i < nin ? bit(r, i) : 0)), c = tr.lastElementChild; c.textContent = y == null ? '–' : y; c.classList.toggle('na', y == null); tr.classList.toggle('hl', r === cur) });
     const msg = $('#xmsg', el), has = yw();
-    msg.textContent = !G.length && !has ? 'Belum ada rangkaian. Tambahkan gerbang dan sambungkan ke Y.' : !has ? 'Hasil belum tersedia: Y belum tersambung ke output gerbang atau terminal.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini A = ${ab[0]}, B = ${ab[1]}, maka Y = ${yv}.`;
+    msg.textContent = !G.length && !has ? 'Belum ada rangkaian. Tambahkan gerbang dan sambungkan ke Y.' : !has ? 'Hasil belum tersedia: Y belum tersambung ke output gerbang atau terminal.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${IN.slice(0, nin).split('').map((k, i) => `${k} = ${ab[i]}`).join(', ')}, maka Y = ${yv}.`;
     msg.classList.toggle('warn', yv == null && !!(G.length || has));
     $('.xempty', el).hidden = G.length > 0;
     $('#xdw', el).disabled = !(sel && sel.k === 'w'); $('#xdg', el).disabled = !(sel && sel.k === 'g'); $('#xcl', el).disabled = !(G.length || W.length);
@@ -184,6 +195,7 @@ SC.simplus = () => {
 
   /* tombol */
   $$('.xtg', el).forEach(b => b.onclick = () => toggleIn(+b.dataset.i));
+  $$('.xmode', el).forEach(b => b.onclick = () => setN(+b.dataset.n));
   $('#xdw').onclick = delSel; $('#xdg').onclick = delSel;
   $('#xcl').onclick = () => { G.length = 0; W.length = 0; sel = null; Snd.sfx('cancelMenu'); say('Rangkaian dikosongkan.', 'info'); render() };
   const back = () => { Snd.sfx('cancelMenu'); go('simpick') };
