@@ -18,7 +18,7 @@ const gGfx = (g, tx, ty, s) => {
 /* ---------- pemilih mode: SIMULASI DASAR / SIMULASI+ ---------- */
 SC.simpick = () => {
   const el = $('#scene');
-  const plus = `<svg class="pkic" viewBox="0 0 200 90" aria-hidden="true">${gGfx('AND', 6, 26, .5)}${gGfx('XOR', 6, 64, .5)}${gGfx('OR', 118, 45, .55)}<path d="M66 26L118 35M67 64L118 55" stroke="#ff7eb6" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`;
+  const plus = `<svg class="pkic" viewBox="0 0 200 90" aria-hidden="true">${gGfx('AND', 6, 26, .5)}${gGfx('XOR', 6, 64, .5)}${gGfx('OR', 118, 45, .55)}<path d="M66 26C92 26 92 35 118 35M67 64C92 64 92 55 118 55" stroke="#ff7eb6" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`;
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>SIMULASI</b><i class="hintc">Pilih jenis simulasi</i></div>
   <div class="pick"><button class="pickc" data-go="simulasi"><svg class="pkic" viewBox="0 0 160 80" aria-hidden="true">${gGfx('AND', 14, 40, .9)}</svg><b>SIMULASI DASAR</b><span>Satu gerbang pada satu waktu. Ubah input, lihat LED dan tabel kebenarannya bersama Yuri.</span><em>BUKA ▶</em></button>
   <button class="pickc" data-go="simplus">${plus}<b>SIMULASI+</b><span>Susun rangkaian dari beberapa gerbang dengan kabel, lalu lihat hasil gabungannya.</span><em>BUKA ▶</em></button></div>`;
@@ -55,9 +55,9 @@ SC.simplus = () => {
   const yVal = vals => { const w = yw(); return w ? evalAt(vals).v(w.from) : null };
 
   /* posisi */
-  const IN = 'ABC', term = () => { const f = nin === 3 ? [.2, .5, .8] : [.3, .7, 0], t = { Y: { x: cw - 78, y: ch / 2 } }; for (let i = 0; i < nin; i++) t[IN[i]] = { x: 78, y: ch * f[i] }; return t };
+  const IN = 'ABC', term = () => { const f = nin === 3 ? [.2, .5, .8] : [.3, .7, 0], t = { Y: { x: cw - 78, y: ch / 2 } }; for (let i = 0; i < nin; i++) t[IN[i]] = { x: 84, y: ch * f[i] }; return t };
   const gp = n => { const o = gGeo(n.type), w = (o.xo - o.xi) * K, tx = n.x - w / 2; return { o, w, tx, ins: o.ys.map(y => ({ x: tx, y: n.y + (y - 50) * K })), out: { x: tx + w, y: n.y } } };
-  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(104 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(58, Math.min(ch - 40, n.y)) };
+  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(112 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(58, Math.min(ch - 40, n.y)) };
   const pinMap = () => {
     const t = term(), m = { Y: { kind: 'dst', ...t.Y, d: { t: 'y' } } }; for (let i = 0; i < nin; i++) m[IN[i]] = { kind: 'src', ...t[IN[i]], d: { t: 'in', k: i } };
     G.forEach(n => { const p = gp(n); m[`g${n.id}o`] = { kind: 'src', ...p.out, d: { t: 'g', id: n.id } }; p.ins.forEach((q, i) => m[`g${n.id}i${i}`] = { kind: 'dst', ...q, d: { t: 'g', id: n.id, pin: i } }) });
@@ -104,7 +104,7 @@ SC.simplus = () => {
   };
 
   /* gambar */
-  const wpath = (a, b) => `M${a.x} ${a.y}L${b.x} ${b.y}`;   // kabel garis lurus dari pin ke pin
+  const wpath = (a, b) => { const dx = Math.max(36, Math.abs(b.x - a.x) / 2); return `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}` };   // kabel lentur (kurva Bezier) dari pin ke pin
   const vtxt = v => v == null ? '?' : v;
   const render = () => {
     if (!cw) return;
@@ -118,7 +118,10 @@ SC.simplus = () => {
       h += `<g class="xg${on ? ' on' : ''}" data-g="${n.id}">${on ? `<rect x="${p.tx - 12}" y="${n.y - 35 * K - 28}" width="${p.w + 24}" height="${70 * K + 36}" rx="12" fill="#ff7eb61f" stroke="#ff7eb6" stroke-width="2.5" stroke-dasharray="6 4"/>` : ''}<rect x="${p.tx - 8}" y="${n.y - 35 * K - 6}" width="${p.w + 16}" height="${70 * K + 12}" fill="transparent"/>${gGfx(n.type, p.tx, n.y, K)}<rect x="${nx - 24}" y="${n.y - 35 * K - 24}" width="48" height="17" rx="8.5" fill="${INK}"/><text x="${nx}" y="${n.y - 35 * K - 11}" font-size="11.5" font-weight="800" fill="#fff" text-anchor="middle">${n.type}</text></g>`;
     });
     // terminal A, B, (C) di kiri dan Y di kanan
-    IN.slice(0, nin).split('').forEach((k, i) => { const q = t[k], v = ab[i]; h += `<g class="xt" data-t="${i}"><path d="M${q.x - 30} ${q.y}H${q.x}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${q.x - 36}" cy="${q.y}" r="17" fill="${INK}"/><text x="${q.x - 36}" y="${q.y + 6}" font-size="17" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${q.x - 36}" y="${q.y + 36}" font-size="13" font-weight="800" fill="${INK}" text-anchor="middle">${k} = ${v}</text></g>` });
+    IN.slice(0, nin).split('').forEach((k, i) => {   // terminal input = saklar: huruf + angka 0/1; menyala (pink + glow) saat 1, kabur (lavender) saat 0
+      const q = t[k], v = ab[i], x0 = q.x - 70, y0 = q.y - 15;
+      h += `<g class="xt${v ? ' on' : ''}" data-t="${i}" role="button" aria-label="Input ${k} = ${v}. Klik untuk mengubah"><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${wc(v)}" stroke-width="3.6" stroke-linecap="round"/><rect x="${x0}" y="${y0}" width="56" height="30" rx="15" fill="${v ? '#ff7eb6' : '#e6dcf5'}" stroke="${INK}" stroke-width="3" style="${v ? 'filter:drop-shadow(0 0 7px #ff4d6d)' : ''}"/><circle cx="${v ? x0 + 41 : x0 + 15}" cy="${q.y}" r="11" fill="${INK}"/><text x="${v ? x0 + 41 : x0 + 15}" y="${q.y + 5}" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${v ? x0 + 15 : x0 + 41}" y="${q.y + 7}" font-size="19" font-weight="800" fill="${v ? INK : '#8a6b86'}" text-anchor="middle">${v}</text><text x="${x0 + 28}" y="${y0 + 46}" font-size="11" font-weight="800" fill="${v ? '#d6336c' : '#8a6b86'}" text-anchor="middle">${v ? 'AKTIF (1)' : 'MATI (0)'}</text></g>`;
+    });
     const yv = yVal(ab), yl = yw();
     h += `<path d="M${t.Y.x} ${t.Y.y}H${t.Y.x + 30}" stroke="${INK}" stroke-width="5" stroke-linecap="round"/><circle cx="${t.Y.x + 36}" cy="${t.Y.y}" r="17" fill="${yv ? '#ff8fb0' : yv === 0 ? '#e6dcf5' : '#fff'}" stroke="${INK}" stroke-width="3"${yv == null ? ' stroke-dasharray="5 4"' : ''} style="${yv ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="${t.Y.x + 36}" y="${t.Y.y + 6}" font-size="17" font-weight="800" fill="${INK}" text-anchor="middle">Y</text><text x="${t.Y.x + 36}" y="${t.Y.y + 36}" font-size="13" font-weight="800" fill="${yv ? '#ff4d6d' : INK}" text-anchor="middle">${yl ? `Y = ${vtxt(yv)}` : 'Y kosong'}</text>`;
     // pin

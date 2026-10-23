@@ -669,3 +669,5 @@ body.m{--cs:.6}
 .m:not(.p) .xtools{flex-direction:row;gap:3px}.m:not(.p) .xtools .btn{width:auto;flex:1;font-size:9px;line-height:1.1;padding:2px 2px;border-radius:8px;white-space:normal}
 .xtg{white-space:nowrap}.m.p .xtg{padding:2px 0;font-size:13px;min-width:0}.m.p .n3 .xtg{font-size:11px;border-width:2px}.m.p .xio .xrow{gap:4px}
 .m.p .xio .xy{flex:1 1 100%;text-align:center}.m.p .n3 .xtg{font-size:12px}
+
+.xt text{pointer-events:none}.xt rect,.xt circle{transition:fill .16s}.xt:hover rect{stroke:var(--pink)}
