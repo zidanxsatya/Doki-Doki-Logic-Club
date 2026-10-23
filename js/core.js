@@ -62,10 +62,10 @@ Actor.live = new Set();
 /* ---------- Character: API sederhana di atas Actor ----------
    character.setExpression("happy"); character.playAnimation("singLEFT"); character.idle(); */
 const CHARS = {
-  sayori: { name: 'Sayori', sc: .9, color: '#95e0fa', dk: '#1d5f8a', expr: { neutral: 'idle', happy: 'singLEFT', talk: 'singRIGHT', calm: 'singDOWN', cheer: 'singUP', sad: 'nara' } },
-  yuri: { name: 'Yuri', sc: .8, color: '#b394e0', dk: '#432a86', expr: { neutral: 'idle', shy: 'singLEFT', talk: 'singRIGHT', happy: 'singUP', explain: 'singDOWN', breath: 'breath' } },
-  natsuki: { name: 'Natsuki', sc: 1.05, color: '#fc95d3', dk: '#8c1c63', expr: { neutral: 'idle', smug: 'singLEFT', talk: 'singRIGHT', angry: 'singDOWN', happy: 'singUP', hmph: 'hmmph' } },
-  monika: { name: 'Monika', sc: .7, color: '#8cd465', dk: '#1e6a2e', expr: { neutral: 'idle', talk: 'singLEFT', happy: 'singRIGHT', cheer: 'singDOWN', wink: 'singUP' } }
+  sayori: { name: 'Sayori', sc: .8, color: '#95e0fa', dk: '#1d5f8a', expr: { neutral: 'idle', happy: 'singLEFT', talk: 'singRIGHT', calm: 'singDOWN', cheer: 'singUP', sad: 'nara' } },
+  yuri: { name: 'Yuri', sc: .78, color: '#b394e0', dk: '#432a86', expr: { neutral: 'idle', shy: 'singLEFT', talk: 'singRIGHT', happy: 'singUP', explain: 'singDOWN', breath: 'breath' } },
+  natsuki: { name: 'Natsuki', sc: .83, color: '#fc95d3', dk: '#8c1c63', expr: { neutral: 'idle', smug: 'singLEFT', talk: 'singRIGHT', angry: 'singDOWN', happy: 'singUP', hmph: 'hmmph' } },
+  monika: { name: 'Monika', sc: .6, color: '#8cd465', dk: '#1e6a2e', expr: { neutral: 'idle', talk: 'singLEFT', happy: 'singRIGHT', cheer: 'singDOWN', wink: 'singUP' } }
 };
 class Character {
   constructor(key, actor) { this.key = key; this.actor = actor; this.cfg = CHARS[key]; actor.canvas.style.height = actor.canvas.height * this.cfg.sc + 'px' }
@@ -92,7 +92,9 @@ class Character {
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const Snd = {
   m: null, cur: null, mg: 1, MG: { A_Story_of_Everyday_Life: .55, A_Wonderful_Happening: .55 }, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
-  fade(a, to, cb, st = .05) { const iv = setInterval(() => { const T = clamp01(typeof to === 'function' ? to() : to), d = T - a.volume; if (Math.abs(d) < .05) { a.volume = T; clearInterval(iv); cb && cb() } else a.volume = clamp01(a.volume + Math.sign(d) * st) }, 40) },
+  // fade berbasis waktu pada pengali per-lagu a._k (0..1); volume nyata = _k * slider musik * gain lagu -> slider tetap berlaku di tengah transisi
+  apply(a) { a.volume = clamp01(a._k * this.mv * a._g) },
+  fade(a, k1, cb, ms = 900) { clearInterval(a._iv); const k0 = a._k, t0 = performance.now(); a._iv = setInterval(() => { const t = Math.min(1, (performance.now() - t0) / ms); a._k = k0 + (k1 - k0) * t * t * (3 - 2 * t); this.apply(a); if (t >= 1) { clearInterval(a._iv); cb && cb() } }, 30) },
   // ---- SFX latensi rendah: semua file didecode SEKALI di awal (preload) lalu diputar lewat Web Audio (tanpa membuat objek Audio per bunyi) ----
   async preload(names = ['scrollMenu', 'select', 'cancelMenu', 'openOS', 'metronomeBar', 'metronomeBeat', 'flip_page', 'confirmMenu']) {
     const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext; if (!OC) return;   // decode tanpa AudioContext -> tidak butuh gestur pengguna
@@ -123,11 +125,12 @@ const Snd = {
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .04);
   },
   music(n) {
-    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, st = g < 1 || this.mg < 1 ? .015 : .05;   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & crossfade lebih halus
-    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a.volume = 0; a.muted = this.muted; this.m = a; this.mg = g; a.play().catch(() => { });
-    this.fade(a, () => this.mv * g, null, st); if (old) this.fade(old, 0, () => old.pause(), st);
+    if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, slow = g < 1 || (old && old._g < 1);   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & fade lebih lambat
+    const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a._k = 0; a._g = g; a.muted = this.muted; this.apply(a); this.m = a; this.mg = g; a.play().catch(() => { });
+    if (old) { clearTimeout(old._to); this.fade(old, 0, () => { old.pause() }, slow ? 700 : 500) }   // lagu lama keluar dulu, lagu baru masuk setelah lagu lama setengah turun: tanpa celah sunyi, tanpa dua lagu penuh bertumpuk
+    a._to = setTimeout(() => this.fade(a, 1, null, slow ? 1500 : 1000), old ? 300 : 0);
   },
-  setMusic(v) { this.mv = clamp01(v); if (this.m) this.m.volume = this.mv * this.mg }, // hanya memengaruhi musik latar
+  setMusic(v) { this.mv = clamp01(v); if (this.m) this.apply(this.m) }, // hanya memengaruhi musik latar (lagu yang sedang fade-out ikut lewat apply di tiap langkah fade)
   setSfx(v) { this.sv = clamp01(v) },                                         // hanya memengaruhi efek suara
   mute() { this.muted = !this.muted; if (this.m) this.m.muted = this.muted; return this.muted }
 };
@@ -178,25 +181,35 @@ class Dialogue {
 const F = { AND: (a, b) => a & b, OR: (a, b) => a | b, NOT: a => +!a, NAND: (a, b) => +!(a & b), NOR: (a, b) => +!(a | b), XOR: (a, b) => a ^ b, XNOR: (a, b) => +!(a ^ b) };
 const GL = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
 const FORM = { AND: 'Y = A · B', OR: 'Y = A + B', NOT: 'Y = Ā', NAND: 'Y = ¬(A · B)', NOR: 'Y = ¬(A + B)', XOR: 'Y = A ⊕ B', XNOR: 'Y = ¬(A ⊕ B)' };
-const wc = v => v == null ? '#556' : v ? '#18b04a' : '#8c8c9a';
-// a,b,o: 0/1 atau null (tidak diketahui). sw=true -> kotak input bisa diklik (.sw[data-i])
+const INK = '#4a2040', wc = v => v == null ? INK : v ? '#18b04a' : '#b9a9c8';
+// a,b,o: 0/1 atau null (tidak diketahui). sw=true -> saklar input bisa diklik (.sw[data-i])
+// Nama gerbang selalu di ATAS gerbang (bukan di dalam badan gerbang). Gaya: Materi (a null) = LED kuning, Latihan (a angka, o null) = keluaran "?", Simulasi (sw) = saklar + LED menyala.
 function gateSVG(g, a, b, o, sw) {
-  const two = g !== 'NOT', neg = /^(NAND|NOR|XNOR|NOT)$/.test(g), ys = two ? [32, 68] : [50], vs = [a, b];
+  const two = g !== 'NOT', neg = /^(NAND|NOR|XNOR|NOT)$/.test(g), ys = two ? [32, 68] : [50], vs = [a, b], known = a != null;
   const body = g === 'NOT' ? 'M52 15V85L118 50Z' : /AND/.test(g) ? 'M52 15H92A35 35 0 0 1 92 85H52Z' : 'M47 15Q82 15 130 50Q82 85 47 85Q70 50 47 15Z';
-  const tip = g === 'NOT' ? 118 : /AND/.test(g) ? 127 : 130, ox = tip + (neg ? 12 : 0);
-  let s = '<svg class="gate" viewBox="-52 0 340 100">';
+  const tip = g === 'NOT' ? 118 : /AND/.test(g) ? 127 : 130, ox = tip + (neg ? 12 : 0), gx = g === 'NOT' ? 85 : 88;
+  let s = '<svg class="gate' + (sw ? ' sim' : '') + '" viewBox="-52 -22 340 130">';
   ys.forEach((y, i) => {
-    s += `<path d="M-14 ${y}H58" stroke="${wc(vs[i])}" stroke-width="5" fill="none"/>`;
-    s += sw ? `<g class="sw" data-i="${i}"><rect x="-50" y="${y - 13}" width="36" height="26" rx="6" fill="${vs[i] ? '#ffd54a' : '#fff'}" stroke="#333" stroke-width="2.5"/><text x="-32" y="${y + 5}" text-anchor="middle" font-size="14" font-weight="bold">${'AB'[i]}=${vs[i]}</text></g>`
-      : `<text x="-34" y="${y + 6}" font-size="16" font-weight="bold" text-anchor="middle">${'AB'[i]}</text>`;
+    const wire = sw ? wc(vs[i]) : INK;
+    s += `<path d="M${sw ? 20 : -14} ${y}H58" stroke="${wire}" stroke-width="5" fill="none" stroke-linecap="round"/>`;
+    if (sw) s += `<g class="sw" data-i="${i}" role="button" aria-label="Input ${'AB'[i]} = ${vs[i]}"><circle cx="-40" cy="${y}" r="11" fill="${INK}"/><text x="-40" y="${y + 5}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">${'AB'[i]}</text><rect class="swp" x="-24" y="${y - 13}" width="52" height="26" rx="13" fill="${vs[i] ? '#ff7eb6' : '#e6dcf5'}" stroke="${INK}" stroke-width="2.5"/><circle cx="${vs[i] ? 15 : -11}" cy="${y}" r="9" fill="#fff" stroke="${INK}" stroke-width="2"/><text x="${vs[i] ? 15 : -11}" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="${INK}">${vs[i]}</text></g>`;
+    else if (known) s += `<rect x="-50" y="${y - 12}" width="50" height="24" rx="12" fill="${INK}"/><text x="-38" y="${y + 5}" text-anchor="middle" font-size="13" font-weight="800" fill="#fff">${'AB'[i]}</text><circle cx="-14" cy="${y}" r="9" fill="#ffd54a" stroke="${INK}" stroke-width="1.5"/><text x="-14" y="${y + 4.5}" text-anchor="middle" font-size="12" font-weight="800" fill="${INK}">${vs[i]}</text>`;
+    else s += `<text x="-34" y="${y + 6}" font-size="16" font-weight="800" text-anchor="middle" fill="${INK}">${'AB'[i]}</text>`;
   });
-  s += `<path d="M${ox} 50H258" stroke="${wc(o)}" stroke-width="5"/>`;
-  if (g.startsWith('X')) s += '<path d="M36 15Q59 50 36 85" fill="none" stroke="#222" stroke-width="4"/>';
-  s += `<path d="${body}" fill="#fff" stroke="#222" stroke-width="4" stroke-linejoin="round"/>`;
-  if (neg) s += `<circle cx="${tip + 6}" cy="50" r="6" fill="#fff" stroke="#222" stroke-width="4"/>`;
-  s += `<text x="${g === 'NOT' ? 70 : 88}" y="55" font-size="14" font-weight="bold" fill="#555" text-anchor="middle">${g}</text>`;
-  s += `<circle cx="272" cy="50" r="14" fill="${o == null ? '#ddd' : o ? '#ff4d6d' : '#4a2a35'}" stroke="#222" stroke-width="3" style="${o ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="272" y="88" font-size="13" font-weight="bold" text-anchor="middle">Y${o == null ? '' : '=' + o}</text></svg>`;
-  return s;
+  s += `<path d="M${ox} 50H${sw || known ? 244 : 256}" stroke="${sw ? wc(o) : INK}" stroke-width="5" stroke-linecap="round"/>`;
+  if (g.startsWith('X')) s += `<path d="M36 15Q59 50 36 85" fill="none" stroke="${INK}" stroke-width="4"/>`;
+  s += `<path d="${body}" fill="#ffd1e6" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>`;
+  if (neg) s += `<circle cx="${tip + 6}" cy="50" r="6" fill="#fff" stroke="${INK}" stroke-width="4"/>`;
+  // nama gerbang di atas
+  s += sw ? `<rect x="${gx - 24}" y="-20" width="48" height="22" rx="11" fill="${INK}"/><text x="${gx}" y="-4.5" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${g}</text>`
+    : `<text x="${gx}" y="2" font-size="15" font-weight="800" fill="${INK}" text-anchor="middle">${g}</text>`;
+  // keluaran
+  if (sw) {
+    if (o) s += [0, 45, 90, 135, 180, 225, 270, 315].map(r => `<line x1="272" y1="25" x2="272" y2="17" transform="rotate(${r} 272 50)" stroke="#ff4d6d" stroke-width="3" stroke-linecap="round"/>`).join('');
+    s += `<circle cx="272" cy="50" r="14" fill="${o ? '#ff8fb0' : '#e6dcf5'}" stroke="${INK}" stroke-width="3" style="${o ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="272" y="100" font-size="12" font-weight="800" fill="${o ? '#ff4d6d' : INK}" text-anchor="middle">${o ? 'LED NYALA' : 'LED MATI'}</text>`;
+  } else if (known) s += `<circle cx="262" cy="50" r="20" fill="#fff" stroke="${INK}" stroke-width="3" stroke-dasharray="5 4"/><text x="262" y="59" font-size="24" font-weight="800" fill="#ff7eb6" text-anchor="middle">?</text><text x="262" y="92" font-size="13" font-weight="800" fill="${INK}" text-anchor="middle">Y</text>`;
+  else s += `<circle cx="264" cy="50" r="13" fill="#ffd54a" stroke="${INK}" stroke-width="3"/><text x="264" y="26" font-size="12" font-weight="800" fill="${INK}" text-anchor="middle">LED</text><text x="264" y="86" font-size="14" font-weight="800" fill="${INK}" text-anchor="middle">Y</text>`;
+  return s + '</svg>';
 }
 const tt = (g, hl = -1) => g === 'NOT'
   ? `<table class="tt"><tr><th>A</th><th>Y</th></tr>${[0, 1].map(a => `<tr class="${a === hl ? 'hl' : ''}"><td>${a}</td><td>${F.NOT(a)}</td></tr>`).join('')}</table>`

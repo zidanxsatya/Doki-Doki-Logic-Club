@@ -95,7 +95,7 @@ const CREDIT = {
     { img: 'yuri', name: 'Yuri', role: 'Pemandu Simulasi' },
     { img: 'natsuki', name: 'Natsuki', role: 'Pemandu Latihan' },
     { img: 'monika', name: 'Monika', role: 'Pemandu Evaluasi' },
-    { img: 'kontributor2', name: 'Dan Salvato', role: 'Pembuat Doki Doki Literature Club' },
-    { img: 'kontributor1', name: 'Jorge-SunSpirit', role: 'Pembuat Doki Doki Takeover' },
+    { img: 'Dan Salvato', name: 'Dan Salvato', role: 'Pembuat Doki Doki Literature Club' },
+    { img: 'Jorge Sun Spirit', name: 'Jorge-SunSpirit', role: 'Pembuat Doki Doki Takeover' },
   ]
 };
