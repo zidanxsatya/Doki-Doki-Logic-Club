@@ -702,3 +702,5 @@ body.m{--cs:.6}
 .xtt th,.xtt td{min-width:0}
 .m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{border-width:2px;padding:2px 1px;font-size:9px;min-width:0}
 .m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{letter-spacing:-.3px}
+/* status ON lebih lembut: tanpa cahaya terang */
+.xy.on{background:#ffc9df}.xy.on::before{background:#ff8fb3;box-shadow:none}.xtg.on{background:#ffe7a0}

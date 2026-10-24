@@ -15,6 +15,23 @@ const gGfx = (g, tx, ty, s) => {
   return h + '</g>';
 };
 
+/* ---------- suara Simulasi+: sintetis (tanpa file), mengikuti slider SFX & mute; hanya bunyi jika AudioContext sudah aktif ---------- */
+const Sfx = (() => {
+  const tone = (c, t, f0, f1, dur, type, vol, at = 0) => { const o = c.createOscillator(), g = c.createGain(), s = t + at; o.type = type; o.frequency.setValueAtTime(f0, s); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, s + dur); g.gain.setValueAtTime(.0001, s); g.gain.exponentialRampToValueAtTime(vol, s + .006); g.gain.exponentialRampToValueAtTime(.0001, s + dur); o.connect(g); g.connect(c.destination); o.start(s); o.stop(s + dur + .03) };
+  const S = {
+    place: (c, t, v) => { tone(c, t, 300, 110, .12, 'sine', .34 * v); tone(c, t, 640, 260, .05, 'triangle', .12 * v) },    // gerbang diletakkan: "tok" lembut
+    plug: (c, t, v) => { tone(c, t, 620, 620, .045, 'square', .06 * v); tone(c, t, 930, 930, .08, 'triangle', .2 * v, .05) },   // kabel terpasang: klik-klik colok
+    unplug: (c, t, v) => tone(c, t, 760, 280, .12, 'triangle', .2 * v),                                                         // kabel dilepas/dihapus
+    del: (c, t, v) => { tone(c, t, 380, 80, .18, 'sine', .3 * v); tone(c, t, 200, 70, .14, 'triangle', .12 * v, .02) },          // gerbang dihapus / kosongkan
+    bad: (c, t, v) => { tone(c, t, 150, 140, .17, 'square', .07 * v); tone(c, t, 112, 104, .17, 'square', .07 * v) },            // ditolak: dengung rendah
+    on: (c, t, v) => tone(c, t, 840, 1180, .08, 'triangle', .2 * v),                                                            // saklar -> 1
+    off: (c, t, v) => tone(c, t, 640, 430, .08, 'triangle', .18 * v),                                                           // saklar -> 0
+    tick: (c, t, v) => tone(c, t, 540, 540, .04, 'sine', .15 * v),                                                              // navigasi kecil
+    win: (c, t, v) => [523, 659, 784, 1046].forEach((f, i) => tone(c, t, f, f, .16, 'triangle', .2 * v, i * .09))                // tantangan selesai
+  };
+  return k => { const c = Snd.ac; if (Snd.muted || Snd.sv <= 0 || !c || c.state !== 'running') return; S[k](c, c.currentTime, clamp01(Snd.sv)) };
+})();
+
 /* ---------- pemilih mode: SIMULASI DASAR / SIMULASI+ ---------- */
 SC.simpick = () => {
   const el = $('#scene');
@@ -35,10 +52,10 @@ SC.simplus = () => {
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.png)"></div><div class="top"><button class="btn sm" id="back">◀ PILIH MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari beberapa gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
   <div class="xp">
     <div class="xpal" aria-label="Palet gerbang">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}</div>
-    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret gerbang dari palet ke sini.<br>Lalu tarik kabel dari A, B, atau output gerbang ke kaki input gerbang, dan dari output gerbang ke Y.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xtoast" role="status" aria-live="polite"></div></div>
+    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret gerbang dari palet ke sini.<br>Lalu tarik kabel dari A, B, atau output gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xtoast" role="status" aria-live="polite"></div></div>
     <div class="xside">
       <div class="xcard xio"><div class="xlab">INPUT<span class="xseg" role="group" aria-label="Jumlah input"><button class="xmode on" data-n="2" aria-pressed="true">2 INPUT</button><button class="xmode" data-n="3" aria-pressed="false">3 INPUT</button></span></div><div class="xrow"><button class="xtg" data-i="0" aria-pressed="false"></button><button class="xtg" data-i="1" aria-pressed="false"></button><button class="xtg" data-i="2" aria-pressed="false" hidden></button><span class="xy" id="xy"></span></div></div>
-      <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN Y</div><table class="tt xtt" id="xtt"></table><p class="xmsg" id="xmsg"></p><p class="xex" id="xex" hidden></p></div>
+      <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN X</div><table class="tt xtt" id="xtt"></table><p class="xmsg" id="xmsg"></p><p class="xex" id="xex" hidden></p></div>
       <div class="xcard xtools"><button class="btn sm" id="xdw" disabled>HAPUS KABEL</button><button class="btn sm" id="xdg" disabled>HAPUS GERBANG</button><button class="btn sm" id="xcl" disabled>KOSONGKAN</button></div>
     </div>
   </div>`;
@@ -70,63 +87,63 @@ SC.simplus = () => {
   /* aturan koneksi */
   const downstream = id => { const s = new Set([id]); let moved = true; while (moved) { moved = false; W.forEach(w => { if (w.from.t === 'g' && s.has(w.from.id) && w.to.t === 'g' && !s.has(w.to.id)) { s.add(w.to.id); moved = true } }) } return s };
   const why = (a, b) => {   // alasan penolakan, atau null bila sambungan sah
-    if (a.kind === b.kind) return a.kind === 'src' ? 'Ditolak: terminal input (A/B/C) dan output gerbang hanya boleh disambung ke kaki input atau Y.' : 'Ditolak: kaki input tidak bisa disambung ke kaki input lain.';
+    if (a.kind === b.kind) return a.kind === 'src' ? 'Ditolak: terminal input (A/B/C) dan output gerbang hanya boleh disambung ke kaki input atau X.' : 'Ditolak: kaki input tidak bisa disambung ke kaki input lain.';
     const s = a.kind === 'src' ? a : b, d = a.kind === 'src' ? b : a;
     if (s.d.t === 'g' && d.d.t === 'g' && downstream(d.d.id).has(s.d.id)) return 'Ditolak: sambungan ini membuat putaran (siklus) yang tidak bisa dihitung.';
     return null;
   };
   const say = (msg, kind = 'info') => { toast.textContent = msg; toast.className = 'xtoast show ' + kind; clearTimeout(tT); tT = setTimeout(() => toast.classList.remove('show'), 2800) };
   const connect = (a, b) => {
-    const bad = why(a, b); if (bad) { Snd.sfx('cancelMenu'); return say(bad, 'bad') }
+    const bad = why(a, b); if (bad) { Sfx('bad'); return say(bad, 'bad') }
     const s = a.kind === 'src' ? a : b, d = a.kind === 'src' ? b : a, dk = keyOf(d.d), old = W.find(w => keyOf(w.to) === dk);
     if (old && keyOf(old.from) === keyOf(s.d)) return say('Sudah tersambung.', 'info');
     if (old) W.splice(W.indexOf(old), 1);   // satu kaki input = satu sumber: sambungan baru menggantikan yang lama
-    W.push({ id: ++wid, from: s.d, to: d.d }); sel = null; Snd.sfx('confirmMenu');
+    W.push({ id: ++wid, from: s.d, to: d.d }); sel = null; Sfx('plug');
     flash = dk; clearTimeout(fT); fT = setTimeout(() => { flash = null; render() }, 900);
     if (old) say('Kabel lama pada kaki itu diganti dengan yang baru.', 'ok');
   };
 
   /* edit */
   const freeSpot = () => { for (const fy of [.3, .55, .8]) for (const fx of [.32, .5, .68]) { const x = cw * fx, y = ch * fy; if (!G.some(n => Math.abs(n.x - x) < 100 && Math.abs(n.y - y) < 60)) return { x, y } } return { x: cw / 2 + Math.random() * 40, y: ch / 2 + Math.random() * 40 } };
-  const place = (type, x, y) => { if (!allowed(type)) return deny(); const n = { id: ++nid, type, x, y }; clampG(n); G.push(n); sel = { k: 'g', id: n.id }; Snd.sfx('select'); render() };
+  const place = (type, x, y) => { if (!allowed(type)) return deny(); const n = { id: ++nid, type, x, y }; clampG(n); G.push(n); sel = { k: 'g', id: n.id }; Sfx('place'); render() };
   const delSel = () => {
-    if (!sel) return;
+    if (!sel) return; Sfx(sel.k === 'w' ? 'unplug' : 'del');
     if (sel.k === 'w') W.splice(W.findIndex(w => w.id === sel.id), 1);
     else { const id = sel.id; for (let i = W.length - 1; i >= 0; i--) if ((W[i].from.t === 'g' && W[i].from.id === id) || (W[i].to.t === 'g' && W[i].to.id === id)) W.splice(i, 1); G.splice(G.findIndex(n => n.id === id), 1) }   // kabel yang menempel ikut dihapus
-    sel = null; Snd.sfx('cancelMenu'); render();
+    sel = null; render();
   };
-  const toggleIn = i => { if (i >= nin) return; hideTip(); ab[i] ^= 1; Snd.sfx(ab[i] ? 'metronomeBar' : 'metronomeBeat'); render() };
+  const toggleIn = i => { if (i >= nin) return; hideTip(); ab[i] ^= 1; Sfx(ab[i] ? 'on' : 'off'); render() };
 
   const setN = n => {
     if (n === nin || chi >= 0) return; let cut = 0;
     if (n === 2) { for (let i = W.length - 1; i >= 0; i--) if (W[i].from.t === 'in' && W[i].from.k === 2) { W.splice(i, 1); cut++ } ab[2] = 0; sel = null }   // input C dihapus: kabel dari C ikut dihapus
-    nin = n; Snd.sfx('select'); say(n === 3 ? 'Input C ditambahkan: tabel kebenaran jadi 8 baris.' : cut ? `Kembali ke 2 input: ${cut} kabel dari C dihapus.` : 'Kembali ke 2 input.', 'info'); render();
+    nin = n; Sfx('tick'); say(n === 3 ? 'Input C ditambahkan: tabel kebenaran jadi 8 baris.' : cut ? `Kembali ke 2 input: ${cut} kabel dari C dihapus.` : 'Kembali ke 2 input.', 'info'); render();
   };
 
-  /* mode tantangan: susun rangkaian sampai tabel Y sama dengan target. y = kolom Y per baris (A = bit tertinggi) */
+  /* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi) */
   const CH = [
     { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'] },
     { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'] },
     { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'] },
     { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'] },
     { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'] },
-    { t: 'Mayoritas: Y = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null },
-    { t: 'Y = A · (B + C)', n: 3, y: '00000111', ok: null },
-    { t: 'Paritas ganjil: Y = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null }
+    { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null },
+    { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null },
+    { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null }
   ];
   const allowed = t => chi < 0 || !CH[chi].ok || CH[chi].ok.includes(t);
-  const deny = () => say(`Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad');
+  const deny = () => { Sfx('bad'); say(`Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad') };
   const list = $('.xlist', el);
   const openList = () => {
     list.innerHTML = `<div class="xlh"><b>PILIH TANTANGAN</b><button class="xlx" aria-label="Tutup daftar">✕</button></div><div class="xlg">${CH.map((c, i) => `<button class="xli${i === chi ? ' cur' : ''}" data-i="${i}"><b>${i + 1}</b><span>${c.t}</span><i>${c.n} input${done.has(i) ? ' · ✓ selesai' : ''}</i></button>`).join('')}</div>`;
     list.hidden = false; $('.xlx', list).onclick = () => { list.hidden = true };
-    $$('.xli', list).forEach(b => b.onclick = () => startCh(+b.dataset.i)); Snd.sfx('select');
+    $$('.xli', list).forEach(b => b.onclick = () => startCh(+b.dataset.i)); Sfx('tick');
   };
   const startCh = i => {
     const had = G.length > 0; chi = i; solved = false; G.length = 0; W.length = 0; sel = null; ab.fill(0); nin = CH[i].n; list.hidden = true; hideTip();
-    Snd.sfx('select'); say(`Tantangan ${i + 1}: ${CH[i].t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
+    Sfx('tick'); say(`Tantangan ${i + 1}: ${CH[i].t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
   };
-  const exitCh = () => { chi = -1; solved = false; Snd.sfx('cancelMenu'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
+  const exitCh = () => { chi = -1; solved = false; Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
 
   /* ekspresi Boolean dari rangkaian: p = tingkat (4 atom, 3 AND, 2 XOR, 1 OR); sub-ekspresi berbeda operator diberi kurung */
   const OPS = { AND: '·', OR: '+', XOR: '⊕' }, BASE = { AND: 'AND', NAND: 'AND', OR: 'OR', NOR: 'OR', XOR: 'XOR', XNOR: 'XOR' }, PREC = { AND: 3, XOR: 2, OR: 1 };
@@ -141,7 +158,7 @@ SC.simplus = () => {
 
   /* tooltip nilai: kursor di atas kabel/kaki (mouse), atau ketuk (layar sentuh) */
   const tip = $('.xtip', el); let tipT = 0;
-  const nm = d => d.t === 'in' ? `Input ${IN[d.k]}` : d.t === 'y' ? 'Y' : d.pin === undefined ? `Output ${gate(d.id).type}` : `Kaki ${d.pin + 1} ${gate(d.id).type}`;
+  const nm = d => d.t === 'in' ? `Input ${IN[d.k]}` : d.t === 'y' ? 'X' : d.pin === undefined ? `Output ${gate(d.id).type}` : `Kaki ${d.pin + 1} ${gate(d.id).type}`;
   const vw = v => v == null ? 'belum diketahui' : v ? '1 (menyala)' : '0 (mati)';
   const hideTip = () => { clearTimeout(tipT); tip.hidden = true };
   const showTip = (p, txt, hold) => { clearTimeout(tipT); tip.textContent = txt; tip.hidden = false; const half = Math.min(130, cw / 2 - 6); tip.style.left = Math.max(half, Math.min(cw - half, p.x)) + 'px'; tip.style.top = Math.max(4, p.y - 42) + 'px'; if (hold) tipT = setTimeout(hideTip, hold) };
@@ -151,13 +168,13 @@ SC.simplus = () => {
   /* gambar */
   const wpath = (a, b) => { const dx = Math.max(36, Math.abs(b.x - a.x) / 2); return `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}` };   // kabel lentur (kurva Bezier) dari pin ke pin
   const vtxt = v => v == null ? '?' : v;
-  const sc = v => v == null ? INK : v ? '#ff4d6d' : '#a592bd';   // satu warna sinyal: 1 = merah muda menyala, 0 = lavender, belum diketahui = tinta
+  const sc = v => v == null ? INK : v ? '#18b04a' : '#a592bd';   // satu warna sinyal: 1 = hijau, 0 = lavender, belum diketahui = tinta
   const render = () => {
     if (!cw) return;
     const pm = pinMap(), ev = evalAt(ab), t = term(); let h = '';
     W.forEach(w => {
       const a = pm[keyOf(w.from)], b = pm[keyOf(w.to)], v = ev.v(w.from), d = wpath(a, b), on = sel && sel.k === 'w' && sel.id === w.id;
-      h += `<g class="xw" data-w="${w.id}">${on ? `<path d="${d}" stroke="#ff7eb6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>` : ''}${v === 1 ? `<path d="${d}" stroke="#ff4d6d" stroke-width="13" fill="none" stroke-linecap="round" opacity=".28"/>` : ''}<path d="${d}" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${v == null ? '#cdbfd6' : sc(v)}" stroke-width="3.6" fill="none" stroke-linecap="round"${v == null ? ' stroke-dasharray="7 6"' : ''}/><path class="xwh" d="${d}" stroke="transparent" stroke-width="20" fill="none"/></g>`;
+      h += `<g class="xw" data-w="${w.id}">${on ? `<path d="${d}" stroke="#ff7eb6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>` : ''}<path d="${d}" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${v == null ? '#cdbfd6' : sc(v)}" stroke-width="3.6" fill="none" stroke-linecap="round"${v == null ? ' stroke-dasharray="7 6"' : ''}/><path class="xwh" d="${d}" stroke="transparent" stroke-width="20" fill="none"/></g>`;
     });
     G.forEach(n => {
       const p = gp(n), on = sel && sel.k === 'g' && sel.id === n.id, nx = p.tx + ((n.type === 'NOT' ? 85 : 88) - 30) * K;
@@ -166,13 +183,11 @@ SC.simplus = () => {
     // terminal A, B, (C) di kiri dan Y di kanan
     IN.slice(0, nin).split('').forEach((k, i) => {   // terminal input = saklar: huruf + angka 0/1; menyala (pink + glow) saat 1, kabur (lavender) saat 0
       const q = t[k], v = ab[i], x0 = q.x - 70, y0 = q.y - 15;
-      h += `<g class="xt${v ? ' on' : ''}" data-t="${i}" role="button" aria-label="Input ${k} = ${v}. Klik untuk mengubah"><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${sc(v)}" stroke-width="3.6" stroke-linecap="round"/><rect x="${x0}" y="${y0}" width="56" height="30" rx="15" fill="${v ? '#ff7eb6' : '#e6dcf5'}" stroke="${INK}" stroke-width="3" style="${v ? 'filter:drop-shadow(0 0 7px #ff4d6d)' : ''}"/><circle cx="${v ? x0 + 41 : x0 + 15}" cy="${q.y}" r="11" fill="${INK}"/><text x="${v ? x0 + 41 : x0 + 15}" y="${q.y + 5}" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${v ? x0 + 15 : x0 + 41}" y="${q.y + 7}" font-size="19" font-weight="800" fill="${v ? INK : '#8a6b86'}" text-anchor="middle">${v}</text><text x="${x0 + 28}" y="${y0 + 46}" font-size="11" font-weight="800" fill="${v ? '#d6336c' : '#8a6b86'}" text-anchor="middle">${v ? 'AKTIF (1)' : 'MATI (0)'}</text></g>`;
+      h += `<g class="xt${v ? ' on' : ''}" data-t="${i}" role="button" aria-label="Input ${k} = ${v}. Klik untuk mengubah"><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${q.x - 14} ${q.y}H${q.x}" stroke="${sc(v)}" stroke-width="3.6" stroke-linecap="round"/><rect x="${x0}" y="${y0}" width="56" height="30" rx="15" fill="${v ? '#ff9cc6' : '#e6dcf5'}" stroke="${INK}" stroke-width="3"/><circle cx="${v ? x0 + 41 : x0 + 15}" cy="${q.y}" r="11" fill="${INK}"/><text x="${v ? x0 + 41 : x0 + 15}" y="${q.y + 5}" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${v ? x0 + 15 : x0 + 41}" y="${q.y + 7}" font-size="19" font-weight="800" fill="${v ? INK : '#8a6b86'}" text-anchor="middle">${v}</text><text x="${x0 + 28}" y="${y0 + 46}" font-size="11" font-weight="800" fill="${v ? '#a8426c' : '#8a6b86'}" text-anchor="middle">${v ? 'AKTIF (1)' : 'MATI (0)'}</text></g>`;
     });
-    const yv = yVal(ab), yl = yw(), lx = t.Y.x + 38, ly = t.Y.y;   // Y = lampu LED: menyala (halo) saat 1, gelap saat 0, putus-putus saat belum diketahui
-    h += `<defs><radialGradient id="xhalo"><stop offset="0" stop-color="#ff4d6d" stop-opacity=".8"/><stop offset="1" stop-color="#ff4d6d" stop-opacity="0"/></radialGradient></defs>`;
+    const yv = yVal(ab), yl = yw(), lx = t.Y.x + 38, ly = t.Y.y;   // output X: lingkaran polos; terisi pink saat 1, lavender saat 0, putus-putus saat belum diketahui
     h += `<path d="M${t.Y.x} ${ly}H${lx - 12}" stroke="${INK}" stroke-width="7" stroke-linecap="round"/><path d="M${t.Y.x} ${ly}H${lx - 12}" stroke="${yl ? sc(yv) : '#cdbfd6'}" stroke-width="3.6" stroke-linecap="round"/>`;
-    if (yv) h += `<circle cx="${lx}" cy="${ly}" r="42" fill="url(#xhalo)"/>`;
-    h += `<circle cx="${lx}" cy="${ly}" r="19" fill="${yv ? '#ff6f93' : yv === 0 ? '#d9cbe8' : '#fff'}" stroke="${INK}" stroke-width="3.5"${yv == null ? ' stroke-dasharray="5 4"' : ''}/><ellipse cx="${lx - 6}" cy="${ly - 7}" rx="6" ry="3.2" fill="#fff" opacity="${yv ? .85 : .55}" transform="rotate(-35 ${lx - 6} ${ly - 7})"/><text x="${lx}" y="${ly + 6}" font-size="17" font-weight="800" fill="${yv ? '#fff' : INK}" text-anchor="middle">Y</text><text x="${lx}" y="${ly + 40}" font-size="13" font-weight="800" fill="${yv ? '#d6336c' : INK}" text-anchor="middle">${yl ? `Y = ${vtxt(yv)}` : 'Y kosong'}</text>`;
+    h += `<circle cx="${lx}" cy="${ly}" r="19" fill="${yv ? '#ff9cc6' : yv === 0 ? '#d9cbe8' : '#fff'}" stroke="${INK}" stroke-width="3.5"${yv == null ? ' stroke-dasharray="5 4"' : ''}/><text x="${lx}" y="${ly + 6}" font-size="17" font-weight="800" fill="${INK}" text-anchor="middle">X</text><text x="${lx}" y="${ly + 40}" font-size="13" font-weight="800" fill="${yv ? '#a8426c' : INK}" text-anchor="middle">${yl ? `X = ${vtxt(yv)}` : 'X kosong'}</text>`;
     // pin
     const cand = drag && drag.k === 'wire' ? nearest(pm, drag.p, 24, drag.from.key) : null;
     for (const k in pm) {
@@ -195,10 +210,10 @@ SC.simplus = () => {
     $('.xp', el).classList.toggle('n3', nin === 3);
     $$('.xmode', el).forEach(b => { const on = +b.dataset.n === nin; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on) });
     $$('.xtg', el).forEach((b, i) => { b.hidden = i >= nin; b.textContent = `${IN[i]} = ${ab[i]}`; b.setAttribute('aria-pressed', ab[i]); b.classList.toggle('on', !!ab[i]) });
-    const xy = $('#xy', el); xy.textContent = `Y = ${vtxt(yv)}`; xy.className = 'xy' + (yv ? ' on' : yv == null ? ' na' : '');
+    const xy = $('#xy', el); xy.textContent = `X = ${vtxt(yv)}`; xy.className = 'xy' + (yv ? ' on' : yv == null ? ' na' : '');
     const rows = 1 << nin, bit = (r, i) => (r >> (nin - 1 - i)) & 1;   // baris r: A = bit tertinggi
     const tk = nin + (chi >= 0 ? 'c' : ''), C = chi >= 0 ? CH[chi] : null;
-    if (tblN !== tk) { tblN = tk; $('#xtt', el).innerHTML = `<tr>${IN.slice(0, nin).split('').map(k => `<th>${k}</th>`).join('')}<th>Y</th>${C ? '<th class="xth">TARGET</th>' : ''}</tr>` + Array.from({ length: rows }, (_, r) => `<tr data-r="${r}">${IN.slice(0, nin).split('').map((_, i) => `<td>${bit(r, i)}</td>`).join('')}<td class="xyc"></td>${C ? '<td class="xtgt"></td>' : ''}</tr>`).join('') }
+    if (tblN !== tk) { tblN = tk; $('#xtt', el).innerHTML = `<tr>${IN.slice(0, nin).split('').map(k => `<th>${k}</th>`).join('')}<th>X</th>${C ? '<th class="xth">TARGET</th>' : ''}</tr>` + Array.from({ length: rows }, (_, r) => `<tr data-r="${r}">${IN.slice(0, nin).split('').map((_, i) => `<td>${bit(r, i)}</td>`).join('')}<td class="xyc"></td>${C ? '<td class="xtgt"></td>' : ''}</tr>`).join('') }
     const cur = ab.slice(0, nin).reduce((a, v) => a * 2 + v, 0); let okN = 0, nul = 0;
     $$('#xtt tr[data-r]', el).forEach(tr => {
       const r = +tr.dataset.r, y = yVal(Array.from({ length: 3 }, (_, i) => i < nin ? bit(r, i) : 0)), c = tr.querySelector('.xyc'), tg = C ? +C.y[r] : null;
@@ -207,10 +222,10 @@ SC.simplus = () => {
       if (C) { tr.querySelector('.xtgt').textContent = tg; c.classList.toggle('ok', y != null && y === tg); c.classList.toggle('bad', y != null && y !== tg) }
     });
     const msg = $('#xmsg', el), has = yw(), now = !!C && !!has && !nul && okN === rows;
-    if (now && !solved) { solved = true; done.add(chi); Snd.sfx('confirmMenu'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
+    if (now && !solved) { solved = true; done.add(chi); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
     msg.textContent = C && has && !nul ? (now ? `✓ Benar! Semua ${rows} baris cocok dengan target (${G.length} gerbang).` : `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`)
-      : !G.length && !has ? 'Belum ada rangkaian. Tambahkan gerbang dan sambungkan ke Y.' : !has ? 'Hasil belum tersedia: Y belum tersambung ke output gerbang atau terminal.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${IN.slice(0, nin).split('').map((k, i) => `${k} = ${ab[i]}`).join(', ')}, maka Y = ${yv}.`;
-    const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E); if (has) ex.textContent = E ? `Y = ${E.s}` : 'Y = … (rangkaian belum lengkap)';
+      : !G.length && !has ? 'Belum ada rangkaian. Tambahkan gerbang dan sambungkan ke X.' : !has ? 'Hasil belum tersedia: X belum tersambung ke output gerbang atau terminal.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${IN.slice(0, nin).split('').map((k, i) => `${k} = ${ab[i]}`).join(', ')}, maka X = ${yv}.`;
+    const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E); if (has) ex.textContent = E ? `X = ${E.s}` : 'X = … (rangkaian belum lengkap)';
     const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1 }
     $$('.xmode', el).forEach(b => { b.disabled = !!C }); $$('.xpi', el).forEach(b => b.classList.toggle('dis', !allowed(b.dataset.g)));
     msg.classList.toggle('warn', yv == null && !!(G.length || has));
@@ -262,10 +277,10 @@ SC.simplus = () => {
   $$('.xtg', el).forEach(b => b.onclick = () => toggleIn(+b.dataset.i));
   $$('.xmode', el).forEach(b => b.onclick = () => setN(+b.dataset.n));
   $('#xdw').onclick = delSel; $('#xdg').onclick = delSel;
-  $('#xcl').onclick = () => { G.length = 0; W.length = 0; sel = null; Snd.sfx('cancelMenu'); say('Rangkaian dikosongkan.', 'info'); render() };
+  $('#xcl').onclick = () => { G.length = 0; W.length = 0; sel = null; Sfx('del'); say('Rangkaian dikosongkan.', 'info'); render() };
   $('#xch').onclick = () => { if (list.hidden) openList(); else list.hidden = true };
   $('#xgl').onclick = openList; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);
-  const back = () => { Snd.sfx('cancelMenu'); go('simpick') };
+  const back = () => { Sfx('tick'); go('simpick') };
   $('#back').onclick = back;
   document.onkeydown = e => { if (e.key === 'Escape') { if (!list.hidden) list.hidden = true; else back() } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { e.preventDefault(); delSel() } };
 
