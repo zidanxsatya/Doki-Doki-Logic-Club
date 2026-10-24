@@ -704,3 +704,37 @@ body.m{--cs:.6}
 .m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{letter-spacing:-.3px}
 /* status ON lebih lembut: tanpa cahaya terang */
 .xy.on{background:#ffc9df}.xy.on::before{background:#ff8fb3;box-shadow:none}.xtg.on{background:#ffe7a0}
+
+/* ===== Simulasi+ v6: input bebas (kartu INPUT), tabel adaptif, garis atas (NOT), cahaya output ===== */
+.xpal{grid-template-columns:repeat(2,minmax(0,1fr))}
+.xpi:not(.xin){grid-column:span 2}
+.xin b{font-size:10px;letter-spacing:.5px}.xin svg{width:100%}.xv{display:none}
+.xin{background:#f4fbf6}
+.xghost.xi{width:64px}
+.xcnt{font-weight:800;font-size:11px;letter-spacing:.5px;color:var(--ink);opacity:.6}
+.xtgs{display:contents}.xnone{font-weight:700;font-size:13px;color:#8a6b86}
+.xio .xrow{gap:6px}
+.xttc{display:flex;flex-direction:column;min-height:0;flex:1 1 auto}
+.xtw{flex:1 1 auto;min-height:0;overflow:auto;position:relative;overscroll-behavior:contain}
+.xtw[hidden],.xtt[hidden]{display:none}
+.xtt{overflow:visible}.xtt th{position:sticky;top:0;z-index:1}
+.xtt th:first-child{border-top-left-radius:7px}.xtt th:last-child{border-top-right-radius:7px}
+.xex{line-height:1.75}.ov{border-top:2px solid currentColor}
+.xtools{flex:none}
+/* landscape ponsel: palet = 7 gerbang + 2 kartu input yang lebih pendek */
+.m:not(.p) .xpal{grid-template-columns:1fr;grid-template-rows:repeat(7,minmax(0,1fr)) repeat(2,minmax(0,.62fr))}
+.m:not(.p) .xpi:not(.xin){grid-column:auto}
+.m:not(.p) .xin{flex-direction:row;gap:4px;justify-content:center;padding:0 2px}.m:not(.p) .xin svg{width:34px;flex:none;height:auto}.m:not(.p) .xin b{font-size:9px;letter-spacing:0}.m:not(.p) .xv{display:inline}
+.m:not(.p) .xtw{min-height:44px}
+/* portrait ponsel: 7 gerbang di baris atas, 2 kartu input lebar di baris kedua */
+.m.p .xpal{grid-template-columns:repeat(14,minmax(0,1fr))}
+.m.p .xpi:not(.xin){grid-column:span 2}.m.p .xin{grid-column:span 7;flex-direction:row;gap:8px;justify-content:center;padding:2px 4px}.m.p .xin svg{width:44px;height:26px;flex:none}.m.p .xin b{font-size:12px;letter-spacing:.5px}.m.p .xv{display:inline}
+.m.p .xtw{max-height:min(30vh,230px)}
+.m .xcnt{font-size:9px}
+.xttc{flex:0 1 auto}
+.xio .xrow{display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
+.xtgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:6px}
+.xtgs .xtg{min-width:0;padding:3px 0}.xio .xy{text-align:center}
+.m .xtgs{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px}.m .xtgs .xtg{font-size:12px;border-width:2px;padding:2px 0}
+.m:not(.p) .xv{display:none}
+.m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{flex:1 1 auto}
