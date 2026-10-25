@@ -68,7 +68,7 @@ const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'H
 const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];
 
 /* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
-const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
+const EVAL_N = 10, nb = s => `<span class="ov">${s}</span>`, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
 const EVAL = [
   { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0 },
   { q: 'Pada sistem kontrol, sensor dan tombol termasuk…', o: ['Input', 'Output', 'Gerbang logika', 'Catu daya'], a: 0 },
@@ -84,7 +84,7 @@ const EVAL = [
   { q: 'Pada rangkaian logika, nilai logika 1 menunjukkan keadaan ….', o: ['hidup atau ada tegangan', 'mati atau tidak ada tegangan', 'arus bolak-balik', 'hambatan yang besar', 'terputus dari catu daya'], a: 0 },
   { q: 'Gerbang OR menghasilkan output berlogika 1 apabila ….', vis: cv('OR', null), o: ['minimal satu input berlogika 1', 'kedua input berlogika 0', 'kedua input berlogika 1 saja', 'kedua input berlogika berbeda saja', 'hanya input B yang berlogika 1'], a: 0 },
   { q: 'Perhatikan gambar simbol gerbang logika berikut. Gerbang tersebut adalah gerbang ….', vis: cv('NOT', null, { out: 'X' }), o: ['NOT', 'AND', 'OR', 'NAND', 'XOR'], a: 0 },
-  { q: 'Persamaan Boolean yang tepat untuk gerbang AND dengan input A dan B serta output X adalah ….', vis: cv('AND', null, { out: 'X' }), o: ['X = A · B', 'X = A + B', 'X = ¬A', 'X = ¬(A · B)', 'X = ¬(A + B)'], a: 0 },
+  { q: 'Persamaan Boolean yang tepat untuk gerbang AND dengan input A dan B serta output X adalah ….', vis: cv('AND', null, { out: 'X' }), o: ['X = A · B', 'X = A + B', `X = ${nb('A')}`, `X = ${nb('A · B')}`, `X = ${nb('A + B')}`], a: 0 },
   { q: 'Pada gerbang NAND dengan dua input A dan B, output bernilai 0 hanya jika ….', vis: cv('NAND', null), o: ['A = 1 dan B = 1', 'A = 0 dan B = 0', 'A = 0 dan B = 1', 'A = 1 dan B = 0', 'salah satu input bernilai 1'], a: 0 },
   { q: 'Perhatikan rangkaian berikut. Output X bernilai 1 hanya jika ….', vis: cv('OR', 'NOT', { out: 'X' }), o: ['kedua input A dan B bernilai 0', 'kedua input A dan B bernilai 1', 'input A bernilai 1 dan input B bernilai 0', 'salah satu input bernilai 1', 'input A dan B bernilai berbeda'], a: 0 },
   { q: 'Gerbang logika dibuat dalam bentuk … yang terdiri atas transistor-transistor, diode, dan komponen-komponen lainnya.', o: ['IC (Integrated Circuit)', 'ICU', 'gerbang', 'hambatan', 'saklar'], a: 0 },

@@ -204,7 +204,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
   };
   o.classList.toggle('n5', Q.opts.length > 4);   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
   Q.opts.forEach((t, k) => {
-    const b = document.createElement('button'); b.className = 'opt'; b.textContent = t;
+    const b = document.createElement('button'); b.className = 'opt'; b.innerHTML = t; if (t.includes('<')) b.setAttribute('aria-label', t.replace(/<span class="ov">(.*?)<\/span>/g, 'bukan ($1)').replace(/<[^>]+>/g, ''));   // opsi bernotasi garis atas (NOT)
     b.onclick = () => {
       if (locked) return; Snd.sfx('openOS'); onPick && onPick(k, choice); choice = k;
       $$('.opt', o).forEach((x, j) => x.classList.toggle('picked', j === k)); showBtn();
