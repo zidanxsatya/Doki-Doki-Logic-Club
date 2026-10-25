@@ -68,7 +68,7 @@ const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'H
 const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];
 
 /* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
-const EVAL_N = 10, nb = s => `<span class="ov">${s}</span>`, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
+const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
 const EVAL = [
   { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0 },
   { q: 'Pada sistem kontrol, sensor dan tombol termasuk…', o: ['Input', 'Output', 'Gerbang logika', 'Catu daya'], a: 0 },

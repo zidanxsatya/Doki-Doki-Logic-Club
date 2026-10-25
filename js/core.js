@@ -180,7 +180,8 @@ class Dialogue {
 /* ---------- Gerbang logika ---------- */
 const F = { AND: (a, b) => a & b, OR: (a, b) => a | b, NOT: a => +!a, NAND: (a, b) => +!(a & b), NOR: (a, b) => +!(a | b), XOR: (a, b) => a ^ b, XNOR: (a, b) => +!(a ^ b) };
 const GL = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
-const FORM = { AND: 'Y = A · B', OR: 'Y = A + B', NOT: 'Y = Ā', NAND: 'Y = ¬(A · B)', NOR: 'Y = ¬(A + B)', XOR: 'Y = A ⊕ B', XNOR: 'Y = ¬(A ⊕ B)' };
+const nb = s => `<span class="ov">${s}</span>`;   // NOT = garis di atas ekspresi (tanpa ' atau ¬)
+const FORM = { AND: 'Y = A · B', OR: 'Y = A + B', NOT: `Y = ${nb('A')}`, NAND: `Y = ${nb('A · B')}`, NOR: `Y = ${nb('A + B')}`, XOR: 'Y = A ⊕ B', XNOR: `Y = ${nb('A ⊕ B')}` };
 const INK = '#4a2040', wc = v => v == null ? INK : v ? '#18b04a' : '#b9a9c8';
 const gBody = g => g === 'NOT' ? 'M52 15V85L118 50Z' : /AND/.test(g) ? 'M52 15H92A35 35 0 0 1 92 85H52Z' : 'M47 15Q82 15 130 50Q82 85 47 85Q70 50 47 15Z';   // bentuk badan gerbang (dipakai juga oleh Simulasi+)
 // a,b,o: 0/1 atau null (tidak diketahui). sw=true -> saklar input bisa diklik (.sw[data-i])
