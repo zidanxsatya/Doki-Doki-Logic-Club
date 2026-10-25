@@ -11,7 +11,7 @@ const store = { get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)
 const _img = {}, _atl = {};
 const loadImg = s => _img[s] ??= new Promise((ok, no) => { const i = new Image(); i.onload = () => (i.decode ? i.decode().catch(() => { }) : Promise.resolve()).then(() => ok(i)); i.onerror = no; i.src = s });
 const loadAtlas = base => _atl[base] ??= (async () => {
-  const [img, txt] = await Promise.all([loadImg(base + '.png'), fetch(base + '.xml').then(r => r.text())]);
+  const [img, txt] = await Promise.all([loadImg(base + '.webp'), fetch(base + '.xml').then(r => r.text())]);
   const doc = new DOMParser().parseFromString(txt.replace(/^\uFEFF/, ''), 'text/xml');
   const list = [...doc.getElementsByTagName('SubTexture')].map(e => {
     const g = k => +e.getAttribute(k) || 0;

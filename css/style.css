@@ -32,7 +32,7 @@ h1,h2{margin:0;font-family:Anton,Impact,"Arial Black",sans-serif;letter-spacing:
 .mchar{position:absolute;right:20px;bottom:0}.mchar canvas{height:700px;width:auto}
 #mute{position:absolute;right:10px;top:10px;z-index:30;font-size:22px;background:#fff9;border:3px solid var(--ink);border-radius:50%;width:44px;height:44px;cursor:pointer}
 /* scene */
-.bg{position:absolute;inset:0;background:url(../assets/img/DDLCbg.png) center/cover}
+.bg{position:absolute;inset:0;background:url(../assets/img/DDLCbg.webp) center/cover}
 .top{position:absolute;left:14px;top:12px;display:flex;align-items:center;gap:14px;z-index:5}
 .top b{font:30px Anton,Impact,sans-serif;letter-spacing:3px;color:#fff;-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink)}
 .cw{position:absolute;left:10px;bottom:30px;z-index:2}

@@ -90,7 +90,7 @@ function buildSettings() {
 function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
-  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.png)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
+  el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
   ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch), chat = bag(D[m.key].chat);
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };
@@ -288,7 +288,7 @@ document.addEventListener('pointermove', e => {
     together = new Actor(await loadAtlas('assets/img/dokitogether'), { t: { name: 'Doki together club monika', fps: 12, loop: true } });
     await Snd.preload();   // SFX didecode sebelum tombol MULAI aktif
     const keys = Object.keys(CHARS);
-    warm = Promise.all([...keys.map(k => Character.load(k).then(c => chars[k] = c)), loadAtlas('assets/img/Text_Boxes'), loadImg('assets/img/DDLCbg.png'), loadImg('assets/img/Music_Room.png')]);
+    warm = Promise.all([...keys.map(k => Character.load(k).then(c => chars[k] = c)), loadAtlas('assets/img/Text_Boxes'), loadImg('assets/img/DDLCbg.webp'), loadImg('assets/img/Music_Room.webp')]);
     warm.catch(err => { msg.textContent = 'Gagal memuat asset.'; console.error(err) });
     msg.remove(); btn.disabled = false;
   } catch (err) { msg.textContent = 'Gagal memuat asset. Buka lewat GitHub Pages atau server lokal (python -m http.server), bukan dengan klik ganda file.'; console.error(err) }
