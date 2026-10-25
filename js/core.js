@@ -212,6 +212,20 @@ function gateSVG(g, a, b, o, sw) {
   else s += `<circle cx="264" cy="50" r="13" fill="#ffd54a" stroke="${INK}" stroke-width="3"/><text x="264" y="26" font-size="12" font-weight="800" fill="${INK}" text-anchor="middle">LED</text><text x="264" y="86" font-size="14" font-weight="800" fill="${INK}" text-anchor="middle">Y</text>`;
   return s + '</svg>';
 }
+// Rangkaian bergambar simbol gerbang (pengganti kotak+panah). g2 opsional: 'NOT' atau gerbang 2 input yang menerima input C.
+// o.t = label input {A:'A = 1'} (pil), o.names = nama gerbang di atas simbol, o.out = label output, o.alt = teks alternatif
+function circ(g1, g2, o = {}) {
+  const T = o.t, L = T ? 64 : 34, out = o.out || 'Y', tip = g => g === 'NOT' ? 118 : /AND/.test(g) ? 127 : 130, neg = g => /^(NAND|NOR|XNOR|NOT)$/.test(g), end = g => tip(g) + (neg(g) ? 12 : 0);
+  const x1 = L + 8, X1 = x1 + end(g1), two2 = g2 && g2 !== 'NOT', c2 = two2 ? 88 : 50, x2 = X1 + 10, gl = g2 || g1, xl = g2 ? x2 : x1, XE = xl + end(gl), cl = g2 ? c2 : 50, W = XE + 36 + 14 + out.length * 12;
+  const line = d => `<path d="${d}" fill="none" stroke="${INK}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>`, tx = (t, x, y, a = 'middle', c = INK) => `<text x="${x}" y="${y}" font-size="20" font-weight="800" fill="${c}" text-anchor="${a}">${t}</text>`;
+  const pin = (n, y, x) => line(`M${L} ${y}H${x}`) + (T ? `<rect x="2" y="${y - 14}" width="${L - 8}" height="28" rx="14" fill="${INK}"/>` + tx(T[n], (L - 4) / 2 + 2, y + 6, 'middle', '#fff').replace('20"', '16"') : tx(n, L - 12, y + 7, 'end'));
+  const gate = (g, x, c) => `<g transform="translate(${x} ${c - 50})">${g[0] === 'X' ? `<path d="M36 15Q59 50 36 85" fill="none" stroke="${INK}" stroke-width="4"/>` : ''}<path d="${gBody(g)}" fill="#ffd1e6" stroke="${INK}" stroke-width="4" stroke-linejoin="round"/>${neg(g) ? `<circle cx="${tip(g) + 6}" cy="50" r="6" fill="#fff" stroke="${INK}" stroke-width="4"/>` : ''}${o.names ? tx(g, g === 'NOT' ? 85 : 88, 2).replace('20"', '16"') : ''}</g>`;
+  let s = g1 === 'NOT' ? pin('A', 50, x1 + 58) : pin('A', 32, x1 + 58) + pin('B', 68, x1 + 58);
+  s += line(`M${X1} 50` + (g2 ? (two2 ? `H${X1 + 34}V${c2 - 18}` : '') + `H${x2 + 58}` : `H${XE + 36}`));
+  if (g2) s += (two2 ? pin('C', c2 + 18, x2 + 58) : '') + line(`M${XE} ${cl}H${XE + 36}`);
+  s += gate(g1, x1, 50) + (g2 ? gate(g2, x2, c2) : '') + tx(out, XE + 46, cl + 7, 'start');
+  return `<svg class="gate circ" viewBox="0 -14 ${W} ${two2 ? 140 : 100}" style="width:${Math.round(W * .8)}px" role="img" aria-label="${o.alt || 'Gambar rangkaian logika'}">${s}</svg>`;
+}
 const tt = (g, hl = -1) => g === 'NOT'
   ? `<table class="tt"><tr><th>A</th><th>Y</th></tr>${[0, 1].map(a => `<tr class="${a === hl ? 'hl' : ''}"><td>${a}</td><td>${F.NOT(a)}</td></tr>`).join('')}</table>`
   : `<table class="tt"><tr><th>A</th><th>B</th><th>Y</th></tr>${[0, 1, 2, 3].map(i => `<tr class="${i === hl ? 'hl' : ''}"><td>${i >> 1}</td><td>${i & 1}</td><td>${F[g](i >> 1, i & 1)}</td></tr>`).join('')}</table>`;

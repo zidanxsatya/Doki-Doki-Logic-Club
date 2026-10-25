@@ -738,3 +738,6 @@ body.m{--cs:.6}
 .m .xtgs{grid-template-columns:repeat(auto-fill,minmax(54px,1fr));gap:4px}.m .xtgs .xtg{font-size:12px;border-width:2px;padding:2px 0}
 .m:not(.p) .xv{display:none}
 .m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{flex:1 1 auto}
+
+/* v7: soal 5 pilihan + gambar rangkaian */
+.qo.n5 .opt{flex:1 1 150px;font-size:19px;padding:7px 8px}.qv .circ{max-width:100%;height:auto}.m .qo.n5 .opt{font-size:16px;padding:6px 7px}

@@ -59,15 +59,16 @@ const QGEN = [
   () => ({ kind: 'mc', ...shuffleOpts(pick(CONCEPT)) }),
   () => { // membaca rangkaian 2 gerbang
     const [g1, g2] = [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR'])], a = rnd(), b = rnd(), c = rnd(), x = F[g1](a, b), y = F[g2](x, c);
-    return { kind: 'mc', q: 'Baca rangkaian berikut. Berapa output Y?', vis: `<div class="flow sm2"><div>A=${a}<br>B=${b}</div><span>➜</span><div>${g1}</div><span>X ➜</span><div>${g2}</div><span>⬅</span><div>C=${c}</div><span>➜</span><div><b>Y=?</b></div></div>`, opts: ['0', '1'], a: y, hint: `Hitung dulu X = ${g1}(A,B), lalu Y = ${g2}(X,C). ${HINT[g1]}` } }
+    return { kind: 'mc', q: 'Baca rangkaian berikut. Berapa output Y?', vis: `<div class="card sm">${circ(g1, g2, { t: { A: 'A = ' + a, B: 'B = ' + b, C: 'C = ' + c }, names: true, out: 'Y = ?', alt: `Gerbang ${g1} dengan input A=${a}, B=${b}, keluarannya masuk gerbang ${g2} bersama C=${c}; output Y` })}</div>`, opts: ['0', '1'], a: y, hint: `Hitung dulu X = ${g1}(A,B), lalu Y = ${g2}(X,C). ${HINT[g1]}` } }
 ];
-function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint } }
+function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis } }
 const makeSet = n => shuffle([0, 1, 2, 3, 4, 0, 2, 4, 1, 3]).slice(0, n).map(i => QGEN[i]());
 
 const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'Hmph, kebetulan aja itu! ...Oke, oke, bagus.', 'Y-yah, itu benar. Jangan sombong dulu!', 'Tch... kamu ternyata nggak sebodoh yang kukira. Sedikit!'];
 const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];
 
-/* ---------- EVALUASI (Monika): 10 soal ---------- */
+/* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
+const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
 const EVAL = [
   { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0 },
   { q: 'Pada sistem kontrol, sensor dan tombol termasuk…', o: ['Input', 'Output', 'Gerbang logika', 'Catu daya'], a: 0 },
@@ -78,7 +79,17 @@ const EVAL = [
   { q: 'Gerbang yang outputnya 0 hanya jika semua inputnya 1 adalah…', o: ['NAND', 'NOR', 'AND', 'XOR'], a: 0 },
   { q: 'Pada gerbang NOR, jika A = 0 dan B = 0, outputnya…', o: ['1', '0', 'Tidak tentu', 'Sama dengan A'], a: 0 },
   { q: 'Gerbang XOR bernilai 1 apabila…', o: ['Kedua input berbeda', 'Kedua input sama', 'Semua input 1', 'Semua input 0'], a: 0 },
-  { q: 'Pada tabel kebenaran XNOR 2 input, berapa baris yang menghasilkan output 1?', o: ['2', '1', '3', '4'], a: 0 }
+  { q: 'Pada tabel kebenaran XNOR 2 input, berapa baris yang menghasilkan output 1?', o: ['2', '1', '3', '4'], a: 0 },
+  // ---- dari dokumen Soal gerbang logika ddlc.docx ----
+  { q: 'Pada rangkaian logika, nilai logika 1 menunjukkan keadaan ….', o: ['hidup atau ada tegangan', 'mati atau tidak ada tegangan', 'arus bolak-balik', 'hambatan yang besar', 'terputus dari catu daya'], a: 0 },
+  { q: 'Gerbang OR menghasilkan output berlogika 1 apabila ….', vis: cv('OR', null), o: ['minimal satu input berlogika 1', 'kedua input berlogika 0', 'kedua input berlogika 1 saja', 'kedua input berlogika berbeda saja', 'hanya input B yang berlogika 1'], a: 0 },
+  { q: 'Perhatikan gambar simbol gerbang logika berikut. Gerbang tersebut adalah gerbang ….', vis: cv('NOT', null, { out: 'X' }), o: ['NOT', 'AND', 'OR', 'NAND', 'XOR'], a: 0 },
+  { q: 'Persamaan Boolean yang tepat untuk gerbang AND dengan input A dan B serta output X adalah ….', vis: cv('AND', null, { out: 'X' }), o: ['X = A · B', 'X = A + B', 'X = ¬A', 'X = ¬(A · B)', 'X = ¬(A + B)'], a: 0 },
+  { q: 'Pada gerbang NAND dengan dua input A dan B, output bernilai 0 hanya jika ….', vis: cv('NAND', null), o: ['A = 1 dan B = 1', 'A = 0 dan B = 0', 'A = 0 dan B = 1', 'A = 1 dan B = 0', 'salah satu input bernilai 1'], a: 0 },
+  { q: 'Perhatikan rangkaian berikut. Output X bernilai 1 hanya jika ….', vis: cv('OR', 'NOT', { out: 'X' }), o: ['kedua input A dan B bernilai 0', 'kedua input A dan B bernilai 1', 'input A bernilai 1 dan input B bernilai 0', 'salah satu input bernilai 1', 'input A dan B bernilai berbeda'], a: 0 },
+  { q: 'Gerbang logika dibuat dalam bentuk … yang terdiri atas transistor-transistor, diode, dan komponen-komponen lainnya.', o: ['IC (Integrated Circuit)', 'ICU', 'gerbang', 'hambatan', 'saklar'], a: 0 },
+  { q: 'Perhatikan rangkaian berikut. Persamaan Boolean output X adalah ….', vis: cv('OR', 'AND', { out: 'X' }), o: ['X = (A + B) · C', 'X = A + B + C', 'X = A · B · C', 'X = (A · B) + C', 'X = A + (B · C)'], a: 0 },
+  { q: 'Berikut adalah gerbang logika dasar yang benar adalah …', o: ['AND, OR, NOT', 'AND, NOT, NAND', 'OR, NOT, NOR', 'XOR, XNOR', 'BUFFER, NAND, OR'], a: 0 }
 ];
 const GRADES = [
   { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wow. Serius, aku sempat merinding. Kamu menguasai ini dengan sangat baik, dan aku bangga banget sama kamu.', 'Hampir sempurna! Kalau ada klub rangkaian logika, aku langsung rekrut kamu jadi wakil ketua. Ehehe~', 'Luar biasa! Aku nggak akan bohong, aku sedikit iri sama otakmu.', 'Nilai ini akan kucatat dengan tinta paling tebal. Secara harfiah: di localStorage. Ehehe.'] },

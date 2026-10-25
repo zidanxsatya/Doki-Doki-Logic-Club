@@ -188,7 +188,7 @@ const ST = {
     bg: 'DDLCbg', title: 'Akhir cerita', go: 'KEMBALI KE MENU',
     next: () => { Story.on = false; go('menu') },
     lines: () => {
-      const p = Story.prog(), r = p.ev ?? 0, N = EVAL.length, hi = r >= 8, mid = r >= 5, g = GRADES.find(x => r >= x.min);
+      const p = Story.prog(), r = p.ev ?? 0, N = EVAL_N, hi = r >= 8, mid = r >= 5, g = GRADES.find(x => r >= x.min);
       return [
         L('m', `Evaluasi akhirmu: ${r} dari ${N} benar, nilai ${r * 10}. Kategorinya "${g.t}".`, hi ? 'happy' : 'calm'),
         ...(hi ? [L('s', 'Tuh kaaan! Aku bilang juga apa! Kamu hebat banget!!', 'cheer'), L('n', 'Hmph... lumayan. Eh, bagus. Bagus banget, maksudku. Jangan geer!', 'hmph'), L('m', 'Natsuki, itu pujian jujur pertamamu hari ini. Kucatat.', 'wink'), L('n', 'B-bukan pujian! Itu... penilaian objektif!', 'shy'), L('y', 'Pemahamanmu sudah kuat. Kamu bisa menjelaskan ini ke orang lain sekarang.', 'happy')]
@@ -203,7 +203,7 @@ const ST = {
     },
     card: panel => {
       const p = Story.prog(), r = p.ev ?? 0, g = GRADES.find(x => r >= x.min);
-      panel.innerHTML = `<div class="startcard res"><h2>HASIL CERITA</h2><div class="rg"><div><b>${p.lat ?? '-'}</b>Latihan /8</div><div><b>${r * 10}</b>Evaluasi</div><div><b>${r / EVAL.length * 100}%</b>Benar</div></div><p class="grade">${g.t}</p><div class="rfoot"><button class="btn" id="again">↻ MAIN CERITA LAGI</button></div></div>`;
+      panel.innerHTML = `<div class="startcard res"><h2>HASIL CERITA</h2><div class="rg"><div><b>${p.lat ?? '-'}</b>Latihan /8</div><div><b>${r * 10}</b>Evaluasi</div><div><b>${r / EVAL_N * 100}%</b>Benar</div></div><p class="grade">${g.t}</p><div class="rfoot"><button class="btn" id="again">↻ MAIN CERITA LAGI</button></div></div>`;
       $('#again', panel).onclick = () => { Snd.sfx('select'); Story.start(true) };
     }
   },

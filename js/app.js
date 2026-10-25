@@ -202,6 +202,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
     else f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`, $('#qn').onclick = () => { Snd.sfx('select'); onAns(choice === Q.a); next() };
     f.scrollIntoView({ block: 'nearest' });
   };
+  o.classList.toggle('n5', Q.opts.length > 4);   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
   Q.opts.forEach((t, k) => {
     const b = document.createElement('button'); b.className = 'opt'; b.textContent = t;
     b.onclick = () => {
@@ -241,9 +242,9 @@ SC.latihan = () => {
 
 /* ---------- EVALUASI (Monika) ---------- */
 SC.evaluasi = () => {
-  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL.length, best = () => store.get('tkm_eval_best', null); let qs, i, right;
+  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right;
   const bestTxt = () => best() == null ? 'Belum ada' : `${best() * 10} (${best()}/${N} benar)`;
-  const begin = () => { qs = shuffle(EVAL).map(c => ({ kind: 'mc', ...shuffleOpts(c) })); i = 0; right = 0; q() };
+  const begin = () => { qs = shuffle(EVAL).slice(0, EVAL_N).map(c => ({ kind: 'mc', ...shuffleOpts(c) })); i = 0; right = 0; q() };
   const q = () => {
     if (i === 0) S.d.say(pick(DM.start));
     else if (i === N - 1) S.d.line(pick(DM.last), 'talk');
