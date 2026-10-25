@@ -525,8 +525,6 @@ body:not(.m) .cw{left:0;width:350px;display:flex;justify-content:center}
 .opt:first-child:nth-last-child(2),.opt:nth-child(2):last-child{flex-basis:calc(50% - 10px)}
 .opt.ok,.opt.bad{display:flex;align-items:center;justify-content:center;gap:12px}
 .opt.ok{background:linear-gradient(#a8f2b8,#6fdc8c)!important}.opt.bad{background:linear-gradient(#ffb3bd,#ff8f9c)!important}
-.opt.ok::before,.opt.bad::before{content:"✓";display:grid;place-items:center;width:30px;height:30px;border-radius:50%;background:#fff;border:3px solid var(--ink);font-size:16px;line-height:1}
-.opt.bad::before{content:"✕"}
 .opt.picked{background:#ffd54a}
 .cell{font:800 20px Nunito,sans-serif;width:64px;height:30px;border:3px dashed var(--ink);border-radius:8px;background:#fff4d6;color:var(--ink)}
 .cell.set,.cell.ok,.cell.bad{border-style:solid;background:#ffd54a;box-shadow:0 2px 0 var(--ink)}
@@ -742,3 +740,4 @@ body.m{--cs:.6}
 /* v7: soal 5 pilihan + gambar rangkaian */
 .qo.n5 .opt{flex:1 1 150px;font-size:19px;padding:7px 8px}.qv .circ{max-width:100%;height:auto}.m .qo.n5 .opt{font-size:16px;padding:6px 7px}
 .opt .ov{padding-top:1px;line-height:1.3}
+.fm .ov{border-top-width:3px;padding-top:3px}.card .fm,.sim .fm{padding:10px 16px 4px}
