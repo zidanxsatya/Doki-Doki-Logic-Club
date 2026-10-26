@@ -741,3 +741,14 @@ body.m{--cs:.6}
 .qo.n5 .opt{flex:1 1 150px;font-size:19px;padding:7px 8px}.qv .circ{max-width:100%;height:auto}.m .qo.n5 .opt{font-size:16px;padding:6px 7px}
 .opt .ov{padding-top:1px;line-height:1.3}
 .fm .ov{border-top-width:3px;padding-top:3px}.card .fm,.sim .fm{padding:10px 16px 4px}
+.m:not(.p) .qo .opt{flex-basis:calc(50% - 8px)}   /* landscape: 2 pilihan per baris, hemat tinggi */
+/* v12: pembahasan Evaluasi */
+.rbtn{display:flex;gap:10px;justify-content:center;align-items:center;flex-wrap:wrap}
+.rv{text-align:left}.rv h2{text-align:center}.rv>.btn{display:block;margin:8px auto 0}
+.rvl{max-height:36vh;overflow:auto;padding:2px}
+.rvl details{border:3px solid var(--ink);border-radius:12px;padding:6px 12px;margin:6px 0;background:#fff}
+.rvl details.ok{background:#e3f8e8}.rvl details.bad{background:#ffe3e8}
+.rvl summary{font-weight:800;cursor:pointer;min-height:32px}
+.rvl p{margin:4px 0}.rvl .rve{font-weight:600}
+.rvl .card{margin:4px 0;padding:2px 8px;display:inline-block}.rvl .circ{max-width:100%;height:auto;width:min(100%,300px)!important}
+.m .rvl{max-height:32vh}.m .rvl details{padding:4px 10px;font-size:15px}

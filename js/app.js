@@ -242,9 +242,9 @@ SC.latihan = () => {
 
 /* ---------- EVALUASI (Monika) ---------- */
 SC.evaluasi = () => {
-  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right;
+  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right, log, lastK;
   const bestTxt = () => best() == null ? 'Belum ada' : `${best() * 10} (${best()}/${N} benar)`;
-  const begin = () => { qs = shuffle(EVAL).slice(0, EVAL_N).map(c => ({ kind: 'mc', ...shuffleOpts(c) })); i = 0; right = 0; q() };
+  const begin = () => { qs = shuffle(EVAL).slice(0, EVAL_N).map(c => ({ kind: 'mc', ...shuffleOpts(c) })); i = 0; right = 0; log = []; q() };
   const q = () => {
     if (i === 0) S.d.say(pick(DM.start));
     else if (i === N - 1) S.d.line(pick(DM.last), 'talk');
@@ -252,14 +252,24 @@ SC.evaluasi = () => {
     else if (Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(pick(DM.q), pick(['talk', 'wink', 'happy']));
     let swaps = 0; // berapa kali pemain mengganti jawaban pada soal ini
-    renderQ(S.panel, qs[i], i, N, { reveal: false, onAns: ok => { if (ok) right++ }, next: () => ++i < N ? q() : end(),
-      onPick: (k, prev) => { if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (Story.on && swaps === 2 && prev >= 0 && k !== prev) S.d.say(ST.eval.swap); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });
+    renderQ(S.panel, qs[i], i, N, { reveal: false, onAns: ok => { if (ok) right++; log.push({ Q: qs[i], k: lastK, ok }) }, next: () => ++i < N ? q() : end(),
+      onPick: (k, prev) => { lastK = k; if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (Story.on && swaps === 2 && prev >= 0 && k !== prev) S.d.say(ST.eval.swap); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });
   };
   const end = () => {
     const wrong = N - right, gr = GRADES.find(g => right >= g.min), prev = best(), rec = prev != null && right > prev; if (prev == null || right > prev) store.set('tkm_eval_best', right);
-    S.panel.innerHTML = `<div class="startcard sc res"><h2>HASIL EVALUASI</h2><div class="rg"><div class="rb ok"><span>Benar</span><b>${right}</b></div><div class="rb bad"><span>Salah</span><b>${wrong}</b></div></div><p class="grade">${gr.t}</p><p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p><button class="btn big" id="go">ULANGI ↻</button></div>`;
-    $('#go').onclick = () => { Snd.sfx('select'); begin() };
-    if (Story.on) { Story.record('ev', right); $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi')) }
+    const show = () => {
+      S.panel.innerHTML = `<div class="startcard sc res"><h2>HASIL EVALUASI</h2><div class="rg"><div class="rb ok"><span>Benar</span><b>${right}</b></div><div class="rb bad"><span>Salah</span><b>${wrong}</b></div></div><p class="grade">${gr.t}</p><p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p><div class="rbtn"><button class="btn big" id="go">ULANGI ↻</button><button class="btn" id="rv">PEMBAHASAN</button></div></div>`;
+      $('#go').onclick = () => { Snd.sfx('select'); begin() };
+      $('#rv').onclick = () => { Snd.sfx('select'); review() };
+      if (Story.on) $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi'));
+    };
+    const review = () => {   // soal salah terbuka, soal benar tertutup (<details> bawaan browser)
+      S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${log.map((l, n) => ({ ...l, n })).sort((x, y) => x.ok - y.ok).map(l => `<details class="${l.ok ? 'ok' : 'bad'}"${l.ok ? '' : ' open'}><summary>${l.n + 1}. ${l.Q.q}</summary>${l.Q.vis || ''}<p>Jawabanmu: <b>${l.Q.opts[l.k]}</b></p>${l.ok ? '' : `<p>Jawaban benar: <b>${l.Q.opts[l.Q.a]}</b></p>`}<p class="rve">${l.Q.e}</p></details>`).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
+      $('#rb').onclick = () => { Snd.sfx('select'); show() };
+      S.d.line(wrong ? 'Bagian paling penting belajar: lihat kenapa salah. Soal yang salah sudah kubuka, ya.' : 'Semuanya benar! Tapi baca-baca penjelasannya juga boleh, siapa tahu ada yang menarik.', wrong ? 'talk' : 'happy');
+    };
+    if (Story.on) Story.record('ev', right);
+    show();
     S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
   startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti']])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);

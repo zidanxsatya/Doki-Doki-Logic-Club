@@ -47,6 +47,8 @@ const CONCEPT = [
   { q: 'NAND sama dengan…', o: ['NOT AND', 'AND NOT', 'OR NOT', 'NOT OR'], a: 0, hint: 'Nama "N" di depan berarti dibalik.' },
   { q: 'Sensor dan tombol pada sistem kontrol berperan sebagai…', o: ['Input', 'Output', 'Gerbang', 'Catu daya'], a: 0, hint: 'Mereka mengirim informasi ke sistem.' }
 ];
+// ekspresi Boolean (HTML, NOT = garis atas); par: hasil AND/OR/XOR dikurung saat jadi input gerbang lain
+const BX = { AND: (a, b) => `${a} · ${b}`, OR: (a, b) => `${a} + ${b}`, XOR: (a, b) => `${a} ⊕ ${b}`, NAND: (a, b) => nb(`${a} · ${b}`), NOR: (a, b) => nb(`${a} + ${b}`), XNOR: (a, b) => nb(`${a} ⊕ ${b}`), NOT: a => nb(a) }, par = (g, s) => /^(AND|OR|XOR)$/.test(g) ? `(${s})` : s;
 const TXT = { q: 'Pilih jawaban yang benar', kind: 'mc' };
 const QGEN = [
   () => { const g = pick(GL), a = rnd(), b = rnd(), y = F[g](a, b); // menentukan output
@@ -59,10 +61,26 @@ const QGEN = [
   () => ({ kind: 'mc', ...shuffleOpts(pick(CONCEPT)) }),
   () => { // membaca rangkaian 2 gerbang
     const [g1, g2] = [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR'])], a = rnd(), b = rnd(), c = rnd(), x = F[g1](a, b), y = F[g2](x, c);
-    return { kind: 'mc', q: 'Baca rangkaian berikut. Berapa output Y?', vis: `<div class="card sm">${circ(g1, g2, { t: { A: 'A = ' + a, B: 'B = ' + b, C: 'C = ' + c }, names: true, out: 'Y = ?', alt: `Gerbang ${g1} dengan input A=${a}, B=${b}, keluarannya masuk gerbang ${g2} bersama C=${c}; output Y` })}</div>`, opts: ['0', '1'], a: y, hint: `Hitung dulu X = ${g1}(A,B), lalu Y = ${g2}(X,C). ${HINT[g1]}` } }
+    return { kind: 'mc', q: 'Baca rangkaian berikut. Berapa output Y?', vis: `<div class="card sm">${circ(g1, g2, { t: { A: 'A = ' + a, B: 'B = ' + b, C: 'C = ' + c }, names: true, out: 'Y = ?', alt: `Gerbang ${g1} dengan input A=${a}, B=${b}, keluarannya masuk gerbang ${g2} bersama C=${c}; output Y` })}</div>`, opts: ['0', '1'], a: y, hint: `Hitung dulu X = ${g1}(A,B), lalu Y = ${g2}(X,C). ${HINT[g1]}` } },
+  () => { // persamaan Boolean dari gambar rangkaian (1 gerbang atau 2 gerbang)
+    const two = Math.random() < .55, ex = (g1, g2) => g2 === 'NOT' ? BX.NOT(BX[g1]('A', 'B')) : BX[g2](par(g1, BX[g1]('A', 'B')), 'C');
+    if (!two) { const g = pick(GL), e = g => g === 'NOT' ? BX.NOT('A') : BX[g]('A', 'B'), opts = shuffle([g, ...shuffle(GL.filter(x => x !== g)).slice(0, 3)]).map(e), s = e(g);
+      return { kind: 'mc', q: 'Persamaan Boolean output X dari rangkaian ini adalah ….', vis: `<div class="card sm">${circ(g, null, { out: 'X' })}</div>`, opts, a: opts.indexOf(s), hint: 'Hafalkan: AND = A · B, OR = A + B, garis di atas = NOT.' } }
+    const pr = () => [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR', 'NOT'])], tv = ([g1, g2]) => [...Array(8).keys()].map(i => { const x = F[g1](i >> 2, (i >> 1) & 1); return g2 === 'NOT' ? F.NOT(x) : F[g2](x, i & 1) }).join('');
+    const ans = pr(), seen = new Set([tv(ans)]), o = [ans];
+    while (o.length < 4) { const p = pr(); if (!seen.has(tv(p))) { seen.add(tv(p)); o.push(p) } }
+    const opts = shuffle(o.map(p => ex(...p)));
+    return { kind: 'mc', q: 'Persamaan Boolean output X dari rangkaian ini adalah ….', vis: `<div class="card sm">${circ(ans[0], ans[1] === 'NOT' ? 'NOT' : ans[1], { out: 'X' })}</div>`, opts, a: opts.indexOf(ex(...ans)), hint: 'Tulis keluaran gerbang pertama dulu, lalu masukkan sebagai input gerbang kedua.' } },
+  () => { // kombinasi input yang membuat output X = 1 (3 input)
+    let g1, g2, on, off; do { [g1, g2] = [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR'])]; const all = [...Array(8).keys()].map(i => [i >> 2, (i >> 1) & 1, i & 1]); on = all.filter(([a, b, c]) => F[g2](F[g1](a, b), c)); off = all.filter(v => !on.includes(v)) } while (!on.length || off.length < 3);
+    const t = ([a, b, c]) => `A = ${a}, B = ${b}, C = ${c}`, good = pick(on), opts = shuffle([good, ...shuffle(off).slice(0, 3)]);
+    return { kind: 'mc', q: 'Kombinasi input mana yang membuat output X = 1?', vis: `<div class="card sm">${circ(g1, g2, { names: true, out: 'X' })}</div>`, opts: opts.map(t), a: opts.indexOf(good), hint: `Hitung ${g1}(A,B) dulu, lalu masukkan hasilnya ke ${g2} bersama C. ${HINT[g1]}` } },
+  () => { // tabel kebenaran rangkaian gerbang + NOT
+    const g = pick(G2);
+    return { kind: 'tt', g: g + '+NOT', n: 4, ans: [0, 1, 2, 3].map(i => F.NOT(F[g](i >> 1, i & 1))), vis: `<div class="card sm">${circ(g, 'NOT', { names: true, out: 'Y' })}</div>`, q: 'Lengkapi tabel kebenaran rangkaian ini (klik kotak "?" untuk mengubah 0/1).', hint: `Hitung ${g}(A,B) dulu, lalu balik hasilnya dengan NOT. ${HINT[g]}` } }
 ];
-function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis } }
-const makeSet = n => shuffle([0, 1, 2, 3, 4, 0, 2, 4, 1, 3]).slice(0, n).map(i => QGEN[i]());
+function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
+const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 7, 0, 2, 4, 5, 6, 1, 3]).slice(0, n).map(i => QGEN[i]());
 
 const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'Hmph, kebetulan aja itu! ...Oke, oke, bagus.', 'Y-yah, itu benar. Jangan sombong dulu!', 'Tch... kamu ternyata nggak sebodoh yang kukira. Sedikit!'];
 const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];
@@ -70,26 +88,26 @@ const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Se
 /* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
 const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
 const EVAL = [
-  { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0 },
-  { q: 'Pada sistem kontrol, sensor dan tombol termasuk…', o: ['Input', 'Output', 'Gerbang logika', 'Catu daya'], a: 0 },
-  { q: 'Logika 1 pada rangkaian digital umumnya menyatakan keadaan…', o: ['HIGH / ON', 'LOW / OFF', '0 Volt', 'Salah'], a: 0 },
-  { q: 'Output gerbang AND bernilai 1 jika…', o: ['Semua input bernilai 1', 'Minimal satu input bernilai 1', 'Semua input bernilai 0', 'Kedua input berbeda'], a: 0 },
-  { q: 'Gerbang yang outputnya 1 jika minimal satu input bernilai 1 adalah…', o: ['OR', 'AND', 'NAND', 'XNOR'], a: 0 },
-  { q: 'Jika input gerbang NOT bernilai 1, maka outputnya adalah…', o: ['0', '1', 'Tidak tentu', 'Sama dengan A dan B'], a: 0 },
-  { q: 'Gerbang yang outputnya 0 hanya jika semua inputnya 1 adalah…', o: ['NAND', 'NOR', 'AND', 'XOR'], a: 0 },
-  { q: 'Pada gerbang NOR, jika A = 0 dan B = 0, outputnya…', o: ['1', '0', 'Tidak tentu', 'Sama dengan A'], a: 0 },
-  { q: 'Gerbang XOR bernilai 1 apabila…', o: ['Kedua input berbeda', 'Kedua input sama', 'Semua input 1', 'Semua input 0'], a: 0 },
-  { q: 'Pada tabel kebenaran XNOR 2 input, berapa baris yang menghasilkan output 1?', o: ['2', '1', '3', '4'], a: 0 },
+  { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0, e: 'Rangkaian logika hanya mengenal dua keadaan, 0 dan 1. Itu sebabnya sinyalnya disebut digital, bukan analog yang berubah halus.' },
+  { q: 'Pada sistem kontrol, sensor dan tombol termasuk…', o: ['Input', 'Output', 'Gerbang logika', 'Catu daya'], a: 0, e: 'Sensor dan tombol mengirim informasi ke sistem, jadi disebut input. Output adalah yang dikendalikan, seperti lampu atau motor.' },
+  { q: 'Logika 1 pada rangkaian digital umumnya menyatakan keadaan…', o: ['HIGH / ON', 'LOW / OFF', '0 Volt', 'Salah'], a: 0, e: 'Logika 1 = HIGH = ON = benar. Logika 0 = LOW = OFF = salah.' },
+  { q: 'Output gerbang AND bernilai 1 jika…', o: ['Semua input bernilai 1', 'Minimal satu input bernilai 1', 'Semua input bernilai 0', 'Kedua input berbeda'], a: 0, e: 'AND bernilai 1 hanya jika semua inputnya 1, seperti dua saklar yang dipasang seri.' },
+  { q: 'Gerbang yang outputnya 1 jika minimal satu input bernilai 1 adalah…', o: ['OR', 'AND', 'NAND', 'XNOR'], a: 0, e: 'OR bernilai 1 jika minimal satu input 1, seperti saklar yang dipasang paralel.' },
+  { q: 'Jika input gerbang NOT bernilai 1, maka outputnya adalah…', o: ['0', '1', 'Tidak tentu', 'Sama dengan A dan B'], a: 0, e: 'NOT membalik nilai: input 1 menjadi 0, dan input 0 menjadi 1.' },
+  { q: 'Gerbang yang outputnya 0 hanya jika semua inputnya 1 adalah…', o: ['NAND', 'NOR', 'AND', 'XOR'], a: 0, e: 'NAND adalah kebalikan AND. Output 0 hanya terjadi saat semua input bernilai 1.' },
+  { q: 'Pada gerbang NOR, jika A = 0 dan B = 0, outputnya…', o: ['1', '0', 'Tidak tentu', 'Sama dengan A'], a: 0, e: 'NOR adalah kebalikan OR. OR(0,0) = 0, jadi NOR(0,0) = 1.' },
+  { q: 'Gerbang XOR bernilai 1 apabila…', o: ['Kedua input berbeda', 'Kedua input sama', 'Semua input 1', 'Semua input 0'], a: 0, e: 'XOR bernilai 1 jika kedua input berbeda, dan 0 jika kedua input sama.' },
+  { q: 'Pada tabel kebenaran XNOR 2 input, berapa baris yang menghasilkan output 1?', o: ['2', '1', '3', '4'], a: 0, e: 'XNOR bernilai 1 jika kedua input sama: baris 00 dan 11. Jadi ada 2 baris dengan output 1.' },
   // ---- dari dokumen Soal gerbang logika ddlc.docx ----
-  { q: 'Pada rangkaian logika, nilai logika 1 menunjukkan keadaan ….', o: ['hidup atau ada tegangan', 'mati atau tidak ada tegangan', 'arus bolak-balik', 'hambatan yang besar', 'terputus dari catu daya'], a: 0 },
-  { q: 'Gerbang OR menghasilkan output berlogika 1 apabila ….', vis: cv('OR', null), o: ['minimal satu input berlogika 1', 'kedua input berlogika 0', 'kedua input berlogika 1 saja', 'kedua input berlogika berbeda saja', 'hanya input B yang berlogika 1'], a: 0 },
-  { q: 'Perhatikan gambar simbol gerbang logika berikut. Gerbang tersebut adalah gerbang ….', vis: cv('NOT', null, { out: 'X' }), o: ['NOT', 'AND', 'OR', 'NAND', 'XOR'], a: 0 },
-  { q: 'Persamaan Boolean yang tepat untuk gerbang AND dengan input A dan B serta output X adalah ….', vis: cv('AND', null, { out: 'X' }), o: ['X = A · B', 'X = A + B', `X = ${nb('A')}`, `X = ${nb('A · B')}`, `X = ${nb('A + B')}`], a: 0 },
-  { q: 'Pada gerbang NAND dengan dua input A dan B, output bernilai 0 hanya jika ….', vis: cv('NAND', null), o: ['A = 1 dan B = 1', 'A = 0 dan B = 0', 'A = 0 dan B = 1', 'A = 1 dan B = 0', 'salah satu input bernilai 1'], a: 0 },
-  { q: 'Perhatikan rangkaian berikut. Output X bernilai 1 hanya jika ….', vis: cv('OR', 'NOT', { out: 'X' }), o: ['kedua input A dan B bernilai 0', 'kedua input A dan B bernilai 1', 'input A bernilai 1 dan input B bernilai 0', 'salah satu input bernilai 1', 'input A dan B bernilai berbeda'], a: 0 },
-  { q: 'Gerbang logika dibuat dalam bentuk … yang terdiri atas transistor-transistor, diode, dan komponen-komponen lainnya.', o: ['IC (Integrated Circuit)', 'ICU', 'gerbang', 'hambatan', 'saklar'], a: 0 },
-  { q: 'Perhatikan rangkaian berikut. Persamaan Boolean output X adalah ….', vis: cv('OR', 'AND', { out: 'X' }), o: ['X = (A + B) · C', 'X = A + B + C', 'X = A · B · C', 'X = (A · B) + C', 'X = A + (B · C)'], a: 0 },
-  { q: 'Berikut adalah gerbang logika dasar yang benar adalah …', o: ['AND, OR, NOT', 'AND, NOT, NAND', 'OR, NOT, NOR', 'XOR, XNOR', 'BUFFER, NAND, OR'], a: 0 }
+  { q: 'Pada rangkaian logika, nilai logika 1 menunjukkan keadaan ….', o: ['hidup atau ada tegangan', 'mati atau tidak ada tegangan', 'arus bolak-balik', 'hambatan yang besar', 'terputus dari catu daya'], a: 0, e: 'Logika 1 berarti hidup atau ada tegangan (HIGH). Logika 0 berarti mati atau tidak ada tegangan.' },
+  { q: 'Gerbang OR menghasilkan output berlogika 1 apabila ….', vis: cv('OR', null), o: ['minimal satu input berlogika 1', 'kedua input berlogika 0', 'kedua input berlogika 1 saja', 'kedua input berlogika berbeda saja', 'hanya input B yang berlogika 1'], a: 0, e: 'OR menghasilkan 1 jika minimal satu input bernilai 1. Hanya saat kedua input 0 outputnya 0.' },
+  { q: 'Perhatikan gambar simbol gerbang logika berikut. Gerbang tersebut adalah gerbang ….', vis: cv('NOT', null, { out: 'X' }), o: ['NOT', 'AND', 'OR', 'NAND', 'XOR'], a: 0, e: 'Segitiga dengan lingkaran kecil di ujung adalah simbol NOT. Gerbang ini hanya punya satu input.' },
+  { q: 'Persamaan Boolean yang tepat untuk gerbang AND dengan input A dan B serta output X adalah ….', vis: cv('AND', null, { out: 'X' }), o: ['X = A · B', 'X = A + B', `X = ${nb('A')}`, `X = ${nb('A · B')}`, `X = ${nb('A + B')}`], a: 0, e: 'AND ditulis dengan tanda kali: X = A · B. Garis di atas ekspresi berarti NOT, seperti pada NAND dan NOR.' },
+  { q: 'Pada gerbang NAND dengan dua input A dan B, output bernilai 0 hanya jika ….', vis: cv('NAND', null), o: ['A = 1 dan B = 1', 'A = 0 dan B = 0', 'A = 0 dan B = 1', 'A = 1 dan B = 0', 'salah satu input bernilai 1'], a: 0, e: 'NAND = NOT AND. AND bernilai 1 hanya saat A = 1 dan B = 1, jadi NAND bernilai 0 hanya saat itu.' },
+  { q: 'Perhatikan rangkaian berikut. Output X bernilai 1 hanya jika ….', vis: cv('OR', 'NOT', { out: 'X' }), o: ['kedua input A dan B bernilai 0', 'kedua input A dan B bernilai 1', 'input A bernilai 1 dan input B bernilai 0', 'salah satu input bernilai 1', 'input A dan B bernilai berbeda'], a: 0, e: 'OR lalu NOT sama dengan NOR. Output 1 hanya saat OR bernilai 0, yaitu saat A dan B sama-sama 0.' },
+  { q: 'Gerbang logika dibuat dalam bentuk … yang terdiri atas transistor-transistor, diode, dan komponen-komponen lainnya.', o: ['IC (Integrated Circuit)', 'ICU', 'gerbang', 'hambatan', 'saklar'], a: 0, e: 'Gerbang logika dibuat dalam bentuk IC (Integrated Circuit) yang berisi transistor, diode, dan komponen lain.' },
+  { q: 'Perhatikan rangkaian berikut. Persamaan Boolean output X adalah ….', vis: cv('OR', 'AND', { out: 'X' }), o: ['X = (A + B) · C', 'X = A + B + C', 'X = A · B · C', 'X = (A · B) + C', 'X = A + (B · C)'], a: 0, e: 'A dan B masuk gerbang OR lebih dulu: (A + B). Hasilnya masuk gerbang AND bersama C, sehingga X = (A + B) · C.' },
+  { q: 'Berikut adalah gerbang logika dasar yang benar adalah …', o: ['AND, OR, NOT', 'AND, NOT, NAND', 'OR, NOT, NOR', 'XOR, XNOR', 'BUFFER, NAND, OR'], a: 0, e: 'Gerbang dasar ada tiga: AND, OR, dan NOT. NAND, NOR, XOR, dan XNOR adalah turunannya.' }
 ];
 const GRADES = [
   { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wow. Serius, aku sempat merinding. Kamu menguasai ini dengan sangat baik, dan aku bangga banget sama kamu.', 'Hampir sempurna! Kalau ada klub rangkaian logika, aku langsung rekrut kamu jadi wakil ketua. Ehehe~', 'Luar biasa! Aku nggak akan bohong, aku sedikit iri sama otakmu.', 'Nilai ini akan kucatat dengan tinta paling tebal. Secara harfiah: di localStorage. Ehehe.'] },
