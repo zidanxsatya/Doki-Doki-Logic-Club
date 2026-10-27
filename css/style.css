@@ -752,3 +752,10 @@ body.m{--cs:.6}
 .rvl p{margin:4px 0}.rvl .rve{font-weight:600}
 .rvl .card{margin:4px 0;padding:2px 8px;display:inline-block}.rvl .circ{max-width:100%;height:auto;width:min(100%,300px)!important}
 .m .rvl{max-height:32vh}.m .rvl details{padding:4px 10px;font-size:15px}
+
+/* v13 polish */
+.m.p .panel{top:44px;height:calc((100% - 44px - 140px - 230px)/var(--pz))}
+.m.p .story .panel{top:44px;height:calc((100% - 44px - 140px - 230px)/var(--pz))}
+.m:not(.p) .sim{flex-wrap:nowrap}.m:not(.p) .sim .card{flex:1 1 0;min-width:0}
+.m:not(.p) .mgrid .mbtn,.m:not(.p) .mstory .mbtn{justify-content:center}
+.btn:disabled,.nav button:disabled{cursor:not-allowed}
