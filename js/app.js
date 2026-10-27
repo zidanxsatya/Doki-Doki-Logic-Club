@@ -14,16 +14,19 @@ const Journey = { prev: null, last: null }; // mode terakhir yang dikunjungi, ag
 
 
 /* ---------- pindah layar (fade + ganti musik) ---------- */
+let pend = null, curId = null;
 async function go(id) {
-  if (busy) return; busy = true;
-  const f = $('#fade'); f.classList.add('on'); await wait(380);
+  if (busy) { if (id !== curId) pend = id; return }   // klik saat transisi: yang terakhir diantre, bukan dibuang
+  busy = true; pend = null;
+  const f = $('#fade'); f.classList.add('on'); await wait(240);
   if (id !== 'menu' && id !== 'settings') await warm;   // aset karakter dimuat di latar belakang setelah MULAI aktif
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
   else { if (id !== 'simpick') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
-  await wait(60); f.classList.remove('on'); busy = false;
+  curId = id; await wait(40); f.classList.remove('on'); busy = false;
+  if (pend && pend !== id) go(pend)
 }
 
 /* ---------- menu utama ---------- */

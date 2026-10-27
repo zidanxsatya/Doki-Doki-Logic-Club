@@ -207,8 +207,8 @@ function gateSVG(g, a, b, o, sw) {
     : `<text x="${gx}" y="2" font-size="15" font-weight="800" fill="${INK}" text-anchor="middle">${g}</text>`;
   // keluaran
   if (sw) {
-    if (o) s += [0, 45, 90, 135, 180, 225, 270, 315].map(r => `<line x1="272" y1="25" x2="272" y2="17" transform="rotate(${r} 272 50)" stroke="#ff4d6d" stroke-width="3" stroke-linecap="round"/>`).join('');
-    s += `<circle cx="272" cy="50" r="14" fill="${o ? '#ff8fb0' : '#e6dcf5'}" stroke="${INK}" stroke-width="3" style="${o ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="272" y="100" font-size="12" font-weight="800" fill="${o ? '#ff4d6d' : INK}" text-anchor="middle">${o ? 'LED NYALA' : 'LED MATI'}</text>`;
+    if (o) s += [0, 45, 90, 135, 180, 225, 270, 315].map(r => `<line class="ray" x1="272" y1="25" x2="272" y2="17" transform="rotate(${r} 272 50)" stroke="#ff4d6d" stroke-width="3" stroke-linecap="round"/>`).join('');
+    s += `<circle class="${o ? 'led lit' : 'led'}" cx="272" cy="50" r="14" fill="${o ? '#ff8fb0' : '#e6dcf5'}" stroke="${INK}" stroke-width="3" style="${o ? 'filter:drop-shadow(0 0 8px #ff4d6d)' : ''}"/><text x="272" y="100" font-size="12" font-weight="800" fill="${o ? '#ff4d6d' : INK}" text-anchor="middle">${o ? 'LED NYALA' : 'LED MATI'}</text>`;
   } else if (known) s += `<circle cx="262" cy="50" r="20" fill="#fff" stroke="${INK}" stroke-width="3" stroke-dasharray="5 4"/><text x="262" y="59" font-size="24" font-weight="800" fill="#ff7eb6" text-anchor="middle">?</text><text x="262" y="92" font-size="13" font-weight="800" fill="${INK}" text-anchor="middle">Y</text>`;
   else s += `<circle cx="264" cy="50" r="13" fill="#ffd54a" stroke="${INK}" stroke-width="3"/><text x="264" y="26" font-size="12" font-weight="800" fill="${INK}" text-anchor="middle">LED</text><text x="264" y="86" font-size="14" font-weight="800" fill="${INK}" text-anchor="middle">Y</text>`;
   return s + '</svg>';
