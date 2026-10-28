@@ -772,3 +772,22 @@ body.m{--cs:.6}
 .mlist .mbtn:nth-child(n+1){animation-duration:.34s}
 .mgrid .mbtn:nth-child(2){animation-delay:.04s}.mgrid .mbtn:nth-child(3){animation-delay:.08s}.mgrid .mbtn:nth-child(4){animation-delay:.12s}
 @media (prefers-reduced-motion:reduce){.led.lit,.ray{animation:none}#fade{transition-duration:.01ms}}
+
+/* v15: kurva tegas, transisi layar iris, area tap HP, titik progres */
+:root{--ease:cubic-bezier(.23,1,.32,1)}
+#fade{opacity:0;clip-path:circle(0% at 50% 50%);background:radial-gradient(circle at 50% 50%,#fff4fa 0,#ffc4e0 100%);transition:opacity .24s var(--ease),clip-path 0s .24s}
+#fade.on{opacity:1;clip-path:circle(150% at 50% 50%);transition:opacity .06s,clip-path .26s cubic-bezier(.55,0,.35,1)}
+.qs i{transition:background-color .2s,border-color .2s}
+@keyframes dotp{50%{scale:1.14}}
+.qs i.cur{animation:dotp 1.4s ease-in-out infinite}
+/* area tap: tampilan tidak berubah, hanya zona sentuh yang melebar (HP: target >= 44px; inset dihitung dari tepi dalam border) */
+:where(.m) :where(.btn,.tab,.xpi,.credlink,.xmode){position:relative}
+.m :where(.btn,.tab,.opt,.xpi,.credlink,#mute,.xmode):not(#startBtn)::after{content:"";position:absolute;inset:-10px}
+.m:not(.p) :where(.btn,.tab,.opt,.xpi,.credlink,#mute,.xmode):not(#startBtn)::after{inset:-14px}
+@media (prefers-reduced-motion:reduce){#fade,#fade.on{clip-path:none;transition:opacity .01ms}.qs i.cur{animation:none}}
+.m.p .tab{min-height:46px}
+/* Simulasi+: area tap hanya vertikal; ID di :not() menyamakan spesifisitas dengan aturan dasar */
+.m :where(.xside,.xp) :where(.btn,.xmode):not(#startBtn)::after{inset:-10px 0}
+.m:not(.p) :where(.xside,.xp) .btn:not(#startBtn)::after{inset:-12px 0}
+.m .xside > :last-child:not(#startBtn)::after{bottom:0}
+.m:not(.p) .xside :where(.btn,.xmode,.credlink):not(#startBtn)::after{content:none}
