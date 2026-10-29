@@ -39,6 +39,13 @@ Story.save = p => store.set(Story.key, p);
 Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadExpr(); go(STEPS[p.step]) };
 Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, STEPS.length - 1); Story.save(p); Story.on = true; go(STEPS[p.step]) };
 Story.index = () => STEPS.indexOf(Journey.last);
+/* kartu judul bab: muncul sebentar saat masuk bagian belajar lewat Mode Cerita; tidak menghalangi sentuhan */
+Story.chap = id => {
+  const n = [1, 3, 5, 7].indexOf(STEPS.indexOf(id)) + 1; if (!Story.on || !n) return;
+  $('.chap')?.remove(); const c = document.createElement('div'); c.className = 'chap'; c.setAttribute('role', 'status'); c.setAttribute('aria-label', `Bab ${n}: ${STEP_NAME[id]}`);
+  c.innerHTML = `<b class="cn">${n}</b><span class="ct">${STEP_NAME[id]}</span><span class="cd" aria-hidden="true">${[1, 2, 3, 4].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
+  $('#stage').append(c); setTimeout(() => c.remove(), 2300);
+};
 Story.menuSub = () => { const p = Story.prog(); return p.step > 0 ? `Lanjutkan: ${STEP_NAME[STEPS[p.step]]}` : p.done ? `Selesai · nilai ${p.ev * 10} · main lagi` : 'Belajar bareng semua karakter' };
 
 /* ---------- potret kiri (layout diskusi edukasi) ---------- */

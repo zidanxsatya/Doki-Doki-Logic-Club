@@ -56,7 +56,7 @@ SC.simplus = () => {
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ PILIH MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari input dan gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
   <div class="xp">
     <div class="xpal" aria-label="Palet gerbang dan input">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}${inCard(0)}${inCard(1)}</div>
-    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xtoast" role="status" aria-live="polite"></div></div>
+    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>
     <div class="xside">
       <div class="xcard xio"><div class="xlab">INPUT<span class="xcnt" id="xcnt"></span></div><div class="xrow"><span class="xtgs" id="xtgs"></span><span class="xy" id="xy"></span></div></div>
       <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN X</div><div class="xtw"><table class="tt xtt" id="xtt"></table></div><p class="xmsg" id="xmsg"></p><p class="xex" id="xex" hidden></p></div>
@@ -65,7 +65,7 @@ SC.simplus = () => {
   </div>`;
   const svg = $('#xsvg', el), cv = $('.xcv', el), pal = $('.xpal', el), toast = $('.xtoast', el), stg = $('#stage');
   const MAXIN = 6, LET = 'ABCDEF';   // input bebas: A..F (maks. 6 -> tabel 64 baris)
-  const G = [], W = [], I = []; let nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set();
+  const G = [], W = [], I = []; let stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set();
   const gate = id => G.find(n => n.id === id), inp = id => I.find(n => n.id === id), into = (id, pin) => W.find(w => w.to.t === 'g' && w.to.id === id && w.to.pin === pin), yw = () => W.find(w => w.to.t === 'y');
   const SI = () => I.slice().sort((a, b) => a.name < b.name ? -1 : 1), curV = () => { const o = {}; I.forEach(n => o[n.id] = n.v); return o };   // urutan kolom tabel = urutan nama (A paling kiri / bit tertinggi)
 
@@ -185,16 +185,31 @@ SC.simplus = () => {
   const wpath = (a, b) => { const dx = Math.max(36, Math.abs(b.x - a.x) / 2); return `M${a.x} ${a.y}C${a.x + dx} ${a.y} ${b.x - dx} ${b.y} ${b.x} ${b.y}` };   // kabel lentur (kurva Bezier) dari pin ke pin
   const vtxt = v => v == null ? '?' : v;
   const sc = v => v == null ? INK : v ? '#18b04a' : '#a592bd';   // satu warna sinyal: 1 = hijau, 0 = lavender, belum diketahui = tinta
+  /* mode LANGKAH: telusuri rangkaian dari input ke X, satu gerbang per langkah */
+  const RULE = { AND: 'AND: keluaran 1 hanya jika semua masukan 1', OR: 'OR: keluaran 1 jika minimal satu masukan 1', NOT: 'NOT: membalik masukan', NAND: 'NAND: kebalikan AND, keluaran 0 hanya jika semua masukan 1', NOR: 'NOR: kebalikan OR, keluaran 1 hanya jika semua masukan 0', XOR: 'XOR: keluaran 1 jika kedua masukan berbeda', XNOR: 'XNOR: keluaran 1 jika kedua masukan sama' };
+  const order = () => { const w = yw(); if (!w || w.from.t !== 'g') return []; const out = [], seen = new Set(), vis = id => { if (seen.has(id)) return; seen.add(id); (gate(id).type === 'NOT' ? [0] : [0, 1]).forEach(p => { const x = into(id, p); if (x && x.from.t === 'g') vis(x.from.id) }); out.push(id) }; vis(w.from.id); return out };
+  const gname = n => { const same = G.filter(x => x.type === n.type); return same.length > 1 ? `${n.type} ke-${same.indexOf(n) + 1}` : n.type };
+  const stepUI = (ev, ord, yv) => {
+    const ready = ord.length > 0 && yv != null, pan = $('.xstp', el), chip = $('#xst', el);
+    if (stp >= 0 && !ready) stp = -1; if (stp > ord.length) stp = ord.length;
+    chip.hidden = stp >= 0 || !ready; pan.hidden = stp < 0; if (stp < 0) return;
+    const N = ord.length; let t;
+    if (stp < N) { const g = gate(ord[stp]), ins = (g.type === 'NOT' ? [0] : [0, 1]).map(p => ev.v(into(g.id, p).from)); t = `Yuri: Langkah ${stp + 1} dari ${N + 1}. Gerbang ${gname(g)}: masukan ${ins.join(' dan ')}, keluaran ${ev.gv(g.id)}. ${RULE[g.type]}.` }
+    else t = `Yuri: Langkah ${N + 1} dari ${N + 1}. Hasil akhir X = ${yv}. ${yv ? 'Rangkaian ini menyala.' : 'Rangkaian ini mati.'} Ubah input untuk melihat langkahnya berubah.`;
+    $('#xstt', el).textContent = t; $('#xsp', el).disabled = stp === 0; $('#xsx', el).disabled = stp >= N;
+  };
   const render = () => {
     if (!cw) return;
-    const pm = pinMap(), vals = curV(), ev = evalAt(vals), t = term(); let h = '';
+    const pm = pinMap(), vals = curV(), ev = evalAt(vals), t = term(), ord = order(); let h = '';
+    if (stp >= 0 && (!ord.length || yVal(vals) == null)) stp = -1;
+    const vis = new Set(ord.slice(0, stp + 1)), cur = stp >= 0 && stp < ord.length ? ord[stp] : -1, wdim = w => stp >= 0 && ((w.from.t === 'g' && !vis.has(w.from.id)) || (w.to.t === 'g' ? !vis.has(w.to.id) : stp < ord.length)), gdim = n => stp >= 0 && !vis.has(n.id);
     W.forEach(w => {
       const a = pm[keyOf(w.from)], b = pm[keyOf(w.to)], v = ev.v(w.from), d = wpath(a, b), on = sel && sel.k === 'w' && sel.id === w.id;
-      h += `<g class="xw" data-w="${w.id}">${on ? `<path d="${d}" stroke="#ff7eb6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>` : ''}<path d="${d}" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${v == null ? '#cdbfd6' : sc(v)}" stroke-width="3.6" fill="none" stroke-linecap="round"${v == null ? ' stroke-dasharray="7 6"' : ''}/><path class="xwh" d="${d}" stroke="transparent" stroke-width="20" fill="none"/></g>`;
+      h += `<g class="xw${wdim(w) ? ' xdim' : ''}" data-w="${w.id}">${on ? `<path d="${d}" stroke="#ff7eb6" stroke-width="14" fill="none" stroke-linecap="round" opacity=".5"/>` : ''}<path d="${d}" stroke="${INK}" stroke-width="7" fill="none" stroke-linecap="round"/><path d="${d}" stroke="${v == null ? '#cdbfd6' : sc(v)}" stroke-width="3.6" fill="none" stroke-linecap="round"${v == null ? ' stroke-dasharray="7 6"' : ''}/><path class="xwh" d="${d}" stroke="transparent" stroke-width="20" fill="none"/></g>`;
     });
     G.forEach(n => {
       const p = gp(n), on = sel && sel.k === 'g' && sel.id === n.id, nx = p.tx + ((n.type === 'NOT' ? 85 : 88) - 30) * K;
-      h += `<g class="xg${on ? ' on' : ''}" data-g="${n.id}">${on ? `<rect x="${p.tx - 12}" y="${n.y - 35 * K - 28}" width="${p.w + 24}" height="${70 * K + 36}" rx="12" fill="#ff7eb61f" stroke="#ff7eb6" stroke-width="2.5" stroke-dasharray="6 4"/>` : ''}<rect x="${p.tx - 8}" y="${n.y - 35 * K - 6}" width="${p.w + 16}" height="${70 * K + 12}" fill="transparent"/>${gGfx(n.type, p.tx, n.y, K)}<rect x="${nx - 24}" y="${n.y - 35 * K - 24}" width="48" height="17" rx="8.5" fill="${INK}"/><text x="${nx}" y="${n.y - 35 * K - 11}" font-size="11.5" font-weight="800" fill="#fff" text-anchor="middle">${n.type}</text></g>`;
+      h += `<g class="xg${on ? ' on' : ''}${gdim(n) ? ' xdim' : ''}" data-g="${n.id}">${n.id === cur ? `<rect class="xhl" x="${p.tx - 12}" y="${n.y - 35 * K - 28}" width="${p.w + 24}" height="${70 * K + 36}" rx="12" fill="#ffd54a33" stroke="#ff7eb6" stroke-width="3.5"/>` : ''}${on ? `<rect x="${p.tx - 12}" y="${n.y - 35 * K - 28}" width="${p.w + 24}" height="${70 * K + 36}" rx="12" fill="#ff7eb61f" stroke="#ff7eb6" stroke-width="2.5" stroke-dasharray="6 4"/>` : ''}<rect x="${p.tx - 8}" y="${n.y - 35 * K - 6}" width="${p.w + 16}" height="${70 * K + 12}" fill="transparent"/>${gGfx(n.type, p.tx, n.y, K)}<rect x="${nx - 24}" y="${n.y - 35 * K - 24}" width="48" height="17" rx="8.5" fill="${INK}"/><text x="${nx}" y="${n.y - 35 * K - 11}" font-size="11.5" font-weight="800" fill="#fff" text-anchor="middle">${n.type}</text></g>`;
     });
     I.forEach(n => {   // input = saklar bebas: huruf + angka 0/1; pink saat 1, lavender saat 0. Ketuk = ubah nilai, seret = pindah
       const v = n.v, x0 = n.x - 70, on = sel && sel.k === 'i' && sel.id === n.id;
@@ -221,6 +236,7 @@ SC.simplus = () => {
       h += `<circle cx="${f.x}" cy="${f.y}" r="12" fill="none" stroke="#ff7eb6" stroke-width="3"/>`;
     }
     svg.innerHTML = h;
+    stepUI(ev, ord, yv);
     sync(yv);
   };
   const sync = yv => {
@@ -306,6 +322,7 @@ SC.simplus = () => {
   /* tombol */
   $('#xtgs', el).onclick = e => { const b = e.target.closest('.xtg'); if (b) toggleIn(+b.dataset.id) };
   $('#xdw').onclick = delSel; $('#xdg').onclick = delSel;
+  $('#xst').onclick = () => { stp = 0; Sfx('tick'); render() }; $('#xsp').onclick = () => { stp = Math.max(0, stp - 1); Sfx('tick'); render() }; $('#xsx').onclick = () => { stp++; Sfx('tick'); render() }; $('#xse').onclick = () => { stp = -1; Sfx('tick'); render() };
   $('#xcl').onclick = () => { G.length = 0; W.length = 0; if (chi < 0) I.length = 0; sel = null; Sfx('del'); say('Rangkaian dikosongkan.', 'info'); render() };
   $('#xch').onclick = () => { if (list.hidden) openList(); else list.hidden = true };
   $('#xgl').onclick = openList; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);

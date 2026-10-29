@@ -25,7 +25,7 @@ async function go(id) {
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
   else { if (id !== 'simpick') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
-  curId = id; await wait(40); f.classList.remove('on'); busy = false;
+  curId = id; await wait(40); f.classList.remove('on'); busy = false; Story.chap?.(id);
   if (pend && pend !== id) go(pend)
 }
 
@@ -216,25 +216,41 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
   });
 }
 
+/* ---------- efek hasil: hitung naik, konfeti, lompatan karakter (transform/opacity saja; mati bila 'kurangi gerakan') ---------- */
+const still = () => matchMedia('(prefers-reduced-motion:reduce)').matches;
+const countUp = (el, to, fmt = x => x, ms = 750) => { if (!el || !to || still()) return; const t0 = performance.now(); el.textContent = fmt(0); (function f(t) { const k = Math.min(1, (t - t0) / ms); el.textContent = fmt(Math.round(to * (1 - (1 - k) ** 3))); k < 1 && requestAnimationFrame(f) })(t0) };
+const confetti = (host, n) => { if (!host || still()) return; for (let i = 0; i < n; i++) { const c = document.createElement('i'); c.className = 'cf'; c.style.cssText = `--x:${Math.round((Math.random() - .5) * 420)}px;--y:${-40 - Math.round(Math.random() * 110)}px;--r:${Math.round(Math.random() * 720 - 360)}deg;--d:${(Math.random() * .3).toFixed(2)}s;background:${pick(['#ffd54a', '#ff7eb6', '#8cd4ff', '#6fdc8c', '#fff'])}`; host.append(c); setTimeout(() => c.remove(), 1900) } };
+const hop = n => { const c = $('.cw canvas'); if (!c || still()) return; c.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-16px)', offset: .4 }, { transform: 'translateY(0)' }], { duration: 440, iterations: n, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }) };
+const starRow = (n, tot) => `<div class="stars" aria-label="${n} dari ${tot} bintang">${Array.from({ length: tot }, (_, k) => `<i class="${k < n ? 'on' : ''}" style="--i:${k}">★</i>`).join('')}</div>`;
+
 /* ---------- LATIHAN (Natsuki) ---------- */
 SC.latihan = () => {
-  const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0); let qs, i, sc, good, bad, wasBad;
-  const begin = () => { qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; q() };
+  const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0); let qs, i, sc, good, bad, wasBad, mx;
+  const begin = () => { qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; q() };
+  const cmb = pop => {   // lencana COMBO di kepala soal; hanya selama sesi, tidak disimpan
+    const h = $('.qhd', S.panel); if (!h) return; let c = $('.combo', h); if (good < 2) { c?.remove(); return }
+    if (!c) { c = document.createElement('div'); c.className = 'combo'; c.setAttribute('role', 'status'); h.append(c) }
+    c.className = 'combo' + (good >= 5 ? ' hot' : ''); c.textContent = `COMBO ×${good}`;
+    if (pop) { void c.offsetWidth; c.classList.add('pop'); if (good >= 3) { const r = c.getBoundingClientRect(); spark({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }, good >= 5 ? 9 : 5) } }
+  };
+  const lose = () => { const c = $('.combo', S.panel); if (c) { c.className = 'combo lost'; c.textContent = 'COMBO PUTUS' } };
   const q = () => {
     if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
     else if (i > 0 && i < N - 1 && Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(i === 0 ? pick(DN.first) : i === N - 1 ? pick(DN.last) : pick(DN.mid), i ? 'talk' : 'smug');
+    queueMicrotask(() => cmb(false));
     renderQ(S.panel, qs[i], i, N, { reveal: true, next: () => ++i < N ? q() : end(),
       onPick: (k, prev) => { if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
-      sc += ok ? 1 : 0; ok ? (good++, bad = 0) : (bad++, good = 0); const wb = wasBad; wasBad = !ok;
+      const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
       if (ok) S.d.say([[DN.streakGood[good] ? pick(DN.streakGood[good]) : wb && Math.random() < .6 ? pick(DN.comeback) : pick(DN.praise), pick(['happy', 'smug'])], ...SL.lat('ok')]);
       else S.d.say([[(bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph'])], ...SL.lat('bad')]);
     } });
   };
   const end = () => {
     const prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set('tkm_latihan_best', sc);
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>Hasil Latihan</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside"><div class="stars" aria-label="${sc} dari ${N} bintang">${Array.from({ length: N }, (_, k) => `<i class="${k < sc ? 'on' : ''}">★</i>`).join('')}</div><p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p><button class="btn big" id="go">ULANGI ↻</button></div></div></div>`;
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>Hasil Latihan</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button></div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
+    countUp($('.score', S.panel), sc, x => `${x} / ${N}`); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1);
     if (Story.on) { Story.record('lat', sc); $('.startcard', S.panel).appendChild(Story.contBtn('latihan')) }
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
@@ -260,10 +276,11 @@ SC.evaluasi = () => {
   };
   const end = () => {
     const wrong = N - right, gr = GRADES.find(g => right >= g.min), prev = best(), rec = prev != null && right > prev; if (prev == null || right > prev) store.set('tkm_eval_best', right);
-    const show = () => {
-      S.panel.innerHTML = `<div class="startcard sc res"><h2>HASIL EVALUASI</h2><div class="rg"><div class="rb ok"><span>Benar</span><b>${right}</b></div><div class="rb bad"><span>Salah</span><b>${wrong}</b></div></div><p class="grade">${gr.t}</p><p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p><div class="rbtn"><button class="btn big" id="go">ULANGI ↻</button><button class="btn" id="rv">PEMBAHASAN</button></div></div>`;
+    const stN = right >= 9 ? 3 : right >= 7 ? 2 : right >= 5 ? 1 : 0, show = fx => {
+      S.panel.innerHTML = `<div class="startcard sc res"><h2>HASIL EVALUASI</h2><div class="rg"><div class="rb ok"><span>Benar</span><b>${right}</b></div><div class="rb bad"><span>Salah</span><b>${wrong}</b></div></div>${starRow(stN, 3)}<p class="grade">${gr.t}</p><p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p><div class="rbtn"><button class="btn big" id="go">ULANGI ↻</button><button class="btn" id="rv">PEMBAHASAN</button></div></div>`;
       $('#go').onclick = () => { Snd.sfx('select'); begin() };
       $('#rv').onclick = () => { Snd.sfx('select'); review() };
+      if (fx) { countUp($('.rb.ok b', S.panel), right); countUp($('.rb.bad b', S.panel), wrong); if (right >= 7) confetti($('.startcard', S.panel), right >= 9 ? 30 : 16); if (right >= 7) hop(right >= 9 ? 2 : 1) }
       if (Story.on) $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi'));
     };
     const review = () => {   // soal salah terbuka, soal benar tertutup (<details> bawaan browser)
@@ -272,7 +289,7 @@ SC.evaluasi = () => {
       S.d.line(wrong ? 'Bagian paling penting belajar: lihat kenapa salah. Soal yang salah sudah kubuka, ya.' : 'Semuanya benar! Tapi baca-baca penjelasannya juga boleh, siapa tahu ada yang menarik.', wrong ? 'talk' : 'happy');
     };
     if (Story.on) Story.record('ev', right);
-    show();
+    show(true);
     S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
   startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti']])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
