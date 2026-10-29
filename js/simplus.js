@@ -194,8 +194,8 @@ SC.simplus = () => {
     if (stp >= 0 && !ready) stp = -1; if (stp > ord.length) stp = ord.length;
     chip.hidden = stp >= 0 || !ready; pan.hidden = stp < 0; if (stp < 0) return;
     const N = ord.length; let t;
-    if (stp < N) { const g = gate(ord[stp]), ins = (g.type === 'NOT' ? [0] : [0, 1]).map(p => ev.v(into(g.id, p).from)); t = `Yuri: Langkah ${stp + 1} dari ${N + 1}. Gerbang ${gname(g)}: masukan ${ins.join(' dan ')}, keluaran ${ev.gv(g.id)}. ${RULE[g.type]}.` }
-    else t = `Yuri: Langkah ${N + 1} dari ${N + 1}. Hasil akhir X = ${yv}. ${yv ? 'Rangkaian ini menyala.' : 'Rangkaian ini mati.'} Ubah input untuk melihat langkahnya berubah.`;
+    if (stp < N) { const g = gate(ord[stp]), ins = (g.type === 'NOT' ? [0] : [0, 1]).map(p => ev.v(into(g.id, p).from)); t = `Langkah ${stp + 1} dari ${N + 1}. Gerbang ${gname(g)}: masukan ${ins.join(' dan ')}, keluaran ${ev.gv(g.id)}. ${RULE[g.type]}.` }
+    else t = `Langkah ${N + 1} dari ${N + 1}. Hasil akhir X = ${yv}. ${yv ? 'Rangkaian ini menyala.' : 'Rangkaian ini mati.'} Ubah input untuk melihat langkahnya berubah.`;
     $('#xstt', el).textContent = t; $('#xsp', el).disabled = stp === 0; $('#xsx', el).disabled = stp >= N;
   };
   const render = () => {
