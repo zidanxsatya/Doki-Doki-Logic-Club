@@ -26,6 +26,31 @@ const MATERI = [
     say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dengan 2 input ada 4 baris.', 'Yeay, materi selesai! Selanjutnya coba SIMULASI bareng Yuri, lalu LATIHAN dan EVALUASI ya!'] }
 ];
 
+/* Kartu ulang Materi (gaya flashcard). f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Tambah kartu = tambah objek. */
+const GATE_RULE = {
+  AND: 'Output 1 hanya jika semua input 1. Seperti saklar seri.', OR: 'Output 1 jika minimal satu input 1. Seperti saklar paralel.', NOT: 'Inverter: output kebalikan dari input. Hanya 1 input.',
+  NAND: 'NOT AND: output 0 hanya jika semua input 1.', NOR: 'NOT OR: output 1 hanya jika semua input 0.', XOR: 'Output 1 jika kedua input berbeda.', XNOR: 'NOT XOR: output 1 jika kedua input sama.'
+};
+const FLASH = [
+  { t: 'Rangkaian logika', f: 'Rangkaian logika memproses sinyal bernilai apa?', b: 'Sinyal <b>digital</b>: hanya <b>0</b> atau <b>1</b>. Dibangun dari gerbang logika.' },
+  { t: 'Input, proses, output', f: 'Sebutkan tiga bagian sistem kontrol.', b: '<b>INPUT</b> (sensor, tombol) → <b>PROSES</b> (gerbang logika) → <b>OUTPUT</b> (lampu, motor, buzzer).' },
+  { t: 'Logika 1', f: 'Logika <b>1</b> sama artinya dengan apa saja?', b: '<b>HIGH</b>, <b>ON</b>, sekitar +5 V, dan <b>benar</b>.' },
+  { t: 'Logika 0', f: 'Logika <b>0</b> sama artinya dengan apa saja?', b: '<b>LOW</b>, <b>OFF</b>, 0 V, dan <b>salah</b>.' },
+  ...['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => ({ t: g, f: `<div class="card sm">${gateSVG(g, null, null, null, false)}</div><p>Gerbang apa ini?</p>`, b: `<b>Gerbang ${g}</b><p>${GATE_RULE[g]}</p><p class="fm">${FORM[g]}</p>` })),
+  { t: 'AND = seri', f: 'Saklar dipasang <b>seri</b> sama dengan gerbang apa? Dan yang <b>paralel</b>?', b: 'Seri = <b>AND</b>. Paralel = <b>OR</b>.' },
+  { t: 'Gerbang universal', f: 'Gerbang apa saja yang disebut <b>universal</b>?', b: '<b>NAND</b> dan <b>NOR</b>: dengan salah satunya, semua gerbang lain bisa dibuat.' },
+  { t: 'Satu input', f: 'Gerbang dasar mana yang hanya punya <b>satu input</b>?', b: '<b>NOT</b>.' },
+  { t: 'XOR 1 dan 1', f: 'XOR dengan A = 1 dan B = 1: berapa outputnya?', b: '<b>0</b>, karena kedua input sama. XOR hanya 1 kalau inputnya berbeda.' },
+  { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b> (2² kombinasi: 00, 01, 10, 11). Dengan n input: 2ⁿ baris.' }
+];
+const FLASH_SAY = {
+  go: 'Mau mengulang materi? Tekan ULANG PAKAI KARTU di papan tulis!',
+  start: ['Oke, mode kartu! Baca sisi depan, jawab dalam hati, lalu balik kartunya.', 'Kartu yang sudah paham hilang dari tumpukan. Yang belum akan muncul lagi nanti.'],
+  belum: ['Tidak apa-apa, kartu ini muncul lagi nanti.', 'Santai, mengulang itu cara paling ampuh buat ingat.', 'Dicatat! Nanti kita coba lagi.'],
+  half: 'Setengah tumpukan sudah paham. Terus ya!',
+  done: 'Semua kartu paham! Keren banget. Sekarang kamu siap SIMULASI dan LATIHAN.'
+};
+
 const SIM_SAY = {
   AND: 'Gerbang AND: keluarannya 1 hanya bila A dan B sama-sama 1. Coba ubah salah satu input menjadi 0, lalu perhatikan LED-nya.',
   OR: 'Gerbang OR: cukup satu input bernilai 1, maka output menjadi 1. LED padam hanya jika keduanya 0.',

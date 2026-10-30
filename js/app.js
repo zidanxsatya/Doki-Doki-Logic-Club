@@ -131,6 +131,39 @@ const entryExtra = key => {
 SC.materi = () => {
   const S = scaffold('materi'); let p = 0, lastFlip = 0; const seen = new Set(), ms = new Set();
   const flipLine = () => { const now = performance.now(), fast = now - lastFlip < 2500; lastFlip = now; return fast && Math.random() < .6 ? [[pick(D.sayori.flipFast), 'happy']] : [] }; // pemain membalik halaman terlalu cepat
+  // mode kartu ulang: balik kartu, "paham" = kartu keluar dari tumpukan, "belum" = muncul lagi di akhir; tidak disimpan
+  const flash = (first = true) => {
+    let deck = shuffle(FLASH.map((_, k) => k)), known = 0; const total = deck.length, missed = new Set(); let halfSaid = false;
+    const quit = () => { Snd.sfx('cancelMenu'); show() };
+    const card = () => {
+      if (!deck.length) return end();
+      const C = FLASH[deck[0]];
+      S.panel.innerHTML = `<div class="fcw"><div class="fch"><button class="btn sm" id="fcx">◀ MATERI</button><span>Kartu ${known + 1} / ${total}</span><span class="fcp">Paham ${known}</span></div>
+      <div class="fcbar" aria-hidden="true"><i style="width:${known / total * 100}%"></i></div>
+      <button class="fcard" id="fcd" aria-label="Kartu. Tekan untuk membalik"><span class="fcin"><span class="ff front"><span class="fx">${C.f}</span></span><span class="ff back" aria-hidden="true"><span class="fx">${C.b}</span></span></span></button>
+      <div class="fcb"><button class="btn" id="fcf">BALIK KARTU</button></div></div>`;
+      const fd = $('#fcd'), fb = $('.fcb', S.panel); let flipped = false;
+      $('#fcx').onclick = quit;
+      const flip = () => {
+        if (flipped) return; flipped = true; Snd.sfx('openOS'); fd.classList.add('flip'); $('.back', fd).removeAttribute('aria-hidden'); $('.front', fd).setAttribute('aria-hidden', 'true');
+        fb.innerHTML = '<button class="btn no" id="fcn">BELUM HAFAL</button><button class="btn yes" id="fcy">SUDAH PAHAM</button>';
+        $('#fcn').onclick = () => { Snd.sfx('cancelMenu'); missed.add(deck[0]); deck.push(deck.shift()); if (Math.random() < .4) S.d.line(pick(FLASH_SAY.belum), 'calm'); card() };
+        $('#fcy').onclick = () => { Snd.sfx('select'); deck.shift(); known++; if (!halfSaid && known >= total / 2) { halfSaid = true; S.d.line(FLASH_SAY.half, 'cheer') } card() };
+        $('#fcy').focus();
+      };
+      fd.onclick = flip; $('#fcf').onclick = flip; fd.focus();
+    };
+    const end = () => {
+      const miss = [...missed].map(k => FLASH[k].t);
+      S.panel.innerHTML = `<div class="fcw"><div class="startcard sc res fcend"><h2>SEMUA KARTU PAHAM!</h2><p>${total} dari ${total} kartu sudah kamu pahami.</p>${miss.length ? `<p class="fcm">Sempat belum hafal: <b>${miss.join(', ')}</b></p>` : '<p class="fcm">Tidak ada satu pun yang salah ingat. Mantap!</p>'}
+      <div class="fcb"><button class="btn" id="fcr">ULANG KARTU</button><button class="btn yes" id="fcm">${Story.on ? NEXT_LABEL.materi : '◀ KEMBALI KE MATERI'}</button></div></div></div>`;
+      Snd.sfx('confirmMenu'); S.d.say([[FLASH_SAY.done, 'cheer']]);
+      $('#fcr').onclick = () => { Snd.sfx('select'); flash(false) };
+      $('#fcm').onclick = () => { Snd.sfx('select'); Story.on ? Story.advance() : show() };
+      $('#fcm').focus();
+    };
+    if (first) S.d.say(FLASH_SAY.start.map(t => [t, 'talk'])); card();
+  };
   const show = (intro = []) => {
     const P = MATERI[p];
     S.panel.innerHTML = `<div class="board"><div class="bt">${p + 1}. ${P.t}</div><div class="bb">${P.html}</div></div>
@@ -138,10 +171,11 @@ SC.materi = () => {
     const pv = $('#pv'), nx = $('#nx'); pv.disabled = !p; nx.disabled = p === MATERI.length - 1;
     pv.onclick = () => { p--; Snd.sfx('flip_page'); show(flipLine()) }; nx.onclick = () => { p++; Snd.sfx('flip_page'); show(flipLine()) };
     if (Story.on && p === MATERI.length - 1) { nx.disabled = false; nx.textContent = NEXT_LABEL.materi; nx.classList.add('contstory'); nx.onclick = () => { Snd.sfx('select'); Story.advance() } }   // lanjut cerita hanya setelah halaman terakhir
+    if (p === MATERI.length - 1) { const c = $('.nav span', S.panel); c.outerHTML = '<button class="btn fcgo" id="fc">KARTU ULANG</button>'; $('#fc').onclick = () => { Snd.sfx('select'); flash() } }   // semua halaman sudah dibaca: tawarkan mode kartu ulang (menggantikan penghitung halaman)
     const ex = Math.random() < .3 ? S.chat() : [pick(D.sayori.ex[p]), pick(['happy', 'talk', 'cheer'])];
     const extra = []; // tonggak kemajuan: separuh jalan & halaman terakhir
     if (p === 5 && !ms.has('h')) { ms.add('h'); extra.push([pick(D.sayori.half), 'cheer']) }
-    if (p === MATERI.length - 1 && !ms.has('e')) { ms.add('e'); extra.push([pick(D.sayori.end), 'happy']) }
+    if (p === MATERI.length - 1 && !ms.has('e')) { ms.add('e'); extra.push([pick(D.sayori.end), 'happy'], [FLASH_SAY.go, 'cheer']) }
     S.d.say([...intro, ...(seen.has(p) ? [[pick(D.sayori.again), 'happy'], [P.say[0], P.e]] : [[P.say[0], P.e], ex, [P.say[1], P.e]]), ...extra, ...SL.materiPage(p, !seen.has(p)), ...(p === MATERI.length - 1 ? SL.materiEnd() : [])]); seen.add(p);
   };
   show([...entryExtra('sayori'), ...pick(D.sayori.intro), ...SL.enter('materi')]);
