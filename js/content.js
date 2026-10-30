@@ -26,29 +26,35 @@ const MATERI = [
     say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dengan 2 input ada 4 baris.', 'Yeay, materi selesai! Selanjutnya coba SIMULASI bareng Yuri, lalu LATIHAN dan EVALUASI ya!'] }
 ];
 
-/* Kartu ulang Materi (gaya flashcard). f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Tambah kartu = tambah objek. */
+/* Kartu ulang Materi (gaya flashcard). f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Semua isi bersumber dari halaman Materi. Tambah kartu = tambah objek. */
 const GATE_RULE = {
-  AND: 'Output 1 hanya jika semua input 1. Seperti saklar seri.', OR: 'Output 1 jika minimal satu input 1. Seperti saklar paralel.', NOT: 'Inverter: output kebalikan dari input. Hanya 1 input.',
+  AND: 'Output 1 hanya jika semua input 1. Seperti saklar seri.', OR: 'Output 1 jika minimal satu input 1. Seperti saklar paralel.', NOT: 'Pembalik (inverter). Satu-satunya gerbang dasar dengan satu input.',
   NAND: 'NOT AND: output 0 hanya jika semua input 1.', NOR: 'NOT OR: output 1 hanya jika semua input 0.', XOR: 'Output 1 jika kedua input berbeda.', XNOR: 'NOT XOR: output 1 jika kedua input sama.'
 };
+const gateFront = g => gateSVG(g, null, null, null, false).replace(/<text x="\d+" y="2"[^>]*>[A-Z]+<\/text>/, '');   // nama gerbang dihapus dari gambar: itu jawabannya
 const FLASH = [
-  { t: 'Rangkaian logika', f: 'Rangkaian logika memproses sinyal bernilai apa?', b: 'Sinyal <b>digital</b>: hanya <b>0</b> atau <b>1</b>. Dibangun dari gerbang logika.' },
-  { t: 'Input, proses, output', f: 'Sebutkan tiga bagian sistem kontrol.', b: '<b>INPUT</b> (sensor, tombol) → <b>PROSES</b> (gerbang logika) → <b>OUTPUT</b> (lampu, motor, buzzer).' },
-  { t: 'Logika 1', f: 'Logika <b>1</b> sama artinya dengan apa saja?', b: '<b>HIGH</b>, <b>ON</b>, sekitar +5 V, dan <b>benar</b>.' },
-  { t: 'Logika 0', f: 'Logika <b>0</b> sama artinya dengan apa saja?', b: '<b>LOW</b>, <b>OFF</b>, 0 V, dan <b>salah</b>.' },
-  ...['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => ({ t: g, f: `<div class="card sm">${gateSVG(g, null, null, null, false)}</div><p>Gerbang apa ini?</p>`, b: `<b>Gerbang ${g}</b><p>${GATE_RULE[g]}</p><p class="fm">${FORM[g]}</p>` })),
-  { t: 'AND = seri', f: 'Saklar dipasang <b>seri</b> sama dengan gerbang apa? Dan yang <b>paralel</b>?', b: 'Seri = <b>AND</b>. Paralel = <b>OR</b>.' },
-  { t: 'Gerbang universal', f: 'Gerbang apa saja yang disebut <b>universal</b>?', b: '<b>NAND</b> dan <b>NOR</b>: dengan salah satunya, semua gerbang lain bisa dibuat.' },
-  { t: 'Satu input', f: 'Gerbang dasar mana yang hanya punya <b>satu input</b>?', b: '<b>NOT</b>.' },
-  { t: 'XOR 1 dan 1', f: 'XOR dengan A = 1 dan B = 1: berapa outputnya?', b: '<b>0</b>, karena kedua input sama. XOR hanya 1 kalau inputnya berbeda.' },
-  { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b> (2² kombinasi: 00, 01, 10, 11). Dengan n input: 2ⁿ baris.' }
+  { t: 'Rangkaian logika', f: 'Rangkaian logika memproses sinyal bernilai apa?', b: 'Sinyal <b>digital</b>: hanya <b>0</b> atau <b>1</b>. Dibangun dari gerbang logika yang mengambil keputusan.' },
+  { t: 'Input, proses, output', f: 'Sebutkan tiga bagian sistem kontrol, dan contoh masing-masing.', b: '<b>Input</b>: sensor, tombol, saklar.<br><b>Proses</b>: gerbang logika.<br><b>Output</b>: lampu, motor, buzzer.' },
+  { t: 'Logika 1 dan 0', f: 'Apa arti logika <b>1</b> dan logika <b>0</b>?', b: '<b>1</b> = HIGH, ON, sekitar +5 V, benar.<br><b>0</b> = LOW, OFF, 0 V, salah.' },
+  ...['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => ({ t: g, f: `<div class="card sm">${gateFront(g)}</div><p>Gerbang apa ini?</p>`, b: `<b>Gerbang ${g}</b><p>${GATE_RULE[g]}</p><p class="fm">${FORM[g]}</p>` })),
+  { t: 'Mesin press', f: 'Mesin press baru jalan kalau tombol kiri <b>dan</b> tombol kanan ditekan. Gerbang apa?', b: '<b>AND</b>. Kedua input harus 1, jadi kedua tangan operator aman di tombol.' },
+  { t: 'Alarm', f: 'Alarm berbunyi kalau sensor asap <b>atau</b> sensor panas aktif. Gerbang apa?', b: '<b>OR</b>. Cukup salah satu input 1 untuk membuat output 1.' },
+  { t: 'Lampu tangga', f: 'Lampu tangga bisa dinyalakan dari lantai atas maupun bawah. Gerbang apa?', b: '<b>XOR</b>. Output 1 kalau kedua saklar berbeda posisi.' },
+  { t: 'Seri dan paralel', f: 'Saklar <b>seri</b> setara gerbang apa? Dan saklar <b>paralel</b>?', b: 'Seri = <b>AND</b>. Paralel = <b>OR</b>.' },
+  { t: 'Gerbang universal', f: 'Gerbang apa saja yang disebut <b>universal</b>?', b: '<b>NAND</b> dan <b>NOR</b>. Dengan salah satunya saja, semua gerbang lain bisa dibuat.' },
+  { t: 'NAND 1 dan 1', f: 'NAND dengan A = 1 dan B = 1: berapa output?', b: '<b>0</b>. AND-nya 1, lalu dibalik oleh NOT menjadi 0.' },
+  { t: 'XOR 1 dan 1', f: 'XOR dengan A = 1 dan B = 1: berapa output?', b: '<b>0</b>. Kedua input sama, dan XOR hanya 1 kalau inputnya berbeda.' },
+  { t: 'XNOR 0 dan 0', f: 'XNOR dengan A = 0 dan B = 0: berapa output?', b: '<b>1</b>. Kedua input sama, dan itulah syarat XNOR menghasilkan 1.' },
+  { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b>: 00, 01, 10, 11 (2² kombinasi). Dengan n input, ada 2ⁿ baris.' }
 ];
 const FLASH_SAY = {
-  go: 'Mau mengulang materi? Tekan ULANG PAKAI KARTU di papan tulis!',
-  start: ['Oke, mode kartu! Baca sisi depan, jawab dalam hati, lalu balik kartunya.', 'Kartu yang sudah paham hilang dari tumpukan. Yang belum akan muncul lagi nanti.'],
+  go: 'Mau mengulang materi? Tekan KARTU ULANG di antara tombol bawah!',
+  start: ['Oke, mode kartu! Baca sisi depan, jawab dalam hati, lalu balik kartunya.', 'Kartu yang sudah paham keluar dari tumpukan. Yang belum akan muncul lagi nanti.'],
+  again: 'Tumpukan baru, urutannya diacak. Coba lagi!',
+  missed: 'Kita ulangi hanya kartu yang tadi belum hafal.',
   belum: ['Tidak apa-apa, kartu ini muncul lagi nanti.', 'Santai, mengulang itu cara paling ampuh buat ingat.', 'Dicatat! Nanti kita coba lagi.'],
   half: 'Setengah tumpukan sudah paham. Terus ya!',
-  done: 'Semua kartu paham! Keren banget. Sekarang kamu siap SIMULASI dan LATIHAN.'
+  done: 'Semua kartu paham! Sekarang kamu siap SIMULASI dan LATIHAN.'
 };
 
 const SIM_SAY = {
