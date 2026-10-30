@@ -96,7 +96,7 @@ const exSrc = (k, e) => { const pl = EX[k][e], n = pl && nextOf(pl, 's' + k + e)
 const preloadExpr = () => Object.keys(EX).forEach(k => new Set(Object.values(EX[k]).flat().filter(Boolean)).forEach(n => getPort(`assets/img/expr/${k}_${n}.webp`)));
 function narrScene(id) {
   const A = ST[id], el = $('#scene'), lines = typeof A.lines === 'function' ? A.lines() : A.lines;
-  const keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => lines.some(l => l[2] === k)), pos = NPOS[keys.length];
+  const all = [...lines, ...(A.ask ? A.ask.opts.flatMap(o => o.lines) : [])], keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => all.some(l => l[2] === k)), pos = NPOS[keys.length];
   el.classList.add('narr');
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
   <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
@@ -107,8 +107,17 @@ function narrScene(id) {
   d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
   const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el)); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
-  const watch = setInterval(() => { if (!d.typing && !d.q.length && d.shown) { done(); clearInterval(watch) } }, 200);
-  d.say(lines, done);
+  /* pilihan (A.ask): dialog sampai pertanyaan -> kartu pilihan -> reaksi sesuai pilihan -> sisa dialog (setelah A.skip baris). Tanpa A.ask: perilaku lama. */
+  const ask = A.ask, first = ask ? lines.slice(0, ask.at + 1) : lines, rest = ask ? lines.slice(ask.at + 1 + (ask.skip || 0)) : [];
+  let phase = ask ? 0 : 2;   // 0 = sebelum pilihan, 1 = menunggu pilihan, 2 = setelah
+  const askUI = () => {
+    const P = $('#panel', el); P.innerHTML = `<div class="startcard sc choice" role="group" aria-label="${ask.q}"><div class="qq">${ask.q}</div><div class="qo">${ask.opts.map((o, i) => `<button class="opt" data-i="${i}">${o.t}</button>`).join('')}</div></div>`;
+    P.onclick = e => { const b = e.target.closest('.opt'); if (!b) return; const o = ask.opts[+b.dataset.i]; P.onclick = null; Snd.sfx('select'); P.innerHTML = ''; phase = 2; d.say([...o.lines, ...rest], after) };
+    $('.opt', P).focus({ preventScroll: true });
+  };
+  const after = () => { if (phase === 0) { phase = 1; askUI() } else if (phase === 2) done() };
+  const watch = setInterval(() => { if (!d.typing && !d.q.length && d.shown && phase !== 1) { after(); if (phase === 2) clearInterval(watch) } }, 200);
+  d.say(first, after);
   const back = () => { Snd.sfx('cancelMenu'); go('menu') };
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === lines[0][2]));
@@ -122,6 +131,11 @@ function narrScene(id) {
 const ST = {
   n_intro: {
     bg: 'DDLCbg', title: 'Klik kotak dialog untuk lanjut', go: 'MULAI BELAJAR: MATERI ▶', reveal: true,   // karakter masuk satu per satu saat pertama kali bicara
+    ask: { at: 16, q: 'Kenapa kamu mau belajar rangkaian logika?', opts: [
+      { t: 'Supaya lulus ujian', lines: [L('n', 'Tujuan yang jelas. Aku suka orang yang tahu maunya.', 'smug'), L('s', 'Kami bantu sampai lulus, janji!', 'cheer')] },
+      { t: 'Penasaran saja', lines: [L('m', 'Rasa penasaran itu modal belajar terbaik, lho.', 'happy'), L('y', 'Biasanya yang penasaran justru cepat paham. Aku senang mendengarnya.', 'shy')] },
+      { t: 'Disuruh guru', lines: [L('s', 'Hehe, sama! Awalnya aku juga terpaksa.', 'playful'), L('n', 'Terpaksa pun tidak apa-apa. Asal tetap dikerjakan sampai selesai.', 'hmph')] }
+    ] },
     lines: [
       L('s', 'Ah, kamu datang! Hai hai! Aku Sayori. Kamu yang mau belajar buat ujian Teknik Kontrol Mekatronika, kan?', 'happy'),
       L('s', 'Jujur, rangkaian logika itu bikin kepalaku muter-muter... Makanya aku ngajak teman-teman klubku belajar bareng. Ayo, ikut aku!', 'worry'),
@@ -139,6 +153,7 @@ const ST = {
       L('m', 'Hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Aturannya cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang paham menjelaskan.', 'happy'),
       L('s', 'Aku yang ragu bertanya!', 'cheer'),
       L('n', 'Dan aku yang paham menjelaskan. Pembagian tugas yang jelas.', 'smug'),
+      L('m', 'Kalau begitu, kamu sendiri: kenapa mau belajar rangkaian logika hari ini?', 'talk'),
       L('y', 'Aku sudah menyusun urutannya: materi dasar dulu, lalu simulasi gerbang logika, latihan soal, dan terakhir evaluasi akhir.', 'explain'),
       L('n', 'Bagian latihan soal aku yang pegang! Jangan harap aku lembek, ya.', 'smug'),
       L('m', 'Urutannya rapi banget, ya? Seolah-olah ada yang sudah menyusun jalan ceritanya untuk kita. Ahaha, abaikan saja ucapanku barusan.', 'wink'),
@@ -147,6 +162,11 @@ const ST = {
   },
   n_1: {
     bg: 'DDLCbg', title: 'Materi selesai', go: 'KE SIMULASI ▶',
+    ask: { at: 2, skip: 4, q: 'Gerbang apa yang outputnya 1 hanya kalau semua inputnya 1?', opts: [
+      { t: 'AND', lines: [L('n', 'Betul, AND! Kamu lebih cepat dari Sayori.', 'happy'), L('s', 'Eh, aku tadi mau jawab itu juga, lho!', 'worry'), L('y', 'Pegangan mudahnya: AND itu "dan", semua syarat harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
+      { t: 'OR', lines: [L('n', 'OR itu cukup satu input saja yang bernilai 1. Yang dicari AND!', 'angry'), L('s', 'Yah, sama kayak aku... Kita senasib!', 'worry'), L('y', 'Wajar tertukar. AND itu "dan", semua syarat harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
+      { t: 'XOR', lines: [L('y', 'XOR keluarannya 1 kalau kedua input berbeda. Kalau keduanya 1, hasilnya justru 0. Yang dicari AND.', 'explain'), L('n', 'Berani juga jawabanmu. Tapi salah arah.', 'smug'), L('s', 'Oh iya! "Dan" ketat, "atau" santai. Aku catat!', 'cheer')] }
+    ] },
     lines: [
       L('y', 'Seluruh materinya sudah kamu lewati. Dasar seperti itu sering diremehkan, padahal semuanya bertumpu di sana.', 'calm'),
       L('s', 'Aku juga ngerasa makin paham! ...mungkin. Sedikit.', 'happy'),
@@ -162,6 +182,10 @@ const ST = {
   },
   n_2: {
     bg: 'Music_Room', title: 'Simulasi selesai', go: 'KE LATIHAN ▶',
+    ask: { at: 6, q: 'Kalau A = 1 dan B = 1, berapa output NAND?', opts: [
+      { t: '0', lines: [L('n', 'Betul, 0! AND-nya menghasilkan 1, lalu dibalik jadi 0.', 'smug'), L('s', 'Wah, aku hampir menjawab 1...', 'worry')] },
+      { t: '1', lines: [L('n', 'Salah! AND-nya 1, tapi NAND membaliknya jadi 0.', 'hmph'), L('y', 'Jebakan klasik: lupa membalik di akhir. Itu yang Natsuki maksud licik.', 'calm')] }
+    ] },
     lines: [
       L('n', 'Oke, sudah puas mainin gerbang? Sekarang giliranku menguji kemampuanmu!', 'smug'),
       L('s', 'Aduh, deg-degan...', 'worry'),
@@ -169,6 +193,7 @@ const ST = {
       L('n', 'Aku sudah menyiapkan delapan soal. Beberapa lumayan licik, jadi bersiaplah.', 'smug'),
       L('s', 'Licik?! Natsuki jangan menakut-nakuti dong!', 'shock'),
       L('n', 'Licik itu maksudnya menjebak yang kurang teliti. Misalnya, ada yang mengira NAND sama dengan AND. NAND itu AND yang dibalik.', 'hmph'),
+      L('n', 'Coba jawab dulu: kalau A = 1 dan B = 1, berapa output NAND?', 'smug'),
       L('y', 'Jebakannya adil, kok. Semuanya bisa dijawab lewat tabel kebenaran.', 'calm'),
       L('m', 'Latihan itu tempat yang boleh salah. Jawabanmu juga masih bisa diganti sebelum dicek.', 'happy'),
       L('s', 'Natsuki, tadi katanya nggak galak.', 'playful'),
@@ -177,6 +202,11 @@ const ST = {
   },
   n_3: {
     bg: 'Music_Room', title: 'Latihan selesai', go: 'KE EVALUASI AKHIR ▶',
+    ask: { at: 6, q: 'Bagaimana perasaanmu menjelang evaluasi?', opts: [
+      { t: 'Gugup sedikit', lines: [L('m', 'Wajar. Tarik napas dulu, lalu kerjakan satu soal demi satu soal.', 'calm'), L('s', 'Tenang, kamu nggak sendirian di sini!', 'cheer')] },
+      { t: 'Siap!', lines: [L('n', 'Percaya diri itu bagus. Asal tetap teliti, ya.', 'smug'), L('m', 'Semangat itu menular. Aku suka.', 'happy')] },
+      { t: 'Lapar, mau cupcake', lines: [L('n', 'D-dasar! Fokus ujian dulu, cupcake belakangan!', 'angry'), L('s', 'Hehe, ujung-ujungnya selalu ke cupcake.', 'playful')] }
+    ] },
     lines: [
       L('m', 'Latihan selesai. Sekarang bagian yang paling kutunggu: Evaluasi akhir.', 'calm'),
       L('s', 'Kamu pasti bisa! Aku sudah siapin permen keberuntungan!', 'playful'),
@@ -184,6 +214,7 @@ const ST = {
       L('m', 'Dua kalimat pertama itu perhatian, Natsuki. Kalimat terakhirnya pembelaan diri.', 'wink'),
       L('n', 'Monika!', 'angry'),
       L('y', 'Sepuluh soal, tanpa petunjuk. Tapi kamu sudah membawa semua bekalnya.', 'calm'),
+      L('s', 'Ngomong-ngomong, kamu sendiri gugup nggak menjelang evaluasi?', 'talk'),
       L('s', 'Habis ujian, kita makan cupcake bareng, ya? Natsuki pasti sudah menyiapkannya!', 'happy'),
       L('n', 'C-cupcake? Memang sudah kubuat. Tapi itu hadiah untuk yang mengerjakan dengan baik, ya!', 'shy'),
       L('y', 'Eh, kalau boleh tahu, rasanya apa?', 'shy'),

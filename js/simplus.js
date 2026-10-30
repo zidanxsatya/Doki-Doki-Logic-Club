@@ -56,7 +56,7 @@ SC.simplus = () => {
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ PILIH MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari input dan gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
   <div class="xp">
     <div class="xpal" aria-label="Palet gerbang dan input">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}${inCard(0)}${inCard(1)}</div>
-    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>
+    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xundo"><button class="btn sm" id="xun" aria-label="Urungkan (Ctrl+Z)" title="Urungkan (Ctrl+Z)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button><button class="btn sm xre" id="xre" aria-label="Ulangi (Ctrl+Y)" title="Ulangi (Ctrl+Y)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>
     <div class="xside">
       <div class="xcard xio"><div class="xlab">INPUT<span class="xcnt" id="xcnt"></span></div><div class="xrow"><span class="xtgs" id="xtgs"></span><span class="xy" id="xy"></span></div></div>
       <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN X</div><div class="xtw"><table class="tt xtt" id="xtt"></table></div><p class="xmsg" id="xmsg"></p><p class="xex" id="xex" hidden></p></div>
@@ -198,6 +198,24 @@ SC.simplus = () => {
     else t = `Langkah ${N + 1} dari ${N + 1}. Hasil akhir X = ${yv}. ${yv ? 'Rangkaian ini menyala.' : 'Rangkaian ini mati.'} Ubah input untuk melihat langkahnya berubah.`;
     $('#xstt', el).textContent = t; $('#xsp', el).disabled = stp === 0; $('#xsx', el).disabled = stp >= N;
   };
+  /* undo/redo: potret struktur (gerbang, kabel, input) dicatat otomatis setelah perubahan berhenti 0,4 s (satu seretan = satu entri). Nilai saklar tidak dicatat. Mati selama Mode Tantangan. */
+  const snap = () => ({ G: G.map(g => ({ ...g })), W: JSON.parse(JSON.stringify(W)), I: I.map(n => ({ ...n })), nid, wid, iid });
+  const skey = () => JSON.stringify([G.map(g => [g.id, g.type, Math.round(g.x), Math.round(g.y)]), W.map(w => [w.id, w.from, w.to]), I.map(n => [n.id, n.name, Math.round(n.x), Math.round(n.y)])]);
+  const btns = () => { $('.xundo', el).hidden = chi >= 0; $('#xun', el).disabled = !hist.length; $('#xre', el).disabled = !fut.length };
+  const hist = [], fut = []; let base = snap(), baseKey = skey(), cT = 0;
+  const commit = () => {
+    const k = skey();
+    if (chi >= 0) { hist.length = fut.length = 0; base = snap(); baseKey = k; return }
+    if (k === baseKey) return;
+    hist.push(base); if (hist.length > 60) hist.shift(); fut.length = 0; base = snap(); baseKey = k; btns();
+  };
+  const restore = s => {
+    const cur = new Map(I.map(n => [n.id, n.v]));
+    G.length = W.length = I.length = 0; G.push(...s.G.map(g => ({ ...g }))); W.push(...JSON.parse(JSON.stringify(s.W))); I.push(...s.I.map(n => ({ ...n, v: cur.has(n.id) ? cur.get(n.id) : n.v })));
+    nid = Math.max(nid, s.nid); wid = Math.max(wid, s.wid); iid = Math.max(iid, s.iid); sel = null; stp = -1; hideTip(); base = snap(); baseKey = skey(); render();
+  };
+  const undo = () => { clearTimeout(cT); commit(); if (chi >= 0 || !hist.length) return; fut.push(base); Sfx('tick'); restore(hist.pop()) };
+  const redo = () => { clearTimeout(cT); commit(); if (chi >= 0 || !fut.length) return; hist.push(base); Sfx('tick'); restore(fut.pop()) };
   const render = () => {
     if (!cw) return;
     const pm = pinMap(), vals = curV(), ev = evalAt(vals), t = term(), ord = order(); let h = '';
@@ -238,6 +256,8 @@ SC.simplus = () => {
     svg.innerHTML = h;
     stepUI(ev, ord, yv);
     sync(yv);
+    clearTimeout(cT); cT = setTimeout(commit, 400);
+    btns();
   };
   const sync = yv => {
     const SIn = SI(), n = SIn.length, rows = 1 << n, bit = (r, i) => (r >> (n - 1 - i)) & 1, C = chi >= 0 ? CH[chi] : null;   // baris r: input pertama (A) = bit tertinggi
@@ -323,15 +343,16 @@ SC.simplus = () => {
   $('#xtgs', el).onclick = e => { const b = e.target.closest('.xtg'); if (b) toggleIn(+b.dataset.id) };
   $('#xdw').onclick = delSel; $('#xdg').onclick = delSel;
   $('#xst').onclick = () => { stp = 0; Sfx('tick'); render() }; $('#xsp').onclick = () => { stp = Math.max(0, stp - 1); Sfx('tick'); render() }; $('#xsx').onclick = () => { stp++; Sfx('tick'); render() }; $('#xse').onclick = () => { stp = -1; Sfx('tick'); render() };
+  $('#xun').onclick = undo; $('#xre').onclick = redo;
   $('#xcl').onclick = () => { G.length = 0; W.length = 0; if (chi < 0) I.length = 0; sel = null; Sfx('del'); say('Rangkaian dikosongkan.', 'info'); render() };
   $('#xch').onclick = () => { if (list.hidden) openList(); else list.hidden = true };
   $('#xgl').onclick = openList; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);
   const back = () => { Sfx('tick'); go('simpick') };
   $('#back').onclick = back;
-  document.onkeydown = e => { if (e.key === 'Escape') { if (!list.hidden) list.hidden = true; else back() } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { e.preventDefault(); delSel() } };
+  document.onkeydown = e => { const z = (e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase(); if (z === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo() } else if (z === 'y') { e.preventDefault(); redo() } else if (e.key === 'Escape') { if (!list.hidden) list.hidden = true; else back() } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { e.preventDefault(); delSel() } };
 
   el.classList.add('on');
   const ro = new ResizeObserver(() => { cw = cv.clientWidth; ch = cv.clientHeight; if (!cw) return; K = mob() ? .66 : .8; svg.setAttribute('viewBox', `0 0 ${cw} ${ch}`); G.forEach(clampG); I.forEach(clampI); render() });
   ro.observe(cv);
-  scene = { cleanup() { ro.disconnect(); clearTimeout(tT); clearTimeout(fT); clearTimeout(tipT); pd && pd.gh && pd.gh.remove(); el.innerHTML = ''; document.onkeydown = null } };
+  scene = { cleanup() { ro.disconnect(); clearTimeout(cT); clearTimeout(tT); clearTimeout(fT); clearTimeout(tipT); pd && pd.gh && pd.gh.remove(); el.innerHTML = ''; document.onkeydown = null } };
 };

@@ -112,7 +112,7 @@ function scaffold(id) {
   scene = { cleanup() { clearInterval(idle); removeEventListener('pointerdown', act, true); removeEventListener('keydown', act, true); ch.unmount(); d.destroy(); el.innerHTML = ''; document.onkeydown = null } };
   return { ch, d, panel: $('#panel'), chat };
 }
-const IC = { out: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>', gate: '<svg viewBox="0 0 16 16"><path d="M5 3.5l7 4.5-7 4.5z"/></svg>', tab: '<svg viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 8h11M8 2.5v11"/></svg>', wire: '<svg viewBox="0 0 16 16"><path d="M2 5h6v6h4"/><circle cx="13" cy="11" r="1.4" fill="currentColor"/></svg>', best: '<svg viewBox="0 0 16 16"><path d="M8 1.8l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.4l-3.9 2.2.9-4.3-3.2-3 4.3-.5z" fill="#ffd54a" stroke="none"/></svg>' };
+const IC = { out: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>', gate: '<svg viewBox="0 0 16 16"><path d="M5 3.5l7 4.5-7 4.5z"/></svg>', tab: '<svg viewBox="0 0 16 16"><rect x="2.5" y="2.5" width="11" height="11" rx="1.5"/><path d="M2.5 8h11M8 2.5v11"/></svg>', wire: '<svg viewBox="0 0 16 16"><path d="M2 5h6v6h4"/><circle cx="13" cy="11" r="1.4" fill="currentColor"/></svg>', clock: '<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5.5"/><path d="M8 4.8V8l2.3 1.4"/></svg>', best: '<svg viewBox="0 0 16 16"><path d="M8 1.8l1.9 4 4.3.5-3.2 3 .9 4.3L8 11.4l-3.9 2.2.9-4.3-3.2-3 4.3-.5z" fill="#ffd54a" stroke="none"/></svg>' };
 const chipRow = a => `<div class="chips">${a.map(([i, t]) => `<span class="chip">${i ? IC[i] : ''}${t}</span>`).join('')}</div>`;
 const startCard = (S, title, desc, onGo) => {
   S.panel.innerHTML = `<div class="startcard sc" data-k="${S.ch.key}"><h2>${title}</h2><div class="scb">${desc}</div><button class="btn big" id="go">MULAI</button></div>`;
@@ -178,7 +178,9 @@ SC.simulasi = () => {
 };
 
 /* ---------- renderer soal (dipakai Latihan & Evaluasi) ---------- */
-function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
+const EVAL_TIME = 60;   // detik per soal Evaluasi
+function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime }) {
+  clearInterval(panel._tm);
   panel.innerHTML = `<div class="qhd"><div class="qh">Soal ${i + 1} / ${n}</div>${reveal ? `<div class="qs" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
   const o = $('.qo', panel), f = $('.qf', panel); let locked = false;
   const done = ok => { locked = true; onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
@@ -202,7 +204,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
       Snd.sfx('select'); locked = true; const ok = choice === Q.a, bs = $$('.opt', o);
       bs[choice].classList.remove('picked'); bs[choice].classList.add(ok ? 'ok' : 'bad'); if (!ok) bs[Q.a].classList.add('ok'); done(ok);
     };
-    else f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`, $('#qn').onclick = () => { Snd.sfx('select'); onAns(choice === Q.a); next() };
+    else f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`, $('#qn').onclick = () => { Snd.sfx('select'); clearInterval(panel._tm); onAns(choice === Q.a); next() };
     f.scrollIntoView({ block: 'nearest' });
   };
   o.classList.toggle('n5', Q.opts.length > 4);   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
@@ -214,6 +216,17 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick }) {
     };
     o.appendChild(b);
   });
+  if (timer) {   // timer per soal: bar menyusut (CSS, linear) + angka; jawaban terpilih tetap dihitung, tanpa jawaban = salah; lalu otomatis ke soal berikutnya
+    $('.qhd', panel).insertAdjacentHTML('beforeend', `<div class="tbar" aria-hidden="true"><i style="--t:${timer}s"></i></div><div class="tmr" role="timer" aria-label="Sisa waktu soal"></div>`);
+    const tm = $('.tmr', panel), bar = $('.tbar', panel), t0 = performance.now();
+    const tick = () => {
+      if (!panel.isConnected) { clearInterval(panel._tm); return }
+      const left = Math.max(0, timer - (performance.now() - t0) / 1000), s = Math.ceil(left), low = left <= 10;
+      tm.textContent = `${s >= 60 ? 1 : 0}:${String(s % 60).padStart(2, '0')}`; tm.classList.toggle('low', low); bar.classList.toggle('low', low);
+      if (left <= 0) { clearInterval(panel._tm); if (locked) return; locked = true; Snd.sfx('cancelMenu'); onAns(choice >= 0 && choice === Q.a); onTime && onTime(choice < 0); next() }
+    };
+    panel._tm = setInterval(tick, 250); tick();
+  }
 }
 
 /* ---------- efek hasil: hitung naik, konfeti, lompatan karakter (transform/opacity saja; mati bila 'kurangi gerakan') ---------- */
@@ -261,17 +274,19 @@ SC.latihan = () => {
 
 /* ---------- EVALUASI (Monika) ---------- */
 SC.evaluasi = () => {
-  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right, log, lastK;
+  const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right, log, lastK, late;
   const bestTxt = () => best() == null ? 'Belum ada' : `${best() * 10} (${best()}/${N} benar)`;
   const begin = () => { qs = shuffle(EVAL).slice(0, EVAL_N).map(c => ({ kind: 'mc', ...shuffleOpts(c) })); i = 0; right = 0; log = []; q() };
   const q = () => {
+    lastK = -1;
     if (i === 0) S.d.say(pick(DM.start));
     else if (i === N - 1) S.d.line(pick(DM.last), 'talk');
     else if (i === N / 2) S.d.say([[pick(DM.half), 'happy'], ...SL.eval('half')]);
     else if (Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(pick(DM.q), pick(['talk', 'wink', 'happy']));
+    if (late) { late = false; S.d.line('Waktu habis, lanjut ke soal berikutnya. Tenang saja.', 'talk') }
     let swaps = 0; // berapa kali pemain mengganti jawaban pada soal ini
-    renderQ(S.panel, qs[i], i, N, { reveal: false, onAns: ok => { if (ok) right++; log.push({ Q: qs[i], k: lastK, ok }) }, next: () => ++i < N ? q() : end(),
+    renderQ(S.panel, qs[i], i, N, { reveal: false, timer: EVAL_TIME, onTime: () => { late = true }, onAns: ok => { if (ok) right++; log.push({ Q: qs[i], k: lastK, ok }) }, next: () => ++i < N ? q() : end(),
       onPick: (k, prev) => { lastK = k; if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (Story.on && swaps === 2 && prev >= 0 && k !== prev) S.d.say(ST.eval.swap); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });
   };
   const end = () => {
@@ -284,7 +299,7 @@ SC.evaluasi = () => {
       if (Story.on) $('.startcard', S.panel).appendChild(Story.contBtn('evaluasi'));
     };
     const review = () => {   // soal salah terbuka, soal benar tertutup (<details> bawaan browser)
-      S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${log.map((l, n) => ({ ...l, n })).sort((x, y) => x.ok - y.ok).map(l => `<details class="${l.ok ? 'ok' : 'bad'}"${l.ok ? '' : ' open'}><summary>${l.n + 1}. ${l.Q.q}</summary>${l.Q.vis || ''}<p>Jawabanmu: <b>${l.Q.opts[l.k]}</b></p>${l.ok ? '' : `<p>Jawaban benar: <b>${l.Q.opts[l.Q.a]}</b></p>`}<p class="rve">${l.Q.e}</p></details>`).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
+      S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${log.map((l, n) => ({ ...l, n })).sort((x, y) => x.ok - y.ok).map(l => `<details class="${l.ok ? 'ok' : 'bad'}"${l.ok ? '' : ' open'}><summary>${l.n + 1}. ${l.Q.q}</summary>${l.Q.vis || ''}<p>Jawabanmu: <b>${l.k >= 0 ? l.Q.opts[l.k] : 'Tidak dijawab (waktu habis)'}</b></p>${l.ok ? '' : `<p>Jawaban benar: <b>${l.Q.opts[l.Q.a]}</b></p>`}<p class="rve">${l.Q.e}</p></details>`).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
       $('#rb').onclick = () => { Snd.sfx('select'); show() };
       S.d.line(wrong ? 'Bagian paling penting belajar: lihat kenapa salah. Soal yang salah sudah kubuka, ya.' : 'Semuanya benar! Tapi baca-baca penjelasannya juga boleh, siapa tahu ada yang menarik.', wrong ? 'talk' : 'happy');
     };
@@ -292,7 +307,7 @@ SC.evaluasi = () => {
     show(true);
     S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
-  startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti']])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
+  startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti'], ['clock', `${EVAL_TIME} detik / soal`]])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
   S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 

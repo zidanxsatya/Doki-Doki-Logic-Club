@@ -815,3 +815,24 @@ body.m{--cs:.6}
 .m .xstp{left:5px;right:5px;bottom:5px;padding:4px 8px 6px;border-width:2px;border-radius:10px}.m .xstt{font-size:12px;margin-bottom:4px}.m:not(.p) .xstt{font-size:11px;line-height:1.25}
 @media (prefers-reduced-motion:reduce){.chap{animation:chapr 2s linear both}@keyframes chapr{0%{opacity:0}14%,84%{opacity:1}100%{opacity:0}}.cf{display:none}.res .stars i.on{animation:none}.xhl,.xstb,.xstp,.combo.pop{animation:none}}
 .xstp:not([hidden]) ~ .xtoast{opacity:0!important}
+
+/* v17: pilihan cerita, undo/redo Simulasi+, timer Evaluasi */
+.choice{margin-top:0!important}
+.choice .qq{margin:16px 16px 10px;font-size:21px}
+.choice .qo{padding:0 16px;gap:10px}
+.m .choice .qq{margin:8px 10px 6px;font-size:15px;padding:5px 10px}.m .choice .qo{padding:0 10px;gap:6px}.m .choice{padding-bottom:10px}
+.m:not(.p) .choice .qq{font-size:13px;margin:4px 8px 4px}.m:not(.p) .choice .qo{gap:4px}
+.xundo{position:absolute;right:8px;top:8px;z-index:4;display:flex;gap:6px}.xundo[hidden]{display:none}
+.xundo .btn{display:grid;place-items:center;padding:3px 9px;min-width:40px}
+.xundo .btn:disabled{opacity:.45;cursor:not-allowed}
+.xre svg{transform:scaleX(-1)}
+.m .xundo{right:5px;top:5px;gap:4px}.m .xundo .btn{min-width:32px;padding:2px 6px}.m .xundo svg{width:15px;height:15px}
+.tbar{flex:1;min-width:40px;height:12px;border:3px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;box-sizing:border-box}
+.tbar i{display:block;height:100%;background:var(--pink);transform-origin:left;animation:tshrink var(--t) linear forwards}
+.tbar.low i{background:#ff4d6d}
+@keyframes tshrink{to{transform:scaleX(0)}}
+.tmr{padding:2px 12px;border-radius:999px;background:#fff;border:3px solid var(--ink);font:800 15px/1.3 Nunito,sans-serif;font-variant-numeric:tabular-nums;box-shadow:0 3px 0 var(--ink);min-width:3.2em;text-align:center}
+.tmr.low{background:#ff4d6d;color:#fff;animation:tlow 1s ease-in-out infinite}
+@keyframes tlow{50%{scale:1.08}}
+.m .tmr{font-size:12px;padding:1px 9px;border-width:2px;box-shadow:0 2px 0 var(--ink)}.m .tbar{height:10px;border-width:2px}
+@media (prefers-reduced-motion:reduce){.tmr.low{animation:none}}
