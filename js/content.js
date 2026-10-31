@@ -106,12 +106,30 @@ const QGEN = [
     let g1, g2, on, off; do { [g1, g2] = [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR'])]; const all = [...Array(8).keys()].map(i => [i >> 2, (i >> 1) & 1, i & 1]); on = all.filter(([a, b, c]) => F[g2](F[g1](a, b), c)); off = all.filter(v => !on.includes(v)) } while (!on.length || off.length < 3);
     const t = ([a, b, c]) => `A = ${a}, B = ${b}, C = ${c}`, good = pick(on), opts = shuffle([good, ...shuffle(off).slice(0, 3)]);
     return { kind: 'mc', q: 'Kombinasi input mana yang membuat output X = 1?', vis: `<div class="card sm">${circ(g1, g2, { names: true, out: 'X' })}</div>`, opts: opts.map(t), a: opts.indexOf(good), hint: `Hitung ${g1}(A,B) dulu, lalu masukkan hasilnya ke ${g2} bersama C. ${HINT[g1]}` } },
+  () => { // detektif gerbang: baris tabel dibuka bertahap, pemain menebak gerbangnya
+    const g = pick(G2); return { kind: 'det', g, order: shuffle([0, 1, 2, 3]), q: 'Detektif gerbang: tebak gerbangnya dari baris tabel yang terbuka. Buka baris lagi kalau belum yakin.', hint: `Gerbangnya ${g}. ${HINT[g]}` } },
+  () => ({ kind: 'match', pairs: shuffle(GL).slice(0, 4), q: 'Cocokkan simbol gerbang dengan namanya. Ketuk satu simbol, lalu satu nama.', hint: 'Gelembung kecil di ujung keluaran = NOT di belakangnya. Lengkung ganda di depan = XOR/XNOR. Badan melengkung lancip = OR/NOR, badan rata di depan = AND/NAND.' }),
+  () => { // nyalakan LED: atur saklar sesuai target (kadang dengan syarat tepat satu saklar ON)
+    const g = pick(GL), two = g !== 'NOT', all = two ? [[0, 0], [0, 1], [1, 0], [1, 1]] : [[0], [1]], f = s => g === 'NOT' ? F.NOT(s[0]) : F[g](s[0], s[1]), t = rnd();
+    const one = two && Math.random() < .45 && all.some(s => f(s) === t && s[0] + s[1] === 1), good = s => f(s) === t && (!one || s[0] + s[1] === 1), s0 = pick(all.filter(s => !good(s)));
+    return { kind: 'led', g, a: s0[0], b: two ? s0[1] : null, t, one, good, f, q: `Atur saklar agar LED ${t ? 'NYALA' : 'MATI'}${one ? ', dengan tepat satu saklar ON' : ''}.`, hint: `${HINT[g]}${one ? ' Cari kombinasi yang hanya menyalakan satu saklar.' : ''}` } },
   () => { // tabel kebenaran rangkaian gerbang + NOT
     const g = pick(G2);
     return { kind: 'tt', g: g + '+NOT', n: 4, ans: [0, 1, 2, 3].map(i => F.NOT(F[g](i >> 1, i & 1))), vis: `<div class="card sm">${circ(g, 'NOT', { names: true, out: 'Y' })}</div>`, q: 'Lengkapi tabel kebenaran rangkaian ini (klik kotak "?" untuk mengubah 0/1).', hint: `Hitung ${g}(A,B) dulu, lalu balik hasilnya dengan NOT. ${HINT[g]}` } }
 ];
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
-const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 7, 0, 2, 4, 5, 6, 1, 3]).slice(0, n).map(i => QGEN[i]());
+// indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT
+const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 10, 0, 2, 4, 5, 6, 1, 3, 7, 8, 9, 7, 9]).slice(0, n).map(i => QGEN[i]());
+// mode Bertahan: soal makin sulit seiring jalan (landai dulu, lalu semua jenis); tidak mengulang jenis yang sama berturut-turut
+const SURV_TIER = [[0, 1, 3, 7], [0, 1, 3, 4, 5, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]];
+const survQ = (i, prev) => { const t = SURV_TIER[i < 3 ? 0 : i < 8 ? 1 : 2]; let k; do { k = pick(t) } while (k === prev && t.length > 1); const q = QGEN[k](); q._k = k; return q };
+const SURV_SAY = {
+  start: ['Mode Bertahan! Kamu punya 3 nyawa. Salah satu kali, nyawa berkurang satu.', 'Soal terus datang sampai nyawamu habis. Skormu adalah jawaban benar beruntun terpanjang. Siap?'],
+  out: ['Nyawa habis. Sayang sekali, padahal tadi lumayan.', 'Habis sudah. Tapi tidak apa-apa, mau coba lagi?'],
+  record: ['Rekor baru! Aku akui, itu hebat.', 'Beruntun terpanjangmu pecah rekor. Hmph, boleh juga.'],
+  end: { low: 'Pemanasan dulu ya. Coba lagi, pasti bisa lebih panjang.', mid: 'Lumayan. Dengan sedikit latihan, kamu bisa melewati 10 beruntun.', high: 'Beruntun sepanjang itu? Kamu benar-benar paham gerbang logika.' }
+};
+
 
 const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'Hmph, kebetulan aja itu! ...Oke, oke, bagus.', 'Y-yah, itu benar. Jangan sombong dulu!', 'Tch... kamu ternyata nggak sebodoh yang kukira. Sedikit!'];
 const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];

@@ -211,13 +211,62 @@ SC.simulasi = () => {
   draw(); S.d.say([...entryExtra('yuri'), ...pick(DY.intro), [SIM_SAY.AND, 'explain'], ...SL.enter('sim')]);
 };
 
+/* ---------- jenis soal interaktif Latihan: detektif gerbang, cocokkan simbol, nyalakan LED (done(ok) mengunci soal & memunculkan LANJUT) ---------- */
+const hearts = n => [0, 1, 2].map(k => `<svg class="heart${k < n ? '' : ' off'}" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.6 9.7 1.6 5.5A3.5 3.5 0 0 1 8 3.8a3.5 3.5 0 0 1 6.4 1.7C14.4 9.7 8 14 8 14Z"/></svg>`).join('');
+const kindDet = (o, Q, done) => {
+  let shown = 2, sel = '', fin = false; o.classList.add('detq');
+  const draw = () => {
+    const open = Q.order.slice(0, fin ? 4 : shown);
+    o.innerHTML = `<table class="tt det"><tr><th>A</th><th>B</th><th>Y</th></tr>${[0, 1, 2, 3].map(r => `<tr class="${open.includes(r) ? '' : 'hid'}"><td>${r >> 1}</td><td>${r & 1}</td><td>${open.includes(r) ? F[Q.g](r >> 1, r & 1) : '?'}</td></tr>`).join('')}</table>
+    <div class="dgrid" role="group" aria-label="Pilih gerbang">${G2.map(g => `<button class="opt${sel === g ? ' picked' : ''}${fin && g === Q.g ? ' ok' : ''}${fin && sel === g && g !== Q.g ? ' bad' : ''}" data-g="${g}"${fin ? ' disabled' : ''}>${g}</button>`).join('')}</div>
+    ${fin ? '' : `<div class="dact"><button class="btn sm" id="dmore"${shown >= 4 ? ' disabled' : ''}>BUKA 1 BARIS LAGI</button><button class="btn" id="dchk"${sel ? '' : ' disabled'}>CEK JAWABAN</button></div>`}`;
+    if (fin) return;
+    $$('.opt', o).forEach(b => b.onclick = () => { Snd.sfx('openOS'); sel = b.dataset.g; draw(); $(`.opt[data-g="${sel}"]`, o).focus() });
+    $('#dmore').onclick = () => { Snd.sfx('openOS'); shown++; draw(); $('#dmore', o).disabled || $('#dmore', o).focus() };
+    $('#dchk').onclick = () => { Snd.sfx('select'); fin = true; draw(); done(sel === Q.g) };
+  };
+  draw();
+};
+const kindMatch = (o, Q, done, panel) => {
+  const names = shuffle(Q.pairs); let L = null, R = null, got = 0, bad = 0, over = false; const t0 = performance.now(), fmt = () => { const s = Math.floor((performance.now() - t0) / 1000); return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}` };
+  o.classList.add('matchq');
+  o.innerHTML = `<div class="mcol">${Q.pairs.map(g => `<button class="mk" data-g="${g}" aria-label="Simbol gerbang"><span class="card sm">${gateFront(g).replace(/viewBox="[^"]*"/, 'viewBox="26 8 126 84"')}</span></button>`).join('')}</div><div class="mcol">${names.map(g => `<button class="mn" data-g="${g}">${g}</button>`).join('')}</div><div class="mst"><span class="mtime" role="timer" aria-label="Waktu berjalan">0:00</span><span class="mbad">Salah: 0</span></div>`;
+  const tm = $('.mtime', o); panel._tm = setInterval(() => { if (!panel.isConnected) clearInterval(panel._tm); else if (!over) tm.textContent = fmt() }, 500);
+  o.onclick = e => {
+    const b = e.target.closest('.mk,.mn'); if (!b || b.disabled || over || b.classList.contains('bad')) return; Snd.sfx('openOS');
+    const side = b.classList.contains('mk') ? 'L' : 'R', cur = side === 'L' ? L : R;
+    if (cur) cur.classList.remove('sel'); const same = cur === b; if (side === 'L') L = same ? null : b; else R = same ? null : b; if (!same) b.classList.add('sel');
+    if (!L || !R) return;
+    if (L.dataset.g === R.dataset.g) { [L, R].forEach(x => { x.classList.remove('sel'); x.classList.add('ok'); x.disabled = true }); L = R = null; Snd.sfx('select');
+      if (++got === Q.pairs.length) { over = true; clearInterval(panel._tm); tm.textContent = fmt(); done(bad <= 1) } }
+    else { bad++; $('.mbad', o).textContent = `Salah: ${bad}`; const x = [L, R]; x.forEach(y => y.classList.add('bad')); L = R = null; Snd.sfx('cancelMenu'); setTimeout(() => x.forEach(y => y.classList.remove('bad', 'sel')), 450) }
+  };
+};
+const kindLed = (o, qv, Q, done) => {
+  const st = [Q.a, Q.b], two = Q.g !== 'NOT'; let shown = false, locked = false; const cur = () => Q.f(st);
+  o.classList.add('ledq');
+  const draw = () => {
+    let sv = gateSVG(Q.g, st[0], two ? st[1] : null, shown ? cur() : 0, true); if (!shown) sv = sv.replace('LED MATI', 'LED ?');
+    qv.innerHTML = `<div class="card sm ledc">${sv}</div>`;
+    $$('.lsw', o).forEach((b, k) => { b.textContent = `Saklar ${'AB'[k]} = ${st[k]}`; b.classList.toggle('on', !!st[k]); b.setAttribute('aria-pressed', st[k] ? 'true' : 'false') });
+  };
+  const flip = k => { if (locked) return; Snd.sfx('openOS'); st[k] ^= 1; draw() };
+  o.innerHTML = `<div class="lsws">${[0, 1].slice(0, two ? 2 : 1).map(k => `<button class="btn lsw" data-k="${k}"></button>`).join('')}</div><button class="btn" id="lchk">CEK RANGKAIAN</button><p class="lres" role="status"></p>`;
+  $$('.lsw', o).forEach(b => b.onclick = () => flip(+b.dataset.k)); qv.onclick = e => { const w = e.target.closest('.sw'); if (w) flip(+w.dataset.i) };
+  $('#lchk').onclick = () => { if (locked) return; locked = true; shown = true; Snd.sfx('select'); const ok = Q.good(st); draw(); $('#lchk').remove(); $$('.lsw', o).forEach(b => b.disabled = true);
+    $('.lres', o).textContent = `LED ${cur() ? 'menyala' : 'mati'}. ${ok ? 'Sesuai target!' : 'Belum sesuai target.'}`; done(ok) };
+  draw();
+};
 /* ---------- renderer soal (dipakai Latihan & Evaluasi) ---------- */
 const EVAL_TIME = 60;   // detik per soal Evaluasi
-function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime }) {
+function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, lives }) {   // n = 0: tanpa batas (mode Bertahan)
   clearInterval(panel._tm);
-  panel.innerHTML = `<div class="qhd"><div class="qh">Soal ${i + 1} / ${n}</div>${reveal ? `<div class="qs" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
+  panel.innerHTML = `<div class="qhd"><div class="qh">Soal ${i + 1}${n ? ` / ${n}` : ''}</div>${reveal && n ? `<div class="qs" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}${lives != null ? `<div class="lives" role="status" aria-label="Sisa nyawa ${lives}">${hearts(lives)}</div>` : ''}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
   const o = $('.qo', panel), f = $('.qf', panel); let locked = false;
-  const done = ok => { locked = true; onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
+  const done = ok => { locked = true; onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n || !n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
+  if (Q.kind === 'det') return kindDet(o, Q, done);
+  if (Q.kind === 'match') return kindMatch(o, Q, done, panel);
+  if (Q.kind === 'led') return kindLed(o, $('.qv', panel), Q, done);
   if (Q.kind === 'tt') {
     const st = Array(Q.n).fill(-1), A = Q.g === 'NOT'; o.classList.add('ttq');
     o.innerHTML = `<table class="tt"><tr><th>A</th>${A ? '' : '<th>B</th>'}<th>Y</th></tr>${st.map((_, r) => `<tr><td>${A ? r : r >> 1}</td>${A ? '' : `<td>${r & 1}</td>`}<td><button class="cell" data-i="${r}">?</button></td></tr>`).join('')}</table><button class="btn" id="chk">CEK JAWABAN</button>`;
@@ -272,8 +321,8 @@ const starRow = (n, tot) => `<div class="stars" aria-label="${n} dari ${tot} bin
 
 /* ---------- LATIHAN (Natsuki) ---------- */
 SC.latihan = () => {
-  const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0); let qs, i, sc, good, bad, wasBad, mx;
-  const begin = () => { qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; q() };
+  const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0), sbest = () => store.get('tkm_latihan_surv', 0); let qs, i, sc, good, bad, wasBad, mx, surv = false, lives = 3;
+  const begin = (sv = false) => { surv = sv; qs = sv ? [] : makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; q() };
   const cmb = pop => {   // lencana COMBO di kepala soal; hanya selama sesi, tidak disimpan
     const h = $('.qhd', S.panel); if (!h) return; let c = $('.combo', h); if (good < 2) { c?.remove(); return }
     if (!c) { c = document.createElement('div'); c.className = 'combo'; c.setAttribute('role', 'status'); h.append(c) }
@@ -281,28 +330,45 @@ SC.latihan = () => {
     if (pop) { void c.offsetWidth; c.classList.add('pop'); if (good >= 3) { const r = c.getBoundingClientRect(); spark({ clientX: r.left + r.width / 2, clientY: r.top + r.height / 2 }, good >= 5 ? 9 : 5) } }
   };
   const lose = () => { const c = $('.combo', S.panel); if (c) { c.className = 'combo lost'; c.textContent = 'COMBO PUTUS' } };
+  const heartsUI = () => { const l = $('.lives', S.panel); if (!l) return; l.innerHTML = hearts(lives); l.setAttribute('aria-label', 'Sisa nyawa ' + lives); l.classList.remove('hit'); void l.offsetWidth; l.classList.add('hit') };
   const q = () => {
-    if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
+    if (surv) { if (!qs[i]) qs[i] = survQ(i, qs[i - 1]?._k); if (i === 0) S.d.say(SURV_SAY.start.map(t => [t, 'smug'])); else if (Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) } else S.d.line(pick(DN.mid), 'talk') }
+    else if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
     else if (i > 0 && i < N - 1 && Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(i === 0 ? pick(DN.first) : i === N - 1 ? pick(DN.last) : pick(DN.mid), i ? 'talk' : 'smug');
     queueMicrotask(() => cmb(false));
-    renderQ(S.panel, qs[i], i, N, { reveal: true, next: () => ++i < N ? q() : end(),
+    renderQ(S.panel, qs[i], i, surv ? 0 : N, { reveal: true, lives: surv ? lives : undefined, next: () => surv ? (lives > 0 ? (i++, q()) : endSurv()) : ++i < N ? q() : end(),
       onPick: (k, prev) => { if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
       const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
+      if (!ok && surv) { lives--; heartsUI() }
       if (ok) S.d.say([[DN.streakGood[good] ? pick(DN.streakGood[good]) : wb && Math.random() < .6 ? pick(DN.comeback) : pick(DN.praise), pick(['happy', 'smug'])], ...SL.lat('ok')]);
-      else S.d.say([[(bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph'])], ...SL.lat('bad')]);
+      else S.d.say([[(bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph'])], ...(surv ? [[lives ? `Nyawamu tinggal ${lives}.` : pick(SURV_SAY.out), lives ? 'hmph' : 'angry']] : SL.lat('bad'))]);
     } });
   };
   const end = () => {
     const prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set('tkm_latihan_best', sc);
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>Hasil Latihan</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button></div></div></div>`;
-    $('#go').onclick = () => { Snd.sfx('select'); begin() };
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>Hasil Latihan</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : '<button class="btn" id="md">MODE LAIN</button>'}</div></div></div>`;
+    $('#go').onclick = () => { Snd.sfx('select'); begin() }; if (!Story.on) $('#md').onclick = () => { Snd.sfx('select'); modes() };
     countUp($('.score', S.panel), sc, x => `${x} / ${N}`); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1);
     if (Story.on) { Story.record('lat', sc); $('.startcard', S.panel).appendChild(Story.contBtn('latihan')) }
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };
-  startCard(S, 'LATIHAN', `${chipRow([['out', 'Tentukan output'], ['gate', 'Kenali gerbang'], ['tab', 'Tabel kebenaran'], ['wire', 'Baca rangkaian']])}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>`, begin);
+  const endSurv = () => {   // skor Bertahan = jawaban benar beruntun terpanjang (mx); total benar ditampilkan sebagai pelengkap
+    const prev = sbest(), rec = mx > prev; if (rec) store.set('tkm_latihan_surv', mx);
+    S.panel.innerHTML = `<div class="startcard sc res lres sres"><h2>NYAWA HABIS</h2><div class="rbody"><div class="sbig"><b class="score">×${mx}</b><span>benar beruntun terpanjang</span></div><div class="rside"><p class="bestp">Total benar: <b>${sc}</b> dari ${i + 1} soal</p><p class="bestp">${IC.best}Rekor Bertahan: <b>×${sbest()}</b></p><button class="btn big" id="go">MAIN LAGI ↻</button><button class="btn" id="md">MODE LAIN</button></div></div></div>`;
+    $('#go').onclick = () => { Snd.sfx('select'); begin(true) }; $('#md').onclick = () => { Snd.sfx('select'); modes() };
+    countUp($('.score', S.panel), mx, x => `×${x}`); if (mx >= 8) confetti($('.startcard', S.panel), mx >= 12 ? 30 : 14); if (mx >= 8) hop(mx >= 12 ? 2 : 1);
+    const t = mx >= 10 ? 'high' : mx >= 5 ? 'mid' : 'low';
+    S.d.say([[pick(SURV_SAY.out), 'hmph'], ...(rec && prev > 0 ? [[pick(SURV_SAY.record), 'smug']] : []), [SURV_SAY.end[t], t === 'high' ? 'happy' : 'smug']]);
+  };
+  const modes = () => {   // pilihan mode: Santai (8 soal, juga dipakai Mode Cerita) atau Bertahan (3 nyawa)
+    startCard(S, 'LATIHAN', `${chipRow([['out', 'Tentukan output'], ['gate', 'Kenali gerbang'], ['tab', 'Tabel kebenaran'], ['wire', 'Baca rangkaian']])}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b>${Story.on ? '' : ` &nbsp;·&nbsp; Rekor Bertahan: <b>×${sbest()}</b>`}</p>`, () => begin());
+    if (Story.on) return;
+    $('#go').textContent = 'SANTAI · 8 SOAL'; $('#go').insertAdjacentHTML('afterend', '<button class="btn big alt" id="go2">BERTAHAN · 3 NYAWA</button>');
+    $('#go2').onclick = () => { Snd.sfx('select'); begin(true) };
+  };
+  modes();
   S.d.say([...entryExtra('natsuki'), ...pick(DN.intro), ...SL.enter('lat')]);
 };
 
