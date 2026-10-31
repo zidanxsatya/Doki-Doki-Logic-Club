@@ -26,7 +26,7 @@ const MATERI = [
     say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dengan 2 input ada 4 baris.', 'Yeay, materi selesai! Selanjutnya coba SIMULASI bareng Yuri, lalu LATIHAN dan EVALUASI ya!'] }
 ];
 
-/* Kartu ulang Materi (gaya flashcard). f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Semua isi bersumber dari halaman Materi. Tambah kartu = tambah objek. */
+/* Flash Card Materi. f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Semua isi bersumber dari halaman Materi. Tambah kartu = tambah objek. */
 const GATE_RULE = {
   AND: 'Output 1 hanya jika semua input 1. Seperti saklar seri.', OR: 'Output 1 jika minimal satu input 1. Seperti saklar paralel.', NOT: 'Pembalik (inverter). Satu-satunya gerbang dasar dengan satu input.',
   NAND: 'NOT AND: output 0 hanya jika semua input 1.', NOR: 'NOT OR: output 1 hanya jika semua input 0.', XOR: 'Output 1 jika kedua input berbeda.', XNOR: 'NOT XOR: output 1 jika kedua input sama.'
@@ -48,13 +48,8 @@ const FLASH = [
   { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b>: 00, 01, 10, 11 (2² kombinasi). Dengan n input, ada 2ⁿ baris.' }
 ];
 const FLASH_SAY = {
-  go: 'Mau mengulang materi? Tekan KARTU ULANG di antara tombol bawah!',
-  start: ['Oke, mode kartu! Baca sisi depan, jawab dalam hati, lalu balik kartunya.', 'Kartu yang sudah paham keluar dari tumpukan. Yang belum akan muncul lagi nanti.'],
-  again: 'Tumpukan baru, urutannya diacak. Coba lagi!',
-  missed: 'Kita ulangi hanya kartu yang tadi belum hafal.',
-  belum: ['Tidak apa-apa, kartu ini muncul lagi nanti.', 'Santai, mengulang itu cara paling ampuh buat ingat.', 'Dicatat! Nanti kita coba lagi.'],
-  half: 'Setengah tumpukan sudah paham. Terus ya!',
-  done: 'Semua kartu paham! Sekarang kamu siap SIMULASI dan LATIHAN.'
+  go: 'Mau mengulang materi? Tekan FLASH CARD di antara tombol bawah!',
+  start: ['Oke, mode Flash Card! Baca sisi depan, jawab dalam hati, lalu ketuk kartunya untuk melihat jawaban.', 'Pakai panah di bawah untuk pindah kartu. Tidak ada nilai, santai saja.']
 };
 
 const SIM_SAY = {
@@ -120,15 +115,6 @@ const QGEN = [
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
 // indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT
 const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 10, 0, 2, 4, 5, 6, 1, 3, 7, 8, 9, 7, 9]).slice(0, n).map(i => QGEN[i]());
-// mode Bertahan: soal makin sulit seiring jalan (landai dulu, lalu semua jenis); tidak mengulang jenis yang sama berturut-turut
-const SURV_TIER = [[0, 1, 3, 7], [0, 1, 3, 4, 5, 7, 8, 9], [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]];
-const survQ = (i, prev) => { const t = SURV_TIER[i < 3 ? 0 : i < 8 ? 1 : 2]; let k; do { k = pick(t) } while (k === prev && t.length > 1); const q = QGEN[k](); q._k = k; return q };
-const SURV_SAY = {
-  start: ['Mode Bertahan! Kamu punya 3 nyawa. Salah satu kali, nyawa berkurang satu.', 'Soal terus datang sampai nyawamu habis. Skormu adalah jawaban benar beruntun terpanjang. Siap?'],
-  out: ['Nyawa habis. Sayang sekali, padahal tadi lumayan.', 'Habis sudah. Tapi tidak apa-apa, mau coba lagi?'],
-  record: ['Rekor baru! Aku akui, itu hebat.', 'Beruntun terpanjangmu pecah rekor. Hmph, boleh juga.'],
-  end: { low: 'Pemanasan dulu ya. Coba lagi, pasti bisa lebih panjang.', mid: 'Lumayan. Dengan sedikit latihan, kamu bisa melewati 10 beruntun.', high: 'Beruntun sepanjang itu? Kamu benar-benar paham gerbang logika.' }
-};
 
 
 const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'Hmph, kebetulan aja itu! ...Oke, oke, bagus.', 'Y-yah, itu benar. Jangan sombong dulu!', 'Tch... kamu ternyata nggak sebodoh yang kukira. Sedikit!'];

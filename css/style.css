@@ -841,8 +841,6 @@ body.m{--cs:.6}
 .nav .fcgo{background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;animation:popin .4s var(--ease) backwards .3s;white-space:nowrap}
 .fcw{display:flex;flex-direction:column;gap:10px;height:372px}
 .fch{display:flex;align-items:center;gap:10px}.fch .btn.sm{padding:6px 14px;font-size:16px;min-height:40px}
-.fch span{font-weight:800;font-size:17px;background:var(--ink);color:#fff;padding:3px 16px;border-radius:999px}.fch .fcp{margin-left:auto;background:#fff;color:var(--ink);border:3px solid var(--ink)}
-.fcbar{height:10px;border:3px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden;flex:none}.fcbar i{display:block;height:100%;background:var(--pink);transition:width .4s var(--ease)}
 /* kartu: tumpukan di belakang (p1/p2) menunjukkan sisa kartu; sisi depan putih, sisi belakang merah muda bergaris putus seperti rumus di papan */
 .fcard{position:relative;border-radius:24px;flex:1;min-height:0;display:block;width:100%;padding:0;border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;perspective:1100px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .fcard::before,.fcard::after{content:"";position:absolute;inset:0;border:5px solid var(--ink);border-radius:20px;background:#fff;z-index:0;opacity:0}
@@ -857,21 +855,15 @@ body.m{--cs:.6}
 .fx{display:block;width:100%}.ff p{margin:6px 0 0}.ff .card{margin:0 auto;max-width:100%}.ff .card.sm svg{height:96px;width:auto}
 .ff .fm{display:inline-block;color:var(--ink);font-size:24px;border:3px dashed var(--ink);border-radius:10px;padding:2px 16px;background:#fff}
 .fcard:focus-visible,.fcb .btn:focus-visible,.fch .btn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
-.fcb{display:flex;gap:12px;justify-content:center;flex:none}.fcb .btn{flex:1;max-width:260px;padding:10px 16px;font-size:19px;min-height:48px}
-.fcb .yes{background:#9be6b2}.fcb .no{background:#ffd0d0}
-.fcend{margin-top:8px}.fcend .fcm{font-size:18px}.fcend .fcb{margin-top:12px;flex-wrap:wrap}.fcend .fcb .btn{flex:1 1 200px;max-width:none}
-.m .fcw{height:100%;gap:6px}.m .fch .btn.sm{padding:4px 10px;font-size:14px;min-height:44px}.m .fch span{font-size:14px;padding:2px 12px}
+.fcb{display:flex;gap:16px;align-items:center;justify-content:center;flex:none}.fca{width:92px;height:52px;padding:0;display:grid;place-items:center}.fca svg{width:24px;height:24px;fill:var(--ink);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.fcn{min-width:88px;text-align:center;font-weight:800;font-size:18px;background:var(--ink);color:#fff;padding:4px 16px;border-radius:999px}
+.m .fcw{height:100%;gap:6px}.m .fch .btn.sm{padding:4px 10px;font-size:14px;min-height:44px}
 .m .ff{font-size:19px;padding:34px 16px 12px;border-width:4px}.m .ft{left:20px;top:14px;font-size:14px}.m .ff .card.sm svg{height:70px}.m .ff .fm{font-size:19px}
-.m .fcb .btn{padding:8px 10px;font-size:15px;min-height:44px}.m .fcb{gap:8px}.m .nav .fcgo{font-size:14px;padding:8px 10px}
-@media (prefers-reduced-motion:reduce){.fcin{transition:none}.fcbar i{transition:none}.nav .fcgo,.fcard.in{animation:none}}
+.m .fca{width:76px;height:44px}.m .fcb{gap:10px}.m .fcn{font-size:15px;padding:3px 12px;min-width:72px}.m .nav .fcgo{font-size:14px;padding:8px 10px}
+@media (prefers-reduced-motion:reduce){.fcin{transition:none}.nav .fcgo,.fcard.in{animation:none}}
 
 /* v19: Latihan, mode Bertahan + jenis soal interaktif */
-.lives{display:flex;gap:4px;margin-left:auto}.lives.hit{animation:badshake .32s}
-.heart{width:26px;height:26px;fill:#ff4d7a;stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round;transition:fill .2s,opacity .2s}.heart.off{fill:#e6dcf5;opacity:.7}
 .qhd{flex-wrap:wrap}
-.sc .btn.alt{background:#ffd54a}.sc #go2{display:block;margin:12px auto 0}.sc #go+#go2{margin-top:12px}
-.sres .sbig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:150px}.sres .sbig b{font-size:64px;line-height:1;color:#d6306f;-webkit-text-stroke:2px var(--ink)}.sres .sbig span{font-weight:800;font-size:16px;text-align:center}
-.lres #md{margin-top:10px}
 /* detektif gerbang */
 .qo.detq,.qo.matchq,.qo.ledq{flex-direction:column;align-items:center;gap:8px}
 .tt.det tr.hid td:last-child{background:#ffe3f0;color:var(--ink);font-weight:800}.tt.det tr.hid td:not(:last-child){opacity:1}
@@ -891,14 +883,12 @@ body.m{--cs:.6}
 .lres{margin:2px 0 0;font-weight:800;min-height:1.4em}
 .mk:focus-visible,.mn:focus-visible,.lsw:focus-visible,.dgrid .opt:focus-visible{outline:4px solid var(--blue);outline-offset:2px}
 /* HP */
-.m .heart{width:22px;height:22px}.m .dgrid{gap:6px}.m .dgrid .opt{font-size:16px;padding:6px 4px;flex-basis:auto}
+.m .dgrid{gap:6px}.m .dgrid .opt{font-size:16px;padding:6px 4px;flex-basis:auto}
 .m .matchq{gap:6px 10px}.m .mcol{gap:6px}.m .mk,.m .mn{min-height:44px;border-width:3px;padding:1px 4px}.m .mn{font-size:18px}.m .mk svg{height:42px}.m .mst{font-size:14px}
 .m .lsw{min-width:108px;font-size:15px}.m .ledc svg{max-height:96px}
 .m:not(.p) .qo.detq{display:grid;grid-template-columns:auto 1fr;align-items:center;column-gap:10px}.m:not(.p) .qo.detq .dact{grid-column:1/-1}
 .m:not(.p) .mk,.m:not(.p) .mn{min-height:34px}.m:not(.p) .mk svg{height:30px}.m:not(.p) .mcol{gap:4px}
-.m:not(.p) .sres .sbig b{font-size:44px}
-@media (prefers-reduced-motion:reduce){.lives.hit,.mk.bad,.mn.bad{animation:none}}
-.sres .bestp{display:block;text-align:center;border-radius:14px;line-height:1.25}
+@media (prefers-reduced-motion:reduce){.mk.bad,.mn.bad{animation:none}}
 .m .mk,.m .mn{position:relative}.m .mk::after,.m .mn::after{content:"";position:absolute;inset:-3px}   /* area tap HP sedikit lebih lebar; celah antar tombol 6px */
 
 /* v20: audit desain. Teks HP >= 11px, area tap >= 44px, gerak dekoratif dibatasi */
@@ -908,3 +898,7 @@ body.m{--cs:.6}
 .cell,.xlx,.setcard input[type=range]{position:relative}
 .cell::after,.xlx::after{content:"";position:absolute;inset:-8px -4px}
 .m .setcard input[type=range]{margin:14px 0}
+
+/* v21: tombol ULANG di kartu CERITA mengikuti gerak angkat kartu menu lain */
+.mre:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 8px 0 var(--ink);background:var(--soft)}.mre:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.mre:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){.mre:hover:not(:disabled){transform:none;box-shadow:0 4px 0 var(--ink)}}
