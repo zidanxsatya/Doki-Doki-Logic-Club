@@ -131,7 +131,7 @@ const entryExtra = key => {
 SC.materi = () => {
   const S = scaffold('materi'); let p = 0, lastFlip = 0; const seen = new Set(), ms = new Set();
   const flipLine = () => { const now = performance.now(), fast = now - lastFlip < 2500; lastFlip = now; return fast && Math.random() < .6 ? [[pick(D.sayori.flipFast), 'happy']] : [] }; // pemain membalik halaman terlalu cepat
-  // mode kartu ulang: balik kartu, "paham" = kartu keluar dari tumpukan, "belum" = muncul lagi di akhir; tidak disimpan
+  // Kartu ulang: "paham" mengeluarkan kartu dari tumpukan, "belum" memindahkannya ke akhir. Tidak disimpan.
   const flash = (ids = null, say = FLASH_SAY.start.map(t => [t, 'talk'])) => {
     let deck = shuffle(ids || FLASH.map((_, k) => k)), known = 0, shown = 0, halfSaid = false; const total = deck.length, missed = new Set(), quit = () => { Snd.sfx('cancelMenu'); show() };
     const card = () => {
@@ -171,7 +171,7 @@ SC.materi = () => {
     const pv = $('#pv'), nx = $('#nx'); pv.disabled = !p; nx.disabled = p === MATERI.length - 1;
     pv.onclick = () => { p--; Snd.sfx('flip_page'); show(flipLine()) }; nx.onclick = () => { p++; Snd.sfx('flip_page'); show(flipLine()) };
     if (Story.on && p === MATERI.length - 1) { nx.disabled = false; nx.textContent = NEXT_LABEL.materi; nx.classList.add('contstory'); nx.onclick = () => { Snd.sfx('select'); Story.advance() } }   // lanjut cerita hanya setelah halaman terakhir
-    if (p === MATERI.length - 1) { const c = $('.nav span', S.panel); c.outerHTML = '<button class="btn fcgo" id="fc">KARTU ULANG</button>'; $('#fc').onclick = () => { Snd.sfx('select'); flash() } }   // semua halaman sudah dibaca: tawarkan mode kartu ulang (menggantikan penghitung halaman)
+    if (p === MATERI.length - 1) { const c = $('.nav span', S.panel); c.outerHTML = '<button class="btn fcgo" id="fc">KARTU ULANG</button>'; $('#fc').onclick = () => { Snd.sfx('select'); flash() } }   // Halaman terakhir: penghitung halaman diganti tombol kartu ulang.
     const ex = Math.random() < .3 ? S.chat() : [pick(D.sayori.ex[p]), pick(['happy', 'talk', 'cheer'])];
     const extra = []; // tonggak kemajuan: separuh jalan & halaman terakhir
     if (p === 5 && !ms.has('h')) { ms.add('h'); extra.push([pick(D.sayori.half), 'cheer']) }
@@ -211,7 +211,7 @@ SC.simulasi = () => {
   draw(); S.d.say([...entryExtra('yuri'), ...pick(DY.intro), [SIM_SAY.AND, 'explain'], ...SL.enter('sim')]);
 };
 
-/* ---------- jenis soal interaktif Latihan: detektif gerbang, cocokkan simbol, nyalakan LED (done(ok) mengunci soal & memunculkan LANJUT) ---------- */
+// Jenis soal interaktif Latihan. Semuanya memanggil done(ok), yang mengunci soal dan memunculkan LANJUT.
 const hearts = n => [0, 1, 2].map(k => `<svg class="heart${k < n ? '' : ' off'}" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.6 9.7 1.6 5.5A3.5 3.5 0 0 1 8 3.8a3.5 3.5 0 0 1 6.4 1.7C14.4 9.7 8 14 8 14Z"/></svg>`).join('');
 const kindDet = (o, Q, done) => {
   let shown = 2, sel = '', fin = false; o.classList.add('detq');
@@ -299,7 +299,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
     };
     o.appendChild(b);
   });
-  if (timer) {   // timer per soal: bar menyusut (CSS, linear) + angka; jawaban terpilih tetap dihitung, tanpa jawaban = salah; lalu otomatis ke soal berikutnya
+  if (timer) {   // Habis waktu: jawaban yang sudah dipilih tetap dihitung, tanpa jawaban = salah, lalu pindah soal.
     $('.qhd', panel).insertAdjacentHTML('beforeend', `<div class="tbar" aria-hidden="true"><i style="--t:${timer}s"></i></div><div class="tmr" role="timer" aria-label="Sisa waktu soal"></div>`);
     const tm = $('.tmr', panel), bar = $('.tbar', panel), t0 = performance.now();
     const tick = () => {
@@ -354,7 +354,7 @@ SC.latihan = () => {
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([[pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };
-  const endSurv = () => {   // skor Bertahan = jawaban benar beruntun terpanjang (mx); total benar ditampilkan sebagai pelengkap
+  const endSurv = () => {   // Skor Bertahan = benar beruntun terpanjang (mx).
     const prev = sbest(), rec = mx > prev; if (rec) store.set('tkm_latihan_surv', mx);
     S.panel.innerHTML = `<div class="startcard sc res lres sres"><h2>NYAWA HABIS</h2><div class="rbody"><div class="sbig"><b class="score">×${mx}</b><span>benar beruntun terpanjang</span></div><div class="rside"><p class="bestp">Total benar: <b>${sc}</b> dari ${i + 1} soal</p><p class="bestp">${IC.best}Rekor Bertahan: <b>×${sbest()}</b></p><button class="btn big" id="go">MAIN LAGI ↻</button><button class="btn" id="md">MODE LAIN</button></div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin(true) }; $('#md').onclick = () => { Snd.sfx('select'); modes() };
@@ -362,7 +362,7 @@ SC.latihan = () => {
     const t = mx >= 10 ? 'high' : mx >= 5 ? 'mid' : 'low';
     S.d.say([[pick(SURV_SAY.out), 'hmph'], ...(rec && prev > 0 ? [[pick(SURV_SAY.record), 'smug']] : []), [SURV_SAY.end[t], t === 'high' ? 'happy' : 'smug']]);
   };
-  const modes = () => {   // pilihan mode: Santai (8 soal, juga dipakai Mode Cerita) atau Bertahan (3 nyawa)
+  const modes = () => {   // Mode Cerita hanya memakai Santai.
     startCard(S, 'LATIHAN', `${chipRow([['out', 'Tentukan output'], ['gate', 'Kenali gerbang'], ['tab', 'Tabel kebenaran'], ['wire', 'Baca rangkaian']])}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b>${Story.on ? '' : ` &nbsp;·&nbsp; Rekor Bertahan: <b>×${sbest()}</b>`}</p>`, () => begin());
     if (Story.on) return;
     $('#go').textContent = 'SANTAI · 8 SOAL'; $('#go').insertAdjacentHTML('afterend', '<button class="btn big alt" id="go2">BERTAHAN · 3 NYAWA</button>');

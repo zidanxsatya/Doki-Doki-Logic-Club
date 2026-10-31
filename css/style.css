@@ -837,7 +837,7 @@ body.m{--cs:.6}
 .m .tmr{font-size:12px;padding:1px 9px;border-width:2px;box-shadow:0 2px 0 var(--ink)}.m .tbar{height:10px;border-width:2px}
 @media (prefers-reduced-motion:reduce){.tmr.low{animation:none}}
 
-/* ===== v18: kartu ulang Materi ===== */
+/* v18: kartu ulang Materi */
 .nav .fcgo{background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;animation:popin .4s var(--ease) backwards .3s;white-space:nowrap}
 .fcw{display:flex;flex-direction:column;gap:10px;height:372px}
 .fch{display:flex;align-items:center;gap:10px}.fch .btn.sm{padding:6px 14px;font-size:16px;min-height:40px}
@@ -853,7 +853,7 @@ body.m{--cs:.6}
 .ff{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 28px 18px;text-align:center;font-weight:800;font-size:25px;line-height:1.35;background:#fff;border:5px solid var(--ink);border-radius:20px;box-shadow:0 6px 0 var(--ink);backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden}
 .ff.back{transform:rotateY(180deg);background:var(--soft)}
 .ff.back::after{content:"";position:absolute;inset:9px;border:2.5px dashed var(--pink);border-radius:13px;pointer-events:none}
-.ft{position:absolute;left:24px;top:18px;font-size:15px;font-weight:800;color:var(--ink);opacity:.75}
+.ft{position:absolute;left:24px;top:18px;font-size:15px;font-weight:800;color:var(--ink)}
 .fx{display:block;width:100%}.ff p{margin:6px 0 0}.ff .card{margin:0 auto;max-width:100%}.ff .card.sm svg{height:96px;width:auto}
 .ff .fm{display:inline-block;color:var(--ink);font-size:24px;border:3px dashed var(--ink);border-radius:10px;padding:2px 16px;background:#fff}
 .fcard:focus-visible,.fcb .btn:focus-visible,.fch .btn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
@@ -865,16 +865,16 @@ body.m{--cs:.6}
 .m .fcb .btn{padding:8px 10px;font-size:15px;min-height:44px}.m .fcb{gap:8px}.m .nav .fcgo{font-size:14px;padding:8px 10px}
 @media (prefers-reduced-motion:reduce){.fcin{transition:none}.fcbar i{transition:none}.nav .fcgo,.fcard.in{animation:none}}
 
-/* ===== v19: Latihan, mode Bertahan + jenis soal interaktif ===== */
+/* v19: Latihan, mode Bertahan + jenis soal interaktif */
 .lives{display:flex;gap:4px;margin-left:auto}.lives.hit{animation:badshake .32s}
 .heart{width:26px;height:26px;fill:#ff4d7a;stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round;transition:fill .2s,opacity .2s}.heart.off{fill:#e6dcf5;opacity:.7}
 .qhd{flex-wrap:wrap}
 .sc .btn.alt{background:#ffd54a}.sc #go2{display:block;margin:12px auto 0}.sc #go+#go2{margin-top:12px}
-.sres .sbig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:150px}.sres .sbig b{font-size:64px;line-height:1;color:var(--pink);-webkit-text-stroke:2px var(--ink)}.sres .sbig span{font-weight:800;font-size:16px;text-align:center}
+.sres .sbig{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:150px}.sres .sbig b{font-size:64px;line-height:1;color:#d6306f;-webkit-text-stroke:2px var(--ink)}.sres .sbig span{font-weight:800;font-size:16px;text-align:center}
 .lres #md{margin-top:10px}
 /* detektif gerbang */
 .qo.detq,.qo.matchq,.qo.ledq{flex-direction:column;align-items:center;gap:8px}
-.tt.det tr.hid td:last-child{background:#ffe3f0;color:var(--pink);font-weight:800}.tt.det tr.hid td:not(:last-child){opacity:1}
+.tt.det tr.hid td:last-child{background:#ffe3f0;color:var(--ink);font-weight:800}.tt.det tr.hid td:not(:last-child){opacity:1}
 .dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:min(100%,480px)}.dgrid .opt{flex:none;font-size:20px;padding:8px 6px}
 .dact{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}.dact .btn{margin:0;min-height:44px}
 /* cocokkan simbol */
@@ -899,3 +899,4 @@ body.m{--cs:.6}
 .m:not(.p) .sres .sbig b{font-size:44px}
 @media (prefers-reduced-motion:reduce){.lives.hit,.mk.bad,.mn.bad{animation:none}}
 .sres .bestp{display:block;text-align:center;border-radius:14px;line-height:1.25}
+.m .mk,.m .mn{position:relative}.m .mk::after,.m .mn::after{content:"";position:absolute;inset:-3px}   /* area tap HP sedikit lebih lebar; celah antar tombol 6px */
