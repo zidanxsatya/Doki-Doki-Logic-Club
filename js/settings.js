@@ -27,7 +27,7 @@ const Layout = {
   resolve() {
     const m = Settings.data.layout; if (m === 'mobile') return true; if (m === 'desktop') return false;
     const small = Math.min(innerWidth, innerHeight), coarse = matchMedia('(pointer:coarse)').matches;
-    return (coarse && small < 820) || small < 480 || innerWidth < 640;
+    return (coarse && small < 820) || small < 480 || innerWidth < 768;
   },
   apply() {
     const st = $('#stage'), w = innerWidth, h = innerHeight, mob = this.resolve(), por = mob && h > w; let s;

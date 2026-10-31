@@ -279,7 +279,7 @@ html{scrollbar-color:var(--pink) transparent}
 .story .dlg{left:410px;width:850px}
 .story .board{height:calc(100% - 66px)}
 .story .startcard{margin-top:18px}
-.contstory{background:var(--pink)!important;color:#fff!important;animation:nudge 1.6s ease-in-out infinite}
+.contstory{background:var(--pink)!important;color:#fff!important;animation:nudge 1.6s ease-in-out 4}
 @keyframes nudge{50%{transform:translateY(-3px)}}
 .sbar{text-align:center;margin-top:10px}.sbar span{display:inline-block;background:var(--ink);color:#fff;font-weight:bold;font-size:16px;padding:4px 16px;border-radius:999px}
 /* adegan cerita: sprite diam */
@@ -288,7 +288,7 @@ html{scrollbar-color:var(--pink) transparent}
 .ns img{display:block;width:auto;height:calc(var(--h) * 1px * var(--ks));max-width:none}
 .narr .dlg{left:175px;width:930px}
 .narr .panel{left:50%;top:120px;translate:-50% 0;width:640px;height:auto;z-index:6}
-.ngo{position:absolute;right:26px;bottom:232px;z-index:7;animation:nudge 1.6s ease-in-out infinite}
+.ngo{position:absolute;right:26px;bottom:232px;z-index:7;animation:nudge 1.6s ease-in-out 4}
 @media (prefers-reduced-motion:reduce){.contstory,.ngo{animation:none}}
 /* mobile / Android: tata ulang, bukan sekadar mengecilkan */
 .m .mtitle h1{font-size:26px}.m .mtitle h1 br{display:none}.m .mtitle h2{font-size:14px}
@@ -779,7 +779,7 @@ body.m{--cs:.6}
 #fade.on{opacity:1;clip-path:circle(150% at 50% 50%);transition:opacity .06s,clip-path .26s cubic-bezier(.55,0,.35,1)}
 .qs i{transition:background-color .2s,border-color .2s}
 @keyframes dotp{50%{scale:1.14}}
-.qs i.cur{animation:dotp 1.4s ease-in-out infinite}
+.qs i.cur{animation:dotp 1.4s ease-in-out 3}
 /* area tap: tampilan tidak berubah, hanya zona sentuh yang melebar (HP: target >= 44px; inset dihitung dari tepi dalam border) */
 :where(.m) :where(.btn,.tab,.xpi,.credlink,.xmode){position:relative}
 .m :where(.btn,.tab,.opt,.xpi,.credlink,#mute,.xmode):not(#startBtn)::after{content:"";position:absolute;inset:-10px}
@@ -811,7 +811,7 @@ body.m{--cs:.6}
 .xstb{position:absolute;right:8px;bottom:8px;z-index:4;animation:popin .3s var(--ease) backwards}
 .xstp{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;background:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--ink);padding:6px 10px 8px;animation:rise .26s var(--ease) backwards}
 .xstt{margin:0 0 6px;font:800 14px/1.35 Nunito,sans-serif;color:var(--ink)}.xsb{display:flex;gap:6px;justify-content:flex-end}
-.xdim{opacity:.22}.xhl{animation:xhlp 1s ease-in-out infinite alternate}@keyframes xhlp{to{stroke-width:2;fill:#ffd54a14}}
+.xdim{opacity:.22}.xhl{animation:xhlp 1s ease-in-out 6 alternate}@keyframes xhlp{to{stroke-width:2;fill:#ffd54a14}}
 .m .xstp{left:5px;right:5px;bottom:5px;padding:4px 8px 6px;border-width:2px;border-radius:10px}.m .xstt{font-size:12px;margin-bottom:4px}.m:not(.p) .xstt{font-size:11px;line-height:1.25}
 @media (prefers-reduced-motion:reduce){.chap{animation:chapr 2s linear both}@keyframes chapr{0%{opacity:0}14%,84%{opacity:1}100%{opacity:0}}.cf{display:none}.res .stars i.on{animation:none}.xhl,.xstb,.xstp,.combo.pop{animation:none}}
 .xstp:not([hidden]) ~ .xtoast{opacity:0!important}
@@ -900,3 +900,11 @@ body.m{--cs:.6}
 @media (prefers-reduced-motion:reduce){.lives.hit,.mk.bad,.mn.bad{animation:none}}
 .sres .bestp{display:block;text-align:center;border-radius:14px;line-height:1.25}
 .m .mk,.m .mn{position:relative}.m .mk::after,.m .mn::after{content:"";position:absolute;inset:-3px}   /* area tap HP sedikit lebih lebar; celah antar tombol 6px */
+
+/* v20: audit desain. Teks HP >= 11px, area tap >= 44px, gerak dekoratif dibatasi */
+.m .xcnt{font-size:11px}.m .xlab{font-size:11px}.m .xmsg{font-size:12px}.m .top #xch{font-size:12px}.m .xpi b{font-size:11px}
+.m:not(.p) .xmsg{font-size:11px}.m:not(.p) .xpi b{font-size:11px}.m .tip,.m .mbtn .sub,.m .chip{font-size:12px}
+.m .eyebrow,.m .mtitle small{font-size:11px}
+.cell,.xlx,.setcard input[type=range]{position:relative}
+.cell::after,.xlx::after{content:"";position:absolute;inset:-8px -4px}
+.m .setcard input[type=range]{margin:14px 0}
