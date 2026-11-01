@@ -132,29 +132,29 @@ const ST = {
   n_intro: {
     bg: 'DDLCbg', title: 'Klik kotak dialog untuk lanjut', go: 'MULAI BELAJAR: MATERI ▶', reveal: true,   // karakter masuk satu per satu saat pertama kali bicara
     ask: { at: 16, q: 'Kenapa kamu mau belajar rangkaian logika?', opts: [
-      { t: 'Supaya lulus ujian', lines: [L('n', 'Tujuan yang jelas. Aku suka orang yang tahu maunya.', 'smug'), L('s', 'Kami bantu sampai lulus, janji!', 'cheer')] },
-      { t: 'Penasaran saja', lines: [L('m', 'Rasa penasaran itu modal belajar terbaik, lho.', 'happy'), L('y', 'Biasanya yang penasaran justru cepat paham. Aku senang mendengarnya.', 'shy')] },
-      { t: 'Disuruh guru', lines: [L('s', 'Hehe, sama! Awalnya aku juga terpaksa.', 'playful'), L('n', 'Terpaksa pun tidak apa-apa. Asal tetap dikerjakan sampai selesai.', 'hmph')] }
+      { t: 'Supaya lulus ujian', lines: [L('n', 'Oke, jelas. Aku suka yang tahu maunya.', 'smug'), L('s', 'Kami bantu sampai lulus, janji!', 'cheer')] },
+      { t: 'Penasaran saja', lines: [L('m', 'Penasaran aja udah cukup buat mulai, kok.', 'happy'), L('y', 'Orang yang penasaran biasanya cepat nangkep. ...Aku senang dengarnya.', 'shy')] },
+      { t: 'Disuruh guru', lines: [L('s', 'Hehe, sama! Awalnya aku juga terpaksa.', 'playful'), L('n', 'Terpaksa juga nggak apa-apa. Yang penting dikerjakan sampai kelar.', 'hmph')] }
     ] },
     lines: [
       L('s', 'Ah, kamu datang! Hai hai! Aku Sayori. Kamu yang mau belajar buat ujian Teknik Kontrol Mekatronika, kan?', 'happy'),
-      L('s', 'Jujur, rangkaian logika itu bikin kepalaku muter-muter... Makanya aku ngajak teman-teman klubku belajar bareng. Ayo, ikut aku!', 'worry'),
+      L('s', 'Rangkaian logika itu bikin kepalaku muter-muter... Makanya aku ngajak teman-teman klubku belajar bareng. Ayo, ikut aku!', 'worry'),
       L('s', 'Nah, ini klubku! Biasanya kami baca puisi dan makan camilan di sini. Hari ini ruangannya kita pakai buat belajar. Duduk di mana aja, ya!', 'cheer'),
       L('s', 'Hmm, yang lain mana ya? ...Ah, itu dia! Natsuki!', 'calm'),
       L('n', 'Sayori! Kamu belum selesai nyiapin meja, tahu! ...Eh? Siapa dia? Oh, yang mau ikut belajar itu?', 'angry'),
       L('s', 'Meja bisa nanti! Tamunya dulu, hehe.', 'playful'),
       L('n', 'Aku Natsuki. Kalau mau belajar, jangan setengah-setengah, ya. Aku bikin kartu soal sendiri, lho. B-bukan khusus buat Sayori!', 'hmph'),
       L('s', 'Natsuki, jangan galak dulu~ Dia kan baru datang!', 'pout'),
-      L('n', 'Aku nggak galak. Aku jujur. Bedanya tipis, tapi ada.', 'grump'),
+      L('n', 'Aku nggak galak. Aku cuma jujur. ...Beda, kok.', 'grump'),
       L('y', 'M-maaf, aku terlambat... Aku Yuri. Semalam aku merangkum catatan gerbang logika. Kalau mau, boleh dipinjam.', 'shy'),
       L('s', 'Wah, Yuri baik banget! Aku pinjam duluan, ya!', 'wink'),
       L('n', 'Pinjam duluan, bacanya kapan-kapan. Kebiasaanmu banget.', 'smug'),
       L('m', 'Sepertinya semua sudah berkumpul. Selamat datang! Aku Monika, ketua klub ini.', 'calm'),
-      L('m', 'Hari ini klub sastra kita menyamar jadi Doki Doki Logic Club. Aturannya cuma satu: tidak ada yang ditinggal. Yang ragu bertanya, yang paham menjelaskan.', 'happy'),
+      L('m', 'Hari ini klub sastra kita nyamar jadi Doki Doki Logic Club. Aturannya satu: jangan ada yang ketinggalan. Yang ragu, tanya. Yang paham, jelasin.', 'happy'),
       L('s', 'Aku yang ragu bertanya!', 'cheer'),
       L('n', 'Dan aku yang paham menjelaskan. Pembagian tugas yang jelas.', 'smug'),
       L('m', 'Kalau begitu, kamu sendiri: kenapa mau belajar rangkaian logika hari ini?', 'talk'),
-      L('y', 'Aku sudah menyusun urutannya: materi dasar dulu, lalu simulasi gerbang logika, latihan soal, dan terakhir evaluasi akhir.', 'explain'),
+      L('y', 'Aku sudah mengatur urutannya. Materi dulu, lalu simulasi, latihan soal, dan terakhir evaluasi.', 'explain'),
       L('n', 'Bagian latihan soal aku yang pegang! Jangan harap aku lembek, ya.', 'smug'),
       L('m', 'Urutannya rapi banget, ya? Seolah-olah ada yang sudah menyusun jalan ceritanya untuk kita. Ahaha, abaikan saja ucapanku barusan.', 'wink'),
       L('s', 'Pokoknya kamu nggak sendirian! Ayo mulai dari Materi!', 'cheer')
@@ -163,28 +163,28 @@ const ST = {
   n_1: {
     bg: 'DDLCbg', title: 'Materi selesai', go: 'KE SIMULASI ▶',
     ask: { at: 2, skip: 4, q: 'Gerbang apa yang outputnya 1 hanya kalau semua inputnya 1?', opts: [
-      { t: 'AND', lines: [L('n', 'Betul, AND! Kamu lebih cepat dari Sayori.', 'happy'), L('s', 'Eh, aku tadi mau jawab itu juga, lho!', 'worry'), L('y', 'Pegangan mudahnya: AND itu "dan", semua syarat harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
-      { t: 'OR', lines: [L('n', 'OR itu cukup satu input saja yang bernilai 1. Yang dicari AND!', 'angry'), L('s', 'Yah, sama kayak aku... Kita senasib!', 'worry'), L('y', 'Wajar tertukar. AND itu "dan", semua syarat harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
+      { t: 'AND', lines: [L('n', 'Betul, AND! Kamu lebih cepat dari Sayori.', 'happy'), L('s', 'Eh, aku tadi mau jawab itu juga, lho!', 'worry'), L('y', 'Gampangnya begini: AND itu "dan", semuanya harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
+      { t: 'OR', lines: [L('n', 'OR itu cukup satu input saja yang bernilai 1. Yang dicari AND!', 'angry'), L('s', 'Yah, sama kayak aku... Kita senasib!', 'worry'), L('y', 'Wajar tertukar. AND itu "dan", semuanya harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain')] },
       { t: 'XOR', lines: [L('y', 'XOR keluarannya 1 kalau kedua input berbeda. Kalau keduanya 1, hasilnya justru 0. Yang dicari AND.', 'explain'), L('n', 'Berani juga jawabanmu. Tapi salah arah.', 'smug'), L('s', 'Oh iya! "Dan" ketat, "atau" santai. Aku catat!', 'cheer')] }
     ] },
     lines: [
-      L('y', 'Seluruh materinya sudah kamu lewati. Dasar seperti itu sering diremehkan, padahal semuanya bertumpu di sana.', 'calm'),
+      L('y', 'Semua materi sudah kamu lewati. Bagian dasar sering diremehkan, padahal dari situ semuanya mulai.', 'calm'),
       L('s', 'Aku juga ngerasa makin paham! ...mungkin. Sedikit.', 'happy'),
       L('n', 'Sedikit? Buktikan. Gerbang apa yang outputnya 1 cuma kalau semua inputnya 1?', 'smug'),
       L('s', 'Ehh, sebentar... OR!', 'worry'),
       L('n', 'AND, Sayori! Yang OR itu yang cukup satu input saja.', 'angry'),
-      L('y', 'Wajar tertukar. Pegangan mudahnya: AND itu "dan", semua syarat harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain'),
+      L('y', 'Wajar tertukar. Gampangnya begini: AND itu "dan", semuanya harus terpenuhi. OR itu "atau", satu saja cukup.', 'explain'),
       L('s', 'Oh iya! "Dan" ketat, "atau" santai. Besok aku nggak tertukar lagi. Janji!', 'cheer'),
-      L('m', 'Itu alasan kita masuk Simulasi. Di sana salah tebak tidak ada yang menegur. Lampunya langsung memberi jawaban.', 'calm'),
-      L('y', 'Bagian berikutnya favoritku: kamu bisa mengubah input dan melihat sendiri bagaimana tiap gerbang bereaksi.', 'happy'),
-      L('m', 'Kali ini bukan sekadar membaca. Kamu yang menekan tombolnya. Ayo ke Simulasi!', 'calm')
+      L('m', 'Makanya kita ke Simulasi. Salah tebak di sana nggak ada yang menegur, lampunya langsung kasih jawaban.', 'calm'),
+      L('y', 'Bagian ini favoritku. Kamu ubah inputnya, lalu lihat sendiri gerbangnya bereaksi seperti apa.', 'happy'),
+      L('m', 'Sekarang kamu yang menekan tombolnya. Ayo ke Simulasi!', 'calm')
     ]
   },
   n_2: {
     bg: 'Music_Room', title: 'Simulasi selesai', go: 'KE LATIHAN ▶',
     ask: { at: 6, q: 'Kalau A = 1 dan B = 1, berapa output NAND?', opts: [
       { t: '0', lines: [L('n', 'Betul, 0! AND-nya menghasilkan 1, lalu dibalik jadi 0.', 'smug'), L('s', 'Wah, aku hampir menjawab 1...', 'worry')] },
-      { t: '1', lines: [L('n', 'Salah! AND-nya 1, tapi NAND membaliknya jadi 0.', 'hmph'), L('y', 'Jebakan klasik: lupa membalik di akhir. Itu yang Natsuki maksud licik.', 'calm')] }
+      { t: '1', lines: [L('n', 'Salah! AND-nya 1, tapi NAND membaliknya jadi 0.', 'hmph'), L('y', 'Jebakan klasik, lupa membalik di akhir. Itu yang Natsuki bilang licik.', 'calm')] }
     ] },
     lines: [
       L('n', 'Oke, sudah puas mainin gerbang? Sekarang giliranku menguji kemampuanmu!', 'smug'),
@@ -192,10 +192,10 @@ const ST = {
       L('y', 'Tenang. Tadi kamu sudah melihat pola tiap gerbang sendiri. Kalau ragu, bayangkan tabel kebenarannya.', 'calm'),
       L('n', 'Aku sudah menyiapkan delapan soal. Beberapa lumayan licik, jadi bersiaplah.', 'smug'),
       L('s', 'Licik?! Natsuki jangan menakut-nakuti dong!', 'shock'),
-      L('n', 'Licik itu maksudnya menjebak yang kurang teliti. Misalnya, ada yang mengira NAND sama dengan AND. NAND itu AND yang dibalik.', 'hmph'),
+      L('n', 'Licik itu maksudnya jebakan buat yang kurang teliti. Contohnya, ada yang ngira NAND sama dengan AND. Padahal NAND itu AND yang dibalik.', 'hmph'),
       L('n', 'Coba jawab dulu: kalau A = 1 dan B = 1, berapa output NAND?', 'smug'),
       L('y', 'Jebakannya adil, kok. Semuanya bisa dijawab lewat tabel kebenaran.', 'calm'),
-      L('m', 'Latihan itu tempat yang boleh salah. Jawabanmu juga masih bisa diganti sebelum dicek.', 'happy'),
+      L('m', 'Di latihan boleh salah, kok. Jawabannya juga masih bisa diganti sebelum dicek.', 'happy'),
       L('s', 'Natsuki, tadi katanya nggak galak.', 'playful'),
       L('n', 'D-diam, Sayori! Ayo mulai!', 'shy')
     ]
@@ -204,7 +204,7 @@ const ST = {
     bg: 'Music_Room', title: 'Latihan selesai', go: 'KE EVALUASI AKHIR ▶',
     ask: { at: 6, q: 'Bagaimana perasaanmu menjelang evaluasi?', opts: [
       { t: 'Gugup sedikit', lines: [L('m', 'Wajar. Tarik napas dulu, lalu kerjakan satu soal demi satu soal.', 'calm'), L('s', 'Tenang, kamu nggak sendirian di sini!', 'cheer')] },
-      { t: 'Siap!', lines: [L('n', 'Percaya diri itu bagus. Asal tetap teliti, ya.', 'smug'), L('m', 'Semangat itu menular. Aku suka.', 'happy')] },
+      { t: 'Siap!', lines: [L('n', 'Percaya diri itu bagus. Asal tetap teliti, ya.', 'smug'), L('m', 'Wah, semangatmu kebawa ke aku.', 'happy')] },
       { t: 'Lapar, mau cupcake', lines: [L('n', 'D-dasar! Fokus ujian dulu, cupcake belakangan!', 'angry'), L('s', 'Hehe, ujung-ujungnya selalu ke cupcake.', 'playful')] }
     ] },
     lines: [
@@ -213,7 +213,7 @@ const ST = {
       L('n', 'Permen apanya... Tapi, ya, jangan gugup. Kamu sudah jauh lebih baik dibanding tadi pagi. B-bukan berarti aku khawatir, ya!', 'shy'),
       L('m', 'Dua kalimat pertama itu perhatian, Natsuki. Kalimat terakhirnya pembelaan diri.', 'wink'),
       L('n', 'Monika!', 'angry'),
-      L('y', 'Sepuluh soal, tanpa petunjuk. Tapi kamu sudah membawa semua bekalnya.', 'calm'),
+      L('y', 'Sepuluh soal, tanpa petunjuk. Bekalnya sudah kamu bawa semua, kok.', 'calm'),
       L('s', 'Ngomong-ngomong, kamu sendiri gugup nggak menjelang evaluasi?', 'talk'),
       L('s', 'Habis ujian, kita makan cupcake bareng, ya? Natsuki pasti sudah menyiapkannya!', 'happy'),
       L('n', 'C-cupcake? Memang sudah kubuat. Tapi itu hadiah untuk yang mengerjakan dengan baik, ya!', 'shy'),
@@ -230,13 +230,13 @@ const ST = {
       return [
         L('m', `Evaluasi akhirmu: ${r} dari ${N} benar, nilai ${r * 10}. Kategorinya "${g.t}".`, hi ? 'happy' : 'calm'),
         ...(hi ? [L('s', 'Tuh kaaan! Aku bilang juga apa! Kamu hebat banget!!', 'cheer'), L('n', 'Hmph... lumayan. Eh, bagus. Bagus banget, maksudku. Jangan geer!', 'hmph'), L('m', 'Natsuki, itu pujian jujur pertamamu hari ini. Kucatat.', 'wink'), L('n', 'B-bukan pujian! Itu... penilaian objektif!', 'shy'), L('y', 'Pemahamanmu sudah kuat. Kamu bisa menjelaskan ini ke orang lain sekarang.', 'happy')]
-          : mid ? [L('s', 'Wah, sudah bagus lho! Tinggal dirapikan sedikit lagi!', 'happy'), L('n', 'Tidak buruk. Yang salah itu bisa dilatih lagi, kan? Latihanku selalu terbuka.', 'smug'), L('s', 'Latihannya jangan yang licik-licik lagi, ya...', 'worry'), L('n', 'Itu justru yang paling berguna.', 'hmph'), L('y', 'Kesalahanmu adalah petunjuk bagian mana yang perlu dibaca ulang. Tidak ada yang sia-sia.', 'calm')]
-            : [L('s', 'Nggak apa-apa! Kita ulang bareng-bareng, aku temani!', 'happy'), L('y', 'Satu kali percobaan bukan ukuran kemampuanmu. Materi dan Simulasi bisa kamu buka kapan saja.', 'talk'), L('n', 'Jangan menyerah! Aku masih punya setumpuk soal... dan aku nggak akan kasihan, ya. Hmph!', 'angry'), L('m', 'Maksud Natsuki: dia akan menemanimu sampai bisa. Dengan cara yang galak.', 'wink'), L('n', 'Aku nggak bilang begitu! ...tapi ya, begitu.', 'shy')]),
+          : mid ? [L('s', 'Wah, sudah bagus lho! Tinggal dirapikan sedikit lagi!', 'happy'), L('n', 'Tidak buruk. Yang salah itu bisa dilatih lagi, kan? Latihanku selalu terbuka.', 'smug'), L('s', 'Latihannya jangan yang licik-licik lagi, ya...', 'worry'), L('n', 'Itu justru yang paling berguna.', 'hmph'), L('y', 'Soal yang salah menunjukkan bagian mana yang perlu dibaca ulang. Jadi tidak ada yang sia-sia.', 'calm')]
+            : [L('s', 'Nggak apa-apa! Kita ulang bareng-bareng, aku temani!', 'happy'), L('y', 'Satu kali percobaan belum menentukan kemampuanmu. Materi dan Simulasi bisa kamu buka lagi kapan saja.', 'talk'), L('n', 'Jangan menyerah! Aku masih punya setumpuk soal... dan aku nggak akan kasihan, ya. Hmph!', 'angry'), L('m', 'Maksud Natsuki: dia akan menemanimu sampai bisa. Dengan cara yang galak.', 'wink'), L('n', 'Aku nggak bilang begitu! ...tapi ya, begitu.', 'shy')]),
         hi ? L('n', 'Cupcake-nya buat kalian semua. Yang paling besar buat kamu. Hmph, anggap saja bonus!', 'happy')
           : mid ? L('n', 'Cupcake-nya tetap ada, kok. Tapi untuk dapat dua, kamu harus latihan sekali lagi!', 'smug')
             : L('n', 'Cupcake-nya kusimpan dulu. Kita ulang belajarnya, baru kita makan bareng. Janji!', 'down'),
         L('s', 'Hari ini seru banget. Terima kasih sudah belajar bareng aku!', 'cheer'),
-        L('m', 'Terima kasih sudah menemani kami sampai akhir cerita ini. Kamu tahu kan, kamu boleh kembali kapan pun. Sampai jumpa lagi!', 'wink')
+        L('m', 'Terima kasih sudah menemani kami sampai akhir. Kapan pun mau balik, pintunya terbuka. Sampai jumpa!', 'wink')
       ];
     },
     card: panel => {
@@ -248,11 +248,11 @@ const ST = {
 
   /* ----- komentar karakter lain di dalam tiap bagian (muncul kontekstual, bukan setiap baris) ----- */
   materi: {
-    enter: [L('y', 'Aku ikut menemani. Kalau ada istilah teknis yang kurang jelas, aku siap menjelaskan lebih rinci.', 'talk'), L('n', 'Dan kalau Sayori salah ngomong, aku yang koreksi!', 'smug'), L('s', 'Heiii~! Aku nggak sesering itu salah kok!', 'pout'), L('m', 'Sudah, sudah. Mulai dari halaman pertama saja.', 'calm')],
+    enter: [L('y', 'Aku ikut menemani. Kalau ada istilah yang kurang jelas, tanya saja, nanti kujelaskan.', 'talk'), L('n', 'Dan kalau Sayori salah ngomong, aku yang koreksi!', 'smug'), L('s', 'Heiii~! Aku nggak sesering itu salah kok!', 'pout'), L('m', 'Sudah, sudah. Mulai dari halaman pertama saja.', 'calm')],
     pg: {
-      0: [L('m', 'Rangkaian logika itu dasar hampir semua kontrol mesin yang pernah kamu lihat: PLC, sensor, interlock, semuanya.', 'calm'), L('s', 'PLC itu... permen bentuk lonceng?', 'worry'), L('n', 'Programmable Logic Controller! Otak kecil di panel mesin, bukan permen.', 'angry'), L('y', 'Ia membaca sinyal dari sensor dan tombol, lalu menyalakan atau mematikan motor dan lampu sesuai logika di dalamnya.', 'explain')],
+      0: [L('m', 'Rangkaian logika dipakai di hampir semua kontrol mesin yang pernah kamu lihat. PLC, sensor, interlock.', 'calm'), L('s', 'PLC itu... permen bentuk lonceng?', 'worry'), L('n', 'Programmable Logic Controller! Otak kecil di panel mesin, bukan permen.', 'angry'), L('y', 'Ia membaca sinyal dari sensor dan tombol, lalu menyalakan atau mematikan motor dan lampu sesuai logika di dalamnya.', 'explain')],
       1: [L('s', 'Jadi tombol itu input, motor itu output, dan gerbang di tengah jadi otaknya?', 'talk'), L('n', 'Otak itu berlebihan. Gerbang cuma juri: lihat input, putuskan output.', 'smug'), L('y', 'Itu cukup tepat. Inputnya sensor, tombol, atau saklar. Outputnya lampu, motor, atau buzzer.', 'explain')],
-      2: [L('y', 'Di dunia nyata, 0 dan 1 adalah tegangan rendah dan tinggi. Sinyal digital hanya peduli di sisi mana sebuah nilai berada.', 'explain'), L('s', 'Kayak saklar lampu kamarku! Atas nyala, bawah mati.', 'happy'), L('n', 'Intinya: 0 itu mati, 1 itu hidup. Kalau sampai ketukar, kujewer!', 'angry')],
+      2: [L('y', 'Di dunia nyata, 0 dan 1 adalah tegangan rendah dan tinggi. Sinyal digital hanya melihat nilainya berada di sisi mana.', 'explain'), L('s', 'Kayak saklar lampu kamarku! Atas nyala, bawah mati.', 'happy'), L('n', 'Intinya: 0 itu mati, 1 itu hidup. Kalau sampai ketukar, kujewer!', 'angry')],
       3: [L('n', 'AND itu pelit: semua input harus 1, baru output ikut 1.', 'smug'), L('y', 'Contoh di mesin: motor hanya jalan kalau tombol START ditekan dan pintu pengaman tertutup. Salah satunya tidak terpenuhi, motor diam.', 'explain'), L('s', 'Jadi kalau pintunya kebuka, motornya ngambek?', 'playful'), L('n', 'Motornya aman. Kamu juga.', 'hmph')],
       4: [L('s', 'OR itu baik hati! Satu aja yang hidup, hasilnya ikut hidup!', 'playful'), L('n', 'Baik hati? Aku bilang longgar. Aturannya gampang dipenuhi.', 'smug'), L('y', 'Output OR baru 0 kalau semua inputnya 0. Contohnya alarm yang berbunyi bila salah satu sensor aktif.', 'explain')],
       5: [L('m', 'NOT unik: satu-satunya gerbang dasar yang hanya punya satu input.', 'talk'), L('s', 'NOT itu tukang usil. Kamu bilang 1, dia bilang 0.', 'playful'), L('n', 'Mirip kamu kalau kuajak ke perpustakaan.', 'smug'), L('y', 'Tepatnya: input 1 menghasilkan 0, dan input 0 menghasilkan 1. Itulah inverter.', 'explain')],
@@ -260,36 +260,36 @@ const ST = {
       7: [L('s', 'NOR itu NOT OR, ya? Jadi kebalikannya OR! ...aku sudah mulai hafal polanya, lho.', 'happy'), L('n', 'Oke, buktikan. NOR nyala kapan?', 'smug'), L('s', 'Kalau salah satu nyala?', 'worry'), L('n', 'Itu OR, Sayori!', 'angry'), L('y', 'NOR hanya menyala kalau semua inputnya 0. Karena OR dibalik, hasilnya juga terbalik.', 'explain')],
       8: [L('n', 'XOR itu soal "beda atau sama?". Beda: nyala. Sama: mati. Gampang!', 'talk'), L('s', 'Jadi kalau dua-duanya 1, XOR mati?', 'talk'), L('n', 'Nah, itu benar! Kenapa tadi kamu ragu?', 'hmph'), L('m', 'Soalnya kamu terlalu cepat mengangguk, Natsuki.', 'wink')],
       9: [L('y', 'XNOR hanya menyala jika kedua input sama. Cara mudah mengingatnya: ia lawan dari XOR.', 'explain'), L('s', 'Berarti XNOR itu... OR?', 'worry'), L('y', 'Bukan. XNOR itu hasil XOR yang dibalik. Sama-sama 0 atau sama-sama 1, outputnya 1.', 'calm'), L('n', 'Nah, itu baru ringkasan yang enak. Catat, Sayori!', 'happy')],
-      10: [L('m', 'Tabel kebenaran adalah catatan lengkap semua kemungkinan. Di Simulasi nanti, tabelnya akan hidup di depan matamu.', 'happy'), L('s', 'Kalau inputnya dua, berarti ada empat baris. Kalau tiga, enam baris, kan?', 'talk'), L('y', 'Delapan baris. Setiap tambahan input menggandakan jumlah kombinasi: dua pangkat jumlah input.', 'explain'), L('n', 'Enam dari mana? Dua kali tiga? Itu asal kali-kali, Sayori.', 'angry'), L('s', 'Aku nggak asal! Aku... estimasi!', 'pout')]
+      10: [L('m', 'Tabel kebenaran itu catatan semua kemungkinan input. Nanti di Simulasi kamu bisa lihat tabelnya berubah langsung.', 'happy'), L('s', 'Kalau inputnya dua, berarti ada empat baris. Kalau tiga, enam baris, kan?', 'talk'), L('y', 'Delapan baris. Tiap input tambahan menggandakan jumlah kombinasi, jadi dua pangkat jumlah input.', 'explain'), L('n', 'Enam dari mana? Dua kali tiga? Itu asal kali-kali, Sayori.', 'angry'), L('s', 'Aku nggak asal! Aku... estimasi!', 'pout')]
     },
-    end: [L('m', 'Itu halaman terakhirnya. Kamu sudah melihat semua materi satu per satu.', 'happy'), L('n', 'Jangan senang dulu. Hafal itu belum sama dengan paham.', 'smug'), L('s', 'Hore! Sekarang kita pindah ke Simulasi bareng Yuri!', 'cheer')]
+    end: [L('m', 'Itu halaman terakhir. Semua materi sudah kamu baca.', 'happy'), L('n', 'Jangan senang dulu. Hafal belum tentu paham.', 'smug'), L('s', 'Hore! Sekarang kita pindah ke Simulasi bareng Yuri!', 'cheer')]
   },
   sim: {
-    enter: [L('s', 'Wah, ada lampunya! Boleh aku yang pencet duluan?', 'cheer'), L('y', 'Silakan. Klik kotak A atau B, lalu perhatikan LED-nya.', 'talk'), L('n', 'Lihat tabelnya dulu baru pencet. Jangan asal, kayak ngetik PIN sambil ngelamun.', 'smug'), L('m', 'Untuk melanjutkan cerita, cobalah minimal empat gerbang berbeda dan ubah input beberapa kali. Aku akan memberi tahu kalau sudah cukup.', 'calm')],
+    enter: [L('s', 'Wah, ada lampunya! Boleh aku yang pencet duluan?', 'cheer'), L('y', 'Silakan. Klik kotak A atau B, lalu perhatikan LED-nya.', 'talk'), L('n', 'Lihat tabelnya dulu baru pencet. Jangan asal, kayak ngetik PIN sambil ngelamun.', 'smug'), L('m', 'Supaya ceritanya lanjut, coba minimal empat gerbang berbeda dan ubah inputnya beberapa kali. Nanti kuberi tahu kalau sudah cukup.', 'calm')],
     gate: {
       AND: [L('n', 'AND: kalau ada satu saja yang 0, selesai. Mati.', 'smug'), L('s', 'Aku coba A nyala, B mati... lampunya mati! Natsuki benar!', 'shock')],
       OR: [L('s', 'OR itu kayak "mau es krim atau kue?" Dapat salah satu pun senang!', 'playful'), L('n', 'Dan kalau dapat dua-duanya, kamu lebih senang lagi. Outputnya tetap 1, ya.', 'smug')],
-      NOT: [L('m', 'Gerbang yang paling sederhana. Tapi hampir semua rangkaian membutuhkannya.', 'talk')],
+      NOT: [L('m', 'Gerbang paling sederhana, tapi hampir semua rangkaian memakainya.', 'talk')],
       NAND: [L('n', 'Hei, NAND itu AND yang dibalik. Jawab cepat: kapan outputnya 0?', 'smug'), L('s', 'Hmm, kalau semuanya 0?', 'worry'), L('y', 'Hanya ketika A dan B sama-sama 1. Coba klik keduanya dan lihat sendiri.', 'happy')],
       NOR: [L('s', 'NOR... jadi nyala cuma kalau semuanya mati? Aneh, tapi keren!', 'happy'), L('y', 'Betul. Semua inputnya harus 0, baru outputnya 1.', 'calm')],
       XOR: [L('m', 'XOR: "salah satu, tetapi tidak keduanya." Cermati bedanya dengan OR.', 'wink'), L('n', 'Gampangnya: OR tapi pelit sama yang kembar. Dua-duanya 1 malah mati.', 'smug')],
       XNOR: [L('n', 'Kebalikan XOR. Sama-sama = nyala. Gampang, kan?', 'talk'), L('s', 'Gampang! ...asal kamu nggak nanya aku lima menit lagi.', 'playful')]
     },
-    ok: [L('m', 'Cukup! Kamu sudah mencoba cukup banyak gerbang dan input. Siap lanjut ke Latihan?', 'happy'), L('s', 'Yuk yuk! Natsuki udah nungguin tuh.', 'cheer'), L('n', 'Siapa yang nungguin? Aku cuma... nyiapin soal. Kebetulan lagi di sini.', 'shy')],
+    ok: [L('m', 'Cukup! Kamu sudah coba banyak gerbang. Siap lanjut ke Latihan?', 'happy'), L('s', 'Yuk yuk! Natsuki udah nungguin tuh.', 'cheer'), L('n', 'Siapa yang nungguin? Aku cuma... nyiapin soal. Kebetulan lagi di sini.', 'shy')],
     need: (g, t) => `Syarat lanjut cerita: gerbang berbeda ${Math.min(g, 4)}/4 · ubah input ${Math.min(t, 6)}/6`
   },
   lat: {
-    enter: [L('m', 'Latihan ini terdiri dari 8 soal acak. Tidak ada nilai jelek di sini, hanya kesempatan mengulang.', 'talk'), L('y', 'Kalau ragu, bayangkan tabel kebenarannya.', 'talk'), L('s', 'Semangat! Aku nonton dari sini, ya!', 'cheer'), L('n', 'Diam dan perhatikan, Sayori! ...Eh, maksudku, ikut semangatin aja boleh.', 'shy')],
-    ok: [L('s', 'Yeay! Benar! Kamu keren banget!', 'cheer'), L('y', 'Jawaban yang tepat, dan alasannya juga sah.', 'happy'), L('m', 'Bagus. Itu jawaban yang matang.', 'happy'), L('n', 'Hmph, yang itu memang soal mudah. Tunggu yang berikutnya.', 'smug'), L('s', 'Natsuki, kamu senyum tadi, aku lihat!', 'playful')],
-    bad: [L('s', 'Nggak apa-apa! Salah itu bagian dari belajar, kok.', 'happy'), L('y', 'Perhatikan petunjuknya: sering kali kuncinya satu pola sederhana.', 'talk'), L('m', 'Satu soal bukan penentu. Lanjut saja dengan tenang.', 'calm'), L('n', 'Hampir! Baca lagi soalnya, kali ini sampai kata terakhir.', 'hmph'), L('s', 'Aku juga sering salah di situ. Jadi tenang, kamu nggak sendirian!', 'worry')],
+    enter: [L('m', 'Latihannya 8 soal acak. Nggak ada nilai jelek di sini, tinggal diulang kalau kurang.', 'talk'), L('y', 'Kalau ragu, bayangkan tabel kebenarannya.', 'talk'), L('s', 'Semangat! Aku nonton dari sini, ya!', 'cheer'), L('n', 'Diam dan perhatikan, Sayori! ...Eh, maksudku, ikut semangatin aja boleh.', 'shy')],
+    ok: [L('s', 'Yeay! Benar! Kamu keren banget!', 'cheer'), L('y', 'Jawabannya tepat, alasannya juga masuk akal.', 'happy'), L('m', 'Bagus. Jawabanmu mantap.', 'happy'), L('n', 'Hmph, yang itu memang soal mudah. Tunggu yang berikutnya.', 'smug'), L('s', 'Natsuki, kamu senyum tadi, aku lihat!', 'playful')],
+    bad: [L('s', 'Nggak apa-apa! Salah itu bagian dari belajar, kok.', 'happy'), L('y', 'Coba lihat petunjuknya. Sering kali kuncinya cuma satu pola sederhana.', 'talk'), L('m', 'Satu soal belum menentukan apa-apa. Lanjut saja pelan-pelan.', 'calm'), L('n', 'Hampir! Baca lagi soalnya, kali ini sampai kata terakhir.', 'hmph'), L('s', 'Aku juga sering salah di situ. Jadi tenang, kamu nggak sendirian!', 'worry')],
     half: { good: [L('m', 'Setengah jalan dan hasilmu bagus. Pertahankan ritmenya.', 'happy'), L('n', 'Jangan sombong dulu. Soal berikutnya sengaja kubuat lebih menjebak.', 'smug')], bad: [L('y', 'Tidak masalah. Cobalah baca ulang soal sampai kata terakhir sebelum menjawab.', 'calm'), L('s', 'Setengah jalan lagi! Ayo, ayo, ayo!', 'cheer')] },
-    end: s => [s >= 6 ? L('s', 'Kamu hebat! Aku bangga banget sama kamu!', 'cheer') : L('s', 'Capek ya? Tapi kamu sudah menyelesaikan satu set penuh. Itu keren!', 'happy'), s >= 6 ? L('n', 'Lumayan. Tapi aku punya soal yang lebih sulit kalau kamu mau.', 'smug') : L('n', 'Hmph. Nilainya belum bagus, tapi kamu menyelesaikan semuanya. Itu yang penting.', 'shy'), L('m', 'Satu set penuh sudah kamu tuntaskan. Kalau siap, kita lanjut ke Evaluasi akhir.', 'talk')]
+    end: s => [s >= 6 ? L('s', 'Kamu hebat! Aku bangga banget sama kamu!', 'cheer') : L('s', 'Capek ya? Tapi kamu sudah menyelesaikan satu set penuh. Itu keren!', 'happy'), s >= 6 ? L('n', 'Lumayan. Tapi aku punya soal yang lebih sulit kalau kamu mau.', 'smug') : L('n', 'Hmph. Nilainya belum bagus, tapi kamu menyelesaikan semuanya. Itu yang penting.', 'shy'), L('m', 'Satu set sudah selesai. Kalau siap, kita lanjut ke Evaluasi.', 'talk')]
   },
   eval: {
     enter: [L('n', 'Evaluasi, ya? Kali ini nggak ada hint dariku. Jangan mengandalkan aku!', 'smug'), L('y', 'Bacalah tiap soal sampai selesai. Banyak kesalahan terjadi pada kata terakhir.', 'talk'), L('s', 'Tarik napas dulu~ Kamu pasti bisa!', 'playful'), L('m', 'Natsuki bilang tanpa hint, tapi dia yang paling duluan gelisah.', 'wink'), L('n', 'A-aku nggak gelisah!', 'shy')],
     half: [L('s', 'Sudah setengah! Sedikit lagi!', 'cheer'), L('y', 'Ritmemu bagus. Tetap fokus.', 'explain'), L('n', 'Setengahnya lagi bukan alasan buat santai. Teliti!', 'hmph')],
-    swap: [L('n', 'Yakin mau diganti? Hmph... terserah, itu hakmu.', 'grump'), L('m', 'Mengganti jawaban itu boleh. Pastikan alasannya jelas, bukan sekadar ragu.', 'calm')],
-    end: s => [s >= 7 ? L('n', 'Hmph, bagus juga. Jangan senang dulu!', 'smug') : L('n', 'Masih bisa lebih baik. Aku tahu kamu bisa.', 'talk'), L('s', s >= 7 ? 'Natsuki, kamu senyum lagi!' : 'Tos dulu! Kamu sudah berusaha keras!', s >= 7 ? 'playful' : 'cheer'), L('y', 'Apa pun hasilnya, proses yang kamu lalui hari ini berharga.', 'calm')]
+    swap: [L('n', 'Yakin mau diganti? Hmph... terserah, itu hakmu.', 'grump'), L('m', 'Ganti jawaban itu boleh. Pastikan ada alasannya, jangan cuma karena ragu.', 'calm')],
+    end: s => [s >= 7 ? L('n', 'Hmph, bagus juga. Jangan senang dulu!', 'smug') : L('n', 'Masih bisa lebih baik. Aku tahu kamu bisa.', 'talk'), L('s', s >= 7 ? 'Natsuki, kamu senyum lagi!' : 'Tos dulu! Kamu sudah berusaha keras!', s >= 7 ? 'playful' : 'cheer'), L('y', 'Apa pun hasilnya, hari ini kamu sudah banyak belajar.', 'calm')]
   }
 };
 

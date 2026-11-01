@@ -3,27 +3,27 @@ const gateBoard = (g, desc) => `<div class="gb"><div class="gl"><div class="card
 
 const MATERI = [
   { t: 'Pengertian Rangkaian Logika', e: 'talk', html: '<ul><li>Rangkaian logika = rangkaian <b>digital</b> yang memproses sinyal bernilai <b>0</b> atau <b>1</b>.</li><li>Dibangun dari <b>gerbang logika</b> yang mengambil keputusan.</li><li>Di mekatronika: PLC, interlock mesin, kontrol motor, alarm sensor.</li></ul>',
-    say: ['Nah, pertama-tama: rangkaian logika itu rangkaian digital yang bikin keputusan dari sinyal 0 dan 1.', 'Di dalamnya ada gerbang-gerbang kecil yang tugasnya "memutuskan". Sederhana kok, aku janji!'] },
+    say: ['Mulai dari dasar ya. Rangkaian logika itu rangkaian digital yang mengambil keputusan dari sinyal 0 dan 1.', 'Di dalamnya ada gerbang-gerbang kecil yang kerjanya "memutuskan". Kedengarannya ribet, tapi nggak kok.'] },
   { t: 'Konsep Input dan Output', e: 'happy', html: '<div class="flow"><div>INPUT<small>sensor, tombol, saklar</small></div><span>➜</span><div>PROSES<small>gerbang logika</small></div><span>➜</span><div>OUTPUT<small>lampu, motor, buzzer</small></div></div><p>Contoh: tombol START ditekan (input) → logika memutuskan → motor menyala (output).</p>',
-    say: ['Setiap sistem kontrol punya tiga bagian: input, proses, dan output.', 'Input itu "telinga" sistem, gerbang logika itu "otak", dan output itu "tangan" yang bekerja!'] },
+    say: ['Sistem kontrol apa pun punya input, proses, dan output.', 'Input itu telinganya, gerbang logika otaknya, output tangannya. Gitu cara aku ngebayanginnya.'] },
   { t: 'Logika 0 dan 1', e: 'calm', html: '<div class="flow"><div>LOGIKA 0<small>LOW · OFF · 0 V · salah</small></div><div>LOGIKA 1<small>HIGH · ON · +5 V · benar</small></div></div><p>Tombol ditekan = 1, dilepas = 0. Sensor mendeteksi benda = 1, tidak = 0.</p>',
-    say: ['Komputer cuma kenal dua keadaan: 0 (mati) dan 1 (hidup). Seperti saklar lampu!', 'Ingat ya: 1 = HIGH = ON = benar, 0 = LOW = OFF = salah.'] },
+    say: ['Komputer cuma kenal dua keadaan, 0 yang mati dan 1 yang hidup. Kayak saklar lampu.', 'Catat ya: 1 itu HIGH, ON, benar. 0 itu LOW, OFF, salah.'] },
   { t: 'Gerbang AND', e: 'talk', html: gateBoard('AND', 'Output <b>1</b> hanya jika <b>semua</b> input = 1. Seperti dua saklar yang dipasang <b>seri</b>.'),
-    say: ['Gerbang AND itu pemilih yang tegas: output baru 1 kalau A DAN B keduanya 1.', 'Contoh: mesin press baru jalan kalau tombol kiri DAN tombol kanan ditekan. Aman buat tangan!'] },
+    say: ['AND itu tegas. Outputnya baru 1 kalau A dan B dua-duanya 1.', 'Contohnya mesin press yang baru jalan kalau tombol kiri dan kanan ditekan bareng. Tangan jadi aman.'] },
   { t: 'Gerbang OR', e: 'happy', html: gateBoard('OR', 'Output <b>1</b> jika <b>minimal satu</b> input = 1. Seperti saklar yang dipasang <b>paralel</b>.'),
-    say: ['Gerbang OR lebih santai: cukup salah satu input 1, output langsung 1.', 'Contoh: alarm berbunyi kalau sensor asap ATAU sensor panas aktif.'] },
+    say: ['OR lebih santai. Satu input 1 saja, outputnya langsung 1.', 'Contohnya alarm yang bunyi kalau sensor asap atau sensor panas aktif.'] },
   { t: 'Gerbang NOT', e: 'calm', html: gateBoard('NOT', 'Hanya <b>1 input</b>. Output adalah <b>kebalikan</b> input (inverter).'),
-    say: ['NOT itu si pembalik. Masuk 0 keluar 1, masuk 1 keluar 0.', 'Dia satu-satunya gerbang dasar yang inputnya cuma satu, lho!'] },
+    say: ['NOT tukang balik. Masuk 0 keluar 1, masuk 1 keluar 0.', 'Inputnya cuma satu, beda dari gerbang dasar yang lain.'] },
   { t: 'Gerbang NAND', e: 'talk', html: gateBoard('NAND', 'NAND = <b>NOT AND</b>. Output 0 hanya jika semua input 1.'),
-    say: ['NAND adalah AND yang dibalik. Hasil AND dibalik pakai NOT.', 'Fakta seru: gerbang NAND bisa dipakai untuk membuat semua gerbang lain!'] },
+    say: ['NAND itu AND yang hasilnya dibalik pakai NOT.', 'Katanya semua gerbang lain bisa dibuat dari NAND saja. Yuri yang cerita, aku cuma percaya.'] },
   { t: 'Gerbang NOR', e: 'happy', html: gateBoard('NOR', 'NOR = <b>NOT OR</b>. Output 1 hanya jika semua input 0.'),
-    say: ['NOR adalah OR yang dibalik. Output 1 cuma kalau semua input 0.', 'Mirip NAND, NOR juga termasuk gerbang universal.'] },
+    say: ['NOR itu OR yang dibalik. Outputnya 1 cuma kalau semua input 0.', 'Sama seperti NAND, NOR juga bisa dipakai membuat gerbang lain.'] },
   { t: 'Gerbang XOR', e: 'talk', html: gateBoard('XOR', 'Exclusive OR: output <b>1</b> jika kedua input <b>berbeda</b>.'),
-    say: ['XOR itu "detektor beda". Kalau A dan B berbeda, output 1. Kalau sama, output 0.', 'Contoh: lampu tangga yang bisa dinyalakan dari lantai atas maupun bawah!'] },
+    say: ['XOR itu pendeteksi beda. A dan B berbeda, outputnya 1. Sama, outputnya 0.', 'Contohnya lampu tangga yang bisa dinyalakan dari atas maupun dari bawah.'] },
   { t: 'Gerbang XNOR', e: 'calm', html: gateBoard('XNOR', 'XNOR = <b>NOT XOR</b>: output <b>1</b> jika kedua input <b>sama</b>.'),
-    say: ['XNOR kebalikan XOR: output 1 kalau A dan B sama.', 'Sering dipakai sebagai pembanding: apakah dua sinyal sama?'] },
+    say: ['XNOR kebalikan XOR. Outputnya 1 kalau A dan B sama.', 'Dipakai buat membandingkan dua sinyal, sama atau tidak.'] },
   { t: 'Tabel Kebenaran', e: 'cheer', html: `<table class="tt wide"><tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th><th>XNOR</th></tr>${[0, 1, 2, 3].map(i => `<tr><td>${i >> 1}</td><td>${i & 1}</td>${['AND', 'OR', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => `<td>${F[g](i >> 1, i & 1)}</td>`).join('')}</tr>`).join('')}</table><p>NOT: 0 → 1 dan 1 → 0. Dengan 2 input ada 2² = <b>4</b> kombinasi.</p>`,
-    say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dengan 2 input ada 4 baris.', 'Yeay, materi selesai! Selanjutnya coba SIMULASI bareng Yuri, lalu LATIHAN dan EVALUASI ya!'] }
+    say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dua input berarti empat baris.', 'Materinya selesai! Habis ini coba SIMULASI sama Yuri, terus LATIHAN dan EVALUASI.'] }
 ];
 
 /* Flash Card Materi. f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Semua isi bersumber dari halaman Materi. Tambah kartu = tambah objek. */
@@ -48,18 +48,18 @@ const FLASH = [
   { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b>: 00, 01, 10, 11 (2² kombinasi). Dengan n input, ada 2ⁿ baris.' }
 ];
 const FLASH_SAY = {
-  go: 'Mau mengulang materi? Tekan FLASH CARD di antara tombol bawah!',
-  start: ['Oke, mode Flash Card! Baca sisi depan, jawab dalam hati, lalu ketuk kartunya untuk melihat jawaban.', 'Pakai panah di bawah untuk pindah kartu. Tidak ada nilai, santai saja.']
+  go: 'Mau ulang materinya? Ada FLASH CARD di tombol bawah.',
+  start: ['Ini Flash Card. Baca sisi depan, jawab dalam hati, lalu ketuk kartunya buat lihat jawaban.', 'Panah di bawah buat pindah kartu. Nggak ada nilai, jadi santai aja.']
 };
 
 const SIM_SAY = {
-  AND: 'Gerbang AND: keluarannya 1 hanya bila A dan B sama-sama 1. Coba ubah salah satu input menjadi 0, lalu perhatikan LED-nya.',
-  OR: 'Gerbang OR: cukup satu input bernilai 1, maka output menjadi 1. LED padam hanya jika keduanya 0.',
-  NOT: 'Gerbang NOT hanya punya satu input. Outputnya selalu kebalikan dari input.',
-  NAND: 'NAND adalah AND yang dibalik. Bandingkan dengan tabel AND, ya... hasilnya selalu berlawanan.',
-  NOR: 'NOR adalah OR yang dibalik. LED hanya menyala ketika A dan B sama-sama 0.',
-  XOR: 'XOR menyala jika kedua input berbeda. Jika sama, hasilnya 0.',
-  XNOR: 'XNOR kebalikan XOR: LED menyala jika kedua input sama.'
+  AND: 'AND: keluarannya 1 hanya kalau A dan B sama-sama 1. Coba ubah salah satu input jadi 0, lalu lihat LED-nya.',
+  OR: 'OR: satu input bernilai 1 saja sudah membuat outputnya 1. LED baru padam kalau keduanya 0.',
+  NOT: 'NOT hanya punya satu input, dan outputnya selalu kebalikan dari input itu.',
+  NAND: 'NAND itu AND yang dibalik. Bandingkan dengan tabel AND, hasilnya selalu berlawanan.',
+  NOR: 'NOR itu OR yang dibalik. LED hanya menyala kalau A dan B sama-sama 0.',
+  XOR: 'XOR menyala kalau kedua input berbeda. Kalau sama, hasilnya 0.',
+  XNOR: 'XNOR kebalikan XOR. LED menyala kalau kedua input sama.'
 };
 
 /* ---------- LATIHAN (Natsuki): soal dibuat acak ---------- */
@@ -113,16 +113,14 @@ const QGEN = [
     return { kind: 'tt', g: g + '+NOT', n: 4, ans: [0, 1, 2, 3].map(i => F.NOT(F[g](i >> 1, i & 1))), vis: `<div class="card sm">${circ(g, 'NOT', { names: true, out: 'Y' })}</div>`, q: 'Lengkapi tabel kebenaran rangkaian ini (klik kotak "?" untuk mengubah 0/1).', hint: `Hitung ${g}(A,B) dulu, lalu balik hasilnya dengan NOT. ${HINT[g]}` } }
 ];
 const LIFE_SAY = {
-  start: 'Kamu punya 3 nyawa. Setiap jawaban salah mengurangi satu, dan kalau habis, latihan selesai.',
-  out: ['Nyawa habis. Sayang sekali, padahal tadi lumayan.', 'Habis sudah. Tapi tidak apa-apa, coba lagi!']
+  start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
+  out: ['Nyawamu habis. Padahal tadi lumayan. Hmph.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
 // indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT
 const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 10, 0, 2, 4, 5, 6, 1, 3, 7, 8, 9, 7, 9]).slice(0, n).map(i => QGEN[i]());
 
 
-const PRAISE = ['B-bukan berarti aku senang kamu benar ya! ...Tapi lumayan.', 'Hmph, kebetulan aja itu! ...Oke, oke, bagus.', 'Y-yah, itu benar. Jangan sombong dulu!', 'Tch... kamu ternyata nggak sebodoh yang kukira. Sedikit!'];
-const OOPS = ['Salah! Dasar ceroboh!', 'Bukan itu, baka! Pikir lagi!', 'Haah? Serius jawabnya begitu?', 'Aduh, salah tuh! Jangan menyerah, ya!'];
 
 /* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
 const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
@@ -149,10 +147,10 @@ const EVAL = [
   { q: 'Berikut adalah gerbang logika dasar yang benar adalah …', o: ['AND, OR, NOT', 'AND, NOT, NAND', 'OR, NOT, NOR', 'XOR, XNOR', 'BUFFER, NAND, OR'], a: 0, e: 'Gerbang dasar ada tiga: AND, OR, dan NOT. NAND, NOR, XOR, dan XNOR adalah turunannya.' }
 ];
 const GRADES = [
-  { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wow. Serius, aku sempat merinding. Kamu menguasai ini dengan sangat baik, dan aku bangga banget sama kamu.', 'Hampir sempurna! Kalau ada klub rangkaian logika, aku langsung rekrut kamu jadi wakil ketua. Ehehe~', 'Luar biasa! Aku nggak akan bohong, aku sedikit iri sama otakmu.', 'Nilai ini akan kucatat dengan tinta paling tebal. Secara harfiah: di localStorage. Ehehe.'] },
-  { min: 7, t: 'Baik', e: 'happy', s: ['Bagus banget! Tinggal sedikit lagi menuju sempurna. Sisanya cuma soal kebiasaan dan ketelitian.', 'Hasil yang solid. Aku tahu kamu masih bisa lebih tinggi, dan aku suka melihat potensimu.', 'Kerja bagus! Ada beberapa bagian yang bisa dipoles, tapi dasarmu kuat.', 'Tinggal sedikit lagi. Dunia kecil ini pasti senang punya pemain sepertimu.'] },
-  { min: 5, t: 'Cukup', e: 'talk', s: ['Lumayan kok! Fondasinya sudah ada. Latihan sedikit lagi di Simulasi, dan kamu bakal naik kelas.', 'Nggak buruk, belum sempurna juga. Tapi percayalah, ini titik awal yang bagus. Coba lagi, ya?', 'Setengah jalan itu tetap jalan. Ayo ulangi pelan-pelan, aku temani.', 'Tenang, aku nggak ke mana-mana. Kecuali kamu menutup tab ini, tentu. Ehehe.'] },
-  { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Hei, jangan sedih. Nilai ini bukan soal seberapa pintar kamu, cuma soal hari ini. Yuk ulang dari Materi bareng Sayori.', 'Nggak apa-apa, serius. Semua orang mulai dari sini. Istirahat sebentar, minum teh, lalu kita coba lagi.', 'Aku nggak kecewa sama sekali. Aku justru melihat kamu mau mencoba, dan itu yang terpenting.', 'Kalau mau, kita ulang dari awal. Aku nggak akan bosan. Salah satu kelebihan jadi karakter game.'] }
+  { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wah. Aku sampai merinding. Kamu benar-benar menguasainya, dan aku bangga.', 'Hampir sempurna. Kalau klub ini punya wakil ketua, aku sudah menunjuk kamu.', 'Sungguh, aku sedikit iri sama otakmu.', 'Nilai ini kucatat pakai tinta paling tebal. Maksudku di localStorage, tapi ya, tebal.'] },
+  { min: 7, t: 'Baik', e: 'happy', s: ['Bagus. Tinggal sedikit menuju sempurna, sisanya soal teliti.', 'Hasilnya solid. Kurasa kamu masih bisa naik lagi.', 'Kerja bagus. Beberapa bagian masih bisa dirapikan, tapi dasarmu sudah kuat.', 'Tinggal selangkah lagi. Aku senang kamu yang main di dunia kecil ini.'] },
+  { min: 5, t: 'Cukup', e: 'talk', s: ['Lumayan. Dasarnya sudah ada. Main sebentar lagi di Simulasi, nilaimu pasti naik.', 'Belum sempurna, tapi ini awal yang bagus. Coba lagi?', 'Separuh jalan tetap jalan. Ulang pelan-pelan, aku temani.', 'Aku nggak ke mana-mana, kecuali kamu menutup tab ini. Itu pengecualiannya.'] },
+  { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Hei, jangan sedih dulu. Nilai ini cuma gambaran hari ini. Yuk ulang dari Materi sama Sayori.', 'Nggak apa-apa. Semua orang mulai dari sini. Istirahat dulu, minum teh, nanti kita coba lagi.', 'Aku nggak kecewa. Aku senang kamu mau mencoba sampai selesai.', 'Kalau mau, kita ulang dari awal. Aku nggak akan bosan. Itu enaknya jadi karakter game.'] }
 ];
 
 /* ---------- Credit (tampil di Pengaturan > Credit) — ganti nama/peran kontributor di sini ---------- */
