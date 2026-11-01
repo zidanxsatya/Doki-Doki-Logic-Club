@@ -839,12 +839,12 @@ body.m{--cs:.6}
 
 /* v18: kartu ulang Materi */
 .nav .fcgo{background:var(--pink);color:#fff;-webkit-text-stroke:0;text-shadow:none;animation:popin .4s var(--ease) backwards .3s;white-space:nowrap}
-.fcw{display:flex;flex-direction:column;gap:10px;height:372px}
+.fcw{display:flex;flex-direction:column;gap:10px;height:404px}
 .fch{display:flex;align-items:center;gap:10px}.fch .btn.sm{padding:6px 14px;font-size:16px;min-height:40px}
 /* kartu: tumpukan di belakang (p1/p2) menunjukkan sisa kartu; sisi depan putih, sisi belakang merah muda bergaris putus seperti rumus di papan */
 .fcard{position:relative;border-radius:24px;flex:1;min-height:0;display:block;width:100%;padding:0;border:0;background:none;font:inherit;color:var(--ink);cursor:pointer;perspective:1100px;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .fcard::before,.fcard::after{content:"";position:absolute;inset:0;border:5px solid var(--ink);border-radius:20px;background:#fff;z-index:0;opacity:0}
-.fcard.p1::after,.fcard.p2::after{opacity:1;transform:translate(6px,7px) rotate(1.4deg)}.fcard.p2::before{opacity:1;transform:translate(-5px,12px) rotate(-1.6deg)}
+.fcard.p1::after,.fcard.p2::after{opacity:1;transform:translate(5px,6px) rotate(.8deg)}.fcard.p2::before{opacity:1;transform:translate(-4px,9px) rotate(-.8deg)}   /* tumpukan kartu menjorok <= 16px ke bawah; .fcb memberi jarak lebih dari itu */
 .fcard.in{animation:fcin .26s var(--ease) backwards}@keyframes fcin{from{opacity:0;translate:0 12px}}
 .fcin{position:relative;z-index:1;display:block;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s var(--ease)}
 .fcard.flip .fcin{transform:rotateY(180deg)}
@@ -855,9 +855,9 @@ body.m{--cs:.6}
 .fx{display:block;width:100%}.ff p{margin:6px 0 0}.ff .card{margin:0 auto;max-width:100%}.ff .card.sm svg{height:96px;width:auto}
 .ff .fm{display:inline-block;color:var(--ink);font-size:24px;border:3px dashed var(--ink);border-radius:10px;padding:2px 16px;background:#fff}
 .fcard:focus-visible,.fcb .btn:focus-visible,.fch .btn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
-.fcb{display:flex;gap:16px;align-items:center;justify-content:center;flex:none}.fca{width:92px;height:52px;padding:0;display:grid;place-items:center}.fca svg{width:24px;height:24px;fill:var(--ink);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
+.fcb{display:flex;gap:16px;align-items:center;justify-content:center;flex:none;margin-top:22px}.fca{width:92px;height:52px;padding:0;display:grid;place-items:center}.fca svg{width:24px;height:24px;fill:var(--ink);stroke:var(--ink);stroke-width:2.5;stroke-linejoin:round}
 .fcn{min-width:88px;text-align:center;font-weight:800;font-size:18px;background:var(--ink);color:#fff;padding:4px 16px;border-radius:999px}
-.m .fcw{height:100%;gap:6px}.m .fch .btn.sm{padding:4px 10px;font-size:14px;min-height:44px}
+.m .fcw{height:100%;gap:6px}.m .fcb{margin-top:20px}.m .fch .btn.sm{padding:4px 10px;font-size:14px;min-height:44px}
 .m .ff{font-size:19px;padding:34px 16px 12px;border-width:4px}.m .ft{left:20px;top:14px;font-size:14px}.m .ff .card.sm svg{height:70px}.m .ff .fm{font-size:19px}
 .m .fca{width:76px;height:44px}.m .fcb{gap:10px}.m .fcn{font-size:15px;padding:3px 12px;min-width:72px}.m .nav .fcgo{font-size:14px;padding:8px 10px}
 @media (prefers-reduced-motion:reduce){.fcin{transition:none}.nav .fcgo,.fcard.in{animation:none}}
@@ -902,3 +902,16 @@ body.m{--cs:.6}
 /* v21: tombol ULANG di kartu CERITA mengikuti gerak angkat kartu menu lain */
 .mre:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 8px 0 var(--ink);background:var(--soft)}.mre:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.mre:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 @media (prefers-reduced-motion:reduce){.mre:hover:not(:disabled){transform:none;box-shadow:0 4px 0 var(--ink)}}
+
+/* v21b: nyawa Latihan, dan tombol ULANG ikut terangkat saat kartu CERITA di-hover/dipilih */
+.lives{display:flex;gap:4px;margin-left:auto}.lives.hit{animation:badshake .32s}
+.heart{width:26px;height:26px;fill:#ff4d7a;stroke:var(--ink);stroke-width:1.4;stroke-linejoin:round;transition:fill .2s,opacity .2s}.heart.off{fill:#e6dcf5;opacity:.7}
+.m .heart{width:22px;height:22px}
+.mre{transition:transform .16s var(--ease),box-shadow .16s var(--ease),background-color .16s}
+.mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translateY(-4px);box-shadow:0 8px 0 var(--ink)}
+.m .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}
+@media (prefers-reduced-motion:reduce){.lives.hit{animation:none}.mstory:has(.mbtn:hover,.mbtn.sel) .mre,.m .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:none;box-shadow:0 4px 0 var(--ink)}}
+.m:not(.p) .fcard.p1::after,.m:not(.p) .fcard.p2::after{transform:translate(4px,4px) rotate(.4deg)}.m:not(.p) .fcard.p2::before{transform:translate(-3px,6px) rotate(-.4deg)}
+/* kartu pendek (tablet potret: panggung hanya 640px): kecilkan isi supaya tidak terpotong */
+.fcard{container-type:size}
+@container (max-height:175px){.ff{font-size:15px;padding:28px 14px 6px}.ft{left:16px;top:8px;font-size:12px}.m .ff .card.sm svg{height:38px}.m .ff .card.sm{padding:3px 8px}.ff p{margin:3px 0 0}.m .ff .fm{font-size:15px;padding:0 10px;border-width:2px}.ff{line-height:1.25}}
