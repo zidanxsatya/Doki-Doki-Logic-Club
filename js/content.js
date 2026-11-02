@@ -114,7 +114,7 @@ const QGEN = [
 ];
 const LIFE_SAY = {
   start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
-  out: ['Nyawamu habis. Padahal tadi lumayan. Hmph.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
+  out: ['Nyawamu habis. Padahal tadi lumayan.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
 // indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT
@@ -148,7 +148,7 @@ const EVAL = [
 ];
 const GRADES = [
   { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wah. Aku sampai merinding. Kamu benar-benar menguasainya, dan aku bangga.', 'Hampir sempurna. Kalau klub ini punya wakil ketua, aku sudah menunjuk kamu.', 'Sungguh, aku sedikit iri sama otakmu.', 'Nilai ini kucatat pakai tinta paling tebal. Maksudku di localStorage, tapi ya, tebal.'] },
-  { min: 7, t: 'Baik', e: 'happy', s: ['Bagus. Tinggal sedikit menuju sempurna, sisanya soal teliti.', 'Hasilnya solid. Kurasa kamu masih bisa naik lagi.', 'Kerja bagus. Beberapa bagian masih bisa dirapikan, tapi dasarmu sudah kuat.', 'Tinggal selangkah lagi. Aku senang kamu yang main di dunia kecil ini.'] },
+  { min: 7, t: 'Baik', e: 'happy', s: ['Bagus. Tinggal sedikit menuju sempurna, sisanya soal teliti.', 'Hasilnya solid. Kurasa kamu masih bisa naik lagi.', 'Kerja bagus. Beberapa bagian masih bisa dirapikan, tapi dasarmu sudah kuat.', 'Tinggal selangkah lagi. Senang rasanya kamu yang memainkan game ini.'] },
   { min: 5, t: 'Cukup', e: 'talk', s: ['Lumayan. Dasarnya sudah ada. Main sebentar lagi di Simulasi, nilaimu pasti naik.', 'Belum sempurna, tapi ini awal yang bagus. Coba lagi?', 'Separuh jalan tetap jalan. Ulang pelan-pelan, aku temani.', 'Aku nggak ke mana-mana, kecuali kamu menutup tab ini. Itu pengecualiannya.'] },
   { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Hei, jangan sedih dulu. Nilai ini cuma gambaran hari ini. Yuk ulang dari Materi sama Sayori.', 'Nggak apa-apa. Semua orang mulai dari sini. Istirahat dulu, minum teh, nanti kita coba lagi.', 'Aku nggak kecewa. Aku senang kamu mau mencoba sampai selesai.', 'Kalau mau, kita ulang dari awal. Aku nggak akan bosan. Itu enaknya jadi karakter game.'] }
 ];
