@@ -59,8 +59,7 @@ class Actor {
 Actor.live = new Set();
 (() => { let last = performance.now(); const loop = n => { const dt = Math.min((n - last) / 1000, .1); last = n; Actor.live.forEach(a => a.tick(dt)); requestAnimationFrame(loop) }; requestAnimationFrame(loop) })();
 
-/* Character: API sederhana di atas Actor 
-   character.setExpression("happy"); character.playAnimation("singLEFT"); character.idle(); */
+/* Character: pembungkus sederhana di atas Actor */
 const CHARS = {
   sayori: { name: 'Sayori', sc: .8, color: '#95e0fa', dk: '#1d5f8a', expr: { neutral: 'idle', happy: 'singLEFT', talk: 'singRIGHT', calm: 'singDOWN', cheer: 'singUP', sad: 'nara' } },
   yuri: { name: 'Yuri', sc: .78, color: '#b394e0', dk: '#432a86', expr: { neutral: 'idle', shy: 'singLEFT', talk: 'singRIGHT', happy: 'singUP', explain: 'singDOWN', breath: 'breath' } },

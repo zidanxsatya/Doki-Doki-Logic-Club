@@ -75,7 +75,6 @@ const CONCEPT = [
 ];
 // ekspresi Boolean (HTML, NOT = garis atas); par: hasil AND/OR/XOR dikurung saat jadi input gerbang lain
 const BX = { AND: (a, b) => `${a} · ${b}`, OR: (a, b) => `${a} + ${b}`, XOR: (a, b) => `${a} ⊕ ${b}`, NAND: (a, b) => nb(`${a} · ${b}`), NOR: (a, b) => nb(`${a} + ${b}`), XNOR: (a, b) => nb(`${a} ⊕ ${b}`), NOT: a => nb(a) }, par = (g, s) => /^(AND|OR|XOR)$/.test(g) ? `(${s})` : s;
-const TXT = { q: 'Pilih jawaban yang benar', kind: 'mc' };
 const QGEN = [
   () => { const g = pick(GL), a = rnd(), b = rnd(), y = F[g](a, b); // menentukan output
     return { kind: 'mc', q: `Berapa output Y gerbang ${g} jika ${g === 'NOT' ? 'A = ' + a : `A = ${a} dan B = ${b}`}?`, vis: `<div class="card sm">${gateSVG(g, a, g === 'NOT' ? null : b, null, false)}</div>`, opts: ['0', '1'], a: y, hint: HINT[g] } },
