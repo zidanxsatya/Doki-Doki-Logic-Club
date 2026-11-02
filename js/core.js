@@ -1,4 +1,4 @@
-/* ===== core.js : utilitas, atlas XML, karakter, audio, dialog, gerbang logika ===== */
+/* core.js : utilitas, atlas XML, karakter, audio, dialog, gerbang logika */
 const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
 const wait = ms => new Promise(r => setTimeout(r, ms));
 const pick = a => a[Math.random() * a.length | 0];
@@ -7,11 +7,11 @@ const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { cons
 const bag = a => { let q = []; return () => (q.length || (q = shuffle(a)), q.pop()) }; // acak tanpa ulang sampai semua terpakai
 const store = { get: (k, d) => { try { return JSON.parse(localStorage.getItem(k)) ?? d } catch { return d } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch { } } };
 
-/* ---------- Atlas (PNG + XML Sparrow) ---------- */
+/* Atlas (PNG + XML Sparrow) */
 const _img = {}, _atl = {};
 const loadImg = s => _img[s] ??= new Promise((ok, no) => { const i = new Image(); i.onload = () => (i.decode ? i.decode().catch(() => { }) : Promise.resolve()).then(() => ok(i)); i.onerror = no; i.src = s });
 const loadAtlas = base => _atl[base] ??= (async () => {
-  const [img, txt] = await Promise.all([loadImg(base + '.webp'), fetch(base + '.xml').then(r => r.text())]);
+  const [img, txt] = await Promise.all([loadImg(base + '.webp?v=2'), fetch(base + '.xml?v=2').then(r => r.text())]);
   const doc = new DOMParser().parseFromString(txt.replace(/^\uFEFF/, ''), 'text/xml');
   const list = [...doc.getElementsByTagName('SubTexture')].map(e => {
     const g = k => +e.getAttribute(k) || 0;
@@ -20,7 +20,7 @@ const loadAtlas = base => _atl[base] ??= (async () => {
   return { img, list };
 })();
 
-/* ---------- Actor: pemutar animasi di <canvas> ---------- */
+/* Actor: pemutar animasi di <canvas> */
 class Actor {
   // anims: { key: {name:'prefix XML', indices:[], offsets:[x,y], fps, loop} }
   constructor(atlas, anims) {
@@ -59,7 +59,7 @@ class Actor {
 Actor.live = new Set();
 (() => { let last = performance.now(); const loop = n => { const dt = Math.min((n - last) / 1000, .1); last = n; Actor.live.forEach(a => a.tick(dt)); requestAnimationFrame(loop) }; requestAnimationFrame(loop) })();
 
-/* ---------- Character: API sederhana di atas Actor ----------
+/* Character: API sederhana di atas Actor 
    character.setExpression("happy"); character.playAnimation("singLEFT"); character.idle(); */
 const CHARS = {
   sayori: { name: 'Sayori', sc: .8, color: '#95e0fa', dk: '#1d5f8a', expr: { neutral: 'idle', happy: 'singLEFT', talk: 'singRIGHT', calm: 'singDOWN', cheer: 'singUP', sad: 'nara' } },
@@ -88,7 +88,7 @@ class Character {
   setExpression(e) { const a = this.cfg.expr[e] || 'idle'; a === 'idle' ? this.idle() : this.playAnimation(a) } // main sekali, lalu kembali idle
 }
 
-/* ---------- Audio: satu musik aktif, fade antar halaman ---------- */
+/* Audio: satu musik aktif, fade antar halaman */
 const clamp01 = v => Math.max(0, Math.min(1, v));
 const Snd = {
   m: null, cur: null, mg: 1, MG: { A_Story_of_Everyday_Life: .55, A_Wonderful_Happening: .55 }, mv: .55, sv: .7, muted: false, ac: null, g: null, buf: {}, last: {}, // mv = volume MUSIK, sv = volume EFEK SUARA (diatur di Pengaturan, saling terpisah)
@@ -137,7 +137,7 @@ const Snd = {
 
 ['pointerdown', 'touchend', 'keydown', 'click'].forEach(ev => addEventListener(ev, () => Snd.unlock(), { capture: true, passive: true }));
 
-/* ---------- Dialogue box (Text_Boxes.png/xml: satu kotak per karakter, label nama sudah menyatu) ---------- */
+/* Dialogue box (Text_Boxes.png/xml: satu kotak per karakter, label nama sudah menyatu) */
 const BOX = { sayori: 'Doki Dialogue Sayo0000', yuri: 'Doki Dialogue Yuri0000', natsuki: 'Doki Dialogue Natsu0000', monika: 'Doki Dialogue Moni0000' };
 class Dialogue {
   constructor(el, ch, cast = null) { // cast (Mode Cerita): { sayori, yuri, natsuki, monika } -> beberapa pembicara; baris dialog boleh [teks, ekspresi, siapa]
@@ -177,7 +177,7 @@ class Dialogue {
   destroy() { this.dead = true; clearInterval(this.iv); removeEventListener('layoutchange', this.onLayout) }
 }
 
-/* ---------- Gerbang logika ---------- */
+/* Gerbang logika */
 const F = { AND: (a, b) => a & b, OR: (a, b) => a | b, NOT: a => +!a, NAND: (a, b) => +!(a & b), NOR: (a, b) => +!(a | b), XOR: (a, b) => a ^ b, XNOR: (a, b) => +!(a ^ b) };
 const GL = ['AND', 'OR', 'NOT', 'NAND', 'NOR', 'XOR', 'XNOR'];
 const nb = s => `<span class="ov">${s}</span>`;   // NOT = garis di atas ekspresi (tanpa ' atau ¬)
@@ -231,7 +231,7 @@ const tt = (g, hl = -1) => g === 'NOT'
   ? `<table class="tt"><tr><th>A</th><th>Y</th></tr>${[0, 1].map(a => `<tr class="${a === hl ? 'hl' : ''}"><td>${a}</td><td>${F.NOT(a)}</td></tr>`).join('')}</table>`
   : `<table class="tt"><tr><th>A</th><th>B</th><th>Y</th></tr>${[0, 1, 2, 3].map(i => `<tr class="${i === hl ? 'hl' : ''}"><td>${i >> 1}</td><td>${i & 1}</td><td>${F[g](i >> 1, i & 1)}</td></tr>`).join('')}</table>`;
 
-/* ---------- Efek sparkle ---------- */
+/* Efek sparkle */
 function spark(e, n = 6) {
   const st = $('#stage'), r = st.getBoundingClientRect(), k = r.width / st.offsetWidth, x = (e.clientX - r.left) / k, y = (e.clientY - r.top) / k;
   for (let i = 0; i < n; i++) {

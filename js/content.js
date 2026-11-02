@@ -1,4 +1,4 @@
-/* ===== content.js : semua teks & soal (mudah diedit) ===== */
+/* content.js : semua teks & soal (mudah diedit) */
 const gateBoard = (g, desc) => `<div class="gb"><div class="gl"><div class="card">${gateSVG(g, null, null, null, false)}</div><p>${desc}</p></div><div class="gr"><div class="card">${tt(g)}</div><p class="fm">${FORM[g]}</p></div></div>`;
 
 const MATERI = [
@@ -62,7 +62,7 @@ const SIM_SAY = {
   XNOR: 'XNOR kebalikan XOR. LED menyala kalau kedua input sama.'
 };
 
-/* ---------- LATIHAN (Natsuki): soal dibuat acak ---------- */
+/* LATIHAN (Natsuki): soal dibuat acak */
 const HINT = { AND: 'AND hanya 1 kalau SEMUA input 1.', OR: 'OR bernilai 1 kalau minimal satu input 1.', NOT: 'NOT membalik: 0 jadi 1, 1 jadi 0.', NAND: 'NAND = kebalikan AND. Hitung AND dulu, lalu balik.', NOR: 'NOR = kebalikan OR. Hitung OR dulu, lalu balik.', XOR: 'XOR bernilai 1 kalau kedua input BERBEDA.', XNOR: 'XNOR bernilai 1 kalau kedua input SAMA.' };
 const G2 = ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'XNOR'];
 const CONCEPT = [
@@ -122,7 +122,7 @@ const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 10, 0, 2, 4, 5, 6, 1, 3, 7, 8
 
 
 
-/* ---------- EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). ---------- */
+/* EVALUASI (Monika): bank soal, tiap sesi mengambil EVAL_N soal acak. Pilihan pertama = jawaban benar (diacak saat tampil). */
 const EVAL_N = 10, cv = (g1, g2, o) => `<div class="card sm">${circ(g1, g2, o)}</div>`;
 const EVAL = [
   { q: 'Rangkaian logika bekerja dengan sinyal berupa…', o: ['Digital 0 dan 1', 'Analog kontinu', 'Gelombang radio', 'Arus bolak-balik saja'], a: 0, e: 'Rangkaian logika hanya mengenal dua keadaan, 0 dan 1. Itu sebabnya sinyalnya disebut digital, bukan analog yang berubah halus.' },
@@ -153,7 +153,7 @@ const GRADES = [
   { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Hei, jangan sedih dulu. Nilai ini cuma gambaran hari ini. Yuk ulang dari Materi sama Sayori.', 'Nggak apa-apa. Semua orang mulai dari sini. Istirahat dulu, minum teh, nanti kita coba lagi.', 'Aku nggak kecewa. Aku senang kamu mau mencoba sampai selesai.', 'Kalau mau, kita ulang dari awal. Aku nggak akan bosan. Itu enaknya jadi karakter game.'] }
 ];
 
-/* ---------- Credit (tampil di Pengaturan > Credit) — ganti nama/peran kontributor di sini ---------- */
+/* Credit (tampil di Pengaturan > Credit) : ganti nama/peran kontributor di sini */
 const CREDIT = {
   note: 'Aset dari Doki Doki Takeover (Jorge-SunSpirit &amp; kontributor). Doki Doki Literature Club © Team Salvato. Proyek edukasi non-komersial.',
   people: [

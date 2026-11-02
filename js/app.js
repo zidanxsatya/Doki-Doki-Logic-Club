@@ -1,6 +1,7 @@
-/* ===== app.js : navigasi, menu, dan keempat mode ===== */
+/* app.js : navigasi, menu, dan keempat mode */
 const stage = $('#stage'), chars = {}, SC = {};
 let warm = Promise.resolve();
+const charP = {}, loadChar = k => charP[k] ??= Character.load(k).then(c => chars[k] = c);   // sprite tiap karakter dimuat saat dibutuhkan, bukan semuanya di awal
 let scene = null, together = null, busy = false;
 const M = {
   materi: { id: 'materi', label: 'MATERI', key: 'sayori', music: 'sayoc', bg: 'DDLCbg', sub: 'Belajar dasar bersama kelas' },
@@ -13,13 +14,13 @@ const MODES = [M.materi, M.simulasi, M.latihan, M.evaluasi];
 const Journey = { prev: null, last: null }; // mode terakhir yang dikunjungi, agar karakter bisa bereaksi saat pemain berpindah bagian
 
 
-/* ---------- pindah layar (fade + ganti musik) ---------- */
+/* pindah layar (fade + ganti musik) */
 let pend = null, curId = null;
 async function go(id) {
   if (busy) { if (id !== curId) pend = id; return }   // klik saat transisi: yang terakhir diantre, bukan dibuang
   busy = true; pend = null;
   const f = $('#fade'); f.classList.add('on'); await wait(240);
-  if (id !== 'menu' && id !== 'settings') await warm;   // aset karakter dimuat di latar belakang setelah MULAI aktif
+  if (id !== 'menu' && id !== 'settings') await Promise.all([warm, !Story.on && M[id] && loadChar(M[id].key)]);   // hanya sprite karakter layar ini yang ditunggu
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
@@ -29,13 +30,13 @@ async function go(id) {
   if (pend && pend !== id) go(pend)
 }
 
-/* ---------- menu utama ---------- */
+/* menu utama */
 function buildMenu() {
   const el = $('#menu');
   const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? 9 : 0, nowI = [1, 3, 5, 7].find(x => x >= cur);
   const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = [1, 3, 5, 7][k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
   const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '8 soal acak per sesi', evaluasi: 'Nilai & kategori' };
-  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><small>TEKNIK KONTROL MEKATRONIKA</small><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
+  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
   <button class="btn setbtn" id="setb">PENGATURAN</button><div class="mkeys"><kbd>↑↓</kbd> pilih menu <kbd>Enter</kbd> buka</div>`;
@@ -53,15 +54,15 @@ function buildMenu() {
   el.classList.add('on');
 }
 
-/* ---------- PENGATURAN: volume musik, volume efek, mode tampilan, tata letak (tersimpan di localStorage) ---------- */
+/* PENGATURAN: volume musik, volume efek, mode tampilan, tata letak (tersimpan di localStorage) */
 function buildSettings() {
   const el = $('#settings'), cfg = Settings.data;
   el.innerHTML = `<div class="mbg"></div><div class="top"><button class="btn sm" id="sback">◀ MENU</button><b id="stitle">PENGATURAN</b></div>
   <div class="setcard">
-    <div class="srow"><label>🎵 Volume Musik <b id="mvv"></b></label><input type="range" id="mv" min="0" max="100" step="1" aria-label="Volume Musik"></div>
-    <div class="srow"><label>🔊 Volume Efek Suara <b id="svv"></b></label><input type="range" id="sv" min="0" max="100" step="1" aria-label="Volume Efek Suara"></div>
-    <div class="srow"><label>🖥️ Mode Tampilan</label><div class="seg" id="sdisp"><button class="btn sm" data-v="window">Jendela</button><button class="btn sm" data-v="full">Desktop Fullscreen</button></div><small id="fsn"></small></div>
-    <div class="srow"><label>📱 Tata Letak</label><div class="seg" id="slay"><button class="btn sm" data-v="auto">Otomatis</button><button class="btn sm" data-v="desktop">Desktop</button><button class="btn sm" data-v="mobile">Mobile / Android</button></div><small>Otomatis menyesuaikan ukuran layar. Pilih Mobile / Android untuk tampilan ponsel.</small></div>
+    <div class="srow"><label>Volume Musik <b id="mvv"></b></label><input type="range" id="mv" min="0" max="100" step="1" aria-label="Volume Musik"></div>
+    <div class="srow"><label>Volume Efek Suara <b id="svv"></b></label><input type="range" id="sv" min="0" max="100" step="1" aria-label="Volume Efek Suara"></div>
+    <div class="srow"><label>Mode Tampilan</label><div class="seg" id="sdisp"><button class="btn sm" data-v="window">Jendela</button><button class="btn sm" data-v="full">Desktop Fullscreen</button></div><small id="fsn"></small></div>
+    <div class="srow"><label>Tata Letak</label><div class="seg" id="slay"><button class="btn sm" data-v="auto">Otomatis</button><button class="btn sm" data-v="desktop">Desktop</button><button class="btn sm" data-v="mobile">Mobile / Android</button></div><small>Otomatis menyesuaikan ukuran layar. Pilih Mobile / Android untuk tampilan ponsel.</small></div>
   </div>
   <div class="setcard credcard" hidden>
     <p class="cnote">${CREDIT.note}</p>
@@ -89,7 +90,7 @@ function buildSettings() {
   mark(); el.classList.add('on');
 }
 
-/* ---------- kerangka scene umum (latar kelas + karakter + dialog) ---------- */
+/* kerangka scene umum (latar kelas + karakter + dialog) */
 function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
@@ -119,7 +120,7 @@ const startCard = (S, title, desc, onGo) => {
   $('#go').onclick = () => { Snd.sfx('select'); onGo() };
 };
 
-/* ---------- reaksi karakter saat pemain datang dari bagian lain & terhadap skor terbaik yang tersimpan ---------- */
+/* reaksi karakter saat pemain datang dari bagian lain & terhadap skor terbaik yang tersimpan */
 const entryExtra = key => {
   if (Story.on) return [];   // Mode Cerita punya alur sendiri
   const d = D[key], f = d.from && d.from[Journey.prev], b = key === 'natsuki' ? store.get('tkm_latihan_best', 0) : key === 'monika' ? store.get('tkm_eval_best', null) : 0;
@@ -127,7 +128,7 @@ const entryExtra = key => {
   return ln && bw ? [Math.random() < .5 ? ln : bw] : ln ? [ln] : bw ? [bw] : [];
 };
 
-/* ---------- MATERI (Sayori) ---------- */
+/* MATERI (Sayori) */
 SC.materi = () => {
   const S = scaffold('materi'); let p = 0, lastFlip = 0; const seen = new Set(), ms = new Set();
   const flipLine = () => { const now = performance.now(), fast = now - lastFlip < 2500; lastFlip = now; return fast && Math.random() < .6 ? [[pick(D.sayori.flipFast), 'happy']] : [] }; // pemain membalik halaman terlalu cepat
@@ -166,7 +167,7 @@ SC.materi = () => {
   show([...entryExtra('sayori'), ...pick(D.sayori.intro), ...SL.enter('materi')]);
 };
 
-/* ---------- SIMULASI (Yuri) ---------- */
+/* SIMULASI (Yuri) */
 SC.simulasi = () => {
   const S = scaffold('simulasi'), DY = D.yuri; let g = 'AND', togg = 0; const v = [0, 0], visited = new Set(), combos = {}, full = new Set(); let simOk = false;
   const gp = () => new Set([...visited, 'AND']).size, met = () => gp() >= 4 && togg >= 6;
@@ -242,7 +243,7 @@ const kindLed = (o, qv, Q, done) => {
     $('.lres', o).textContent = `LED ${cur() ? 'menyala' : 'mati'}. ${ok ? 'Sesuai target!' : 'Belum sesuai target.'}`; done(ok) };
   draw();
 };
-/* ---------- renderer soal (dipakai Latihan & Evaluasi) ---------- */
+/* renderer soal (dipakai Latihan & Evaluasi) */
 const EVAL_TIME = 60;   // detik per soal Evaluasi
 function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, lives }) {
   clearInterval(panel._tm);
@@ -297,14 +298,14 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
   }
 }
 
-/* ---------- efek hasil: hitung naik, konfeti, lompatan karakter (transform/opacity saja; mati bila 'kurangi gerakan') ---------- */
+/* efek hasil: hitung naik, konfeti, lompatan karakter (transform/opacity saja; mati bila 'kurangi gerakan') */
 const still = () => matchMedia('(prefers-reduced-motion:reduce)').matches;
 const countUp = (el, to, fmt = x => x, ms = 750) => { if (!el || !to || still()) return; const t0 = performance.now(); el.textContent = fmt(0); (function f(t) { const k = Math.min(1, (t - t0) / ms); el.textContent = fmt(Math.round(to * (1 - (1 - k) ** 3))); k < 1 && requestAnimationFrame(f) })(t0) };
 const confetti = (host, n) => { if (!host || still()) return; for (let i = 0; i < n; i++) { const c = document.createElement('i'); c.className = 'cf'; c.style.cssText = `--x:${Math.round((Math.random() - .5) * 420)}px;--y:${-40 - Math.round(Math.random() * 110)}px;--r:${Math.round(Math.random() * 720 - 360)}deg;--d:${(Math.random() * .3).toFixed(2)}s;background:${pick(['#ffd54a', '#ff7eb6', '#8cd4ff', '#6fdc8c', '#fff'])}`; host.append(c); setTimeout(() => c.remove(), 1900) } };
 const hop = n => { const c = $('.cw canvas'); if (!c || still()) return; c.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-16px)', offset: .4 }, { transform: 'translateY(0)' }], { duration: 440, iterations: n, easing: 'cubic-bezier(0.23, 1, 0.32, 1)' }) };
 const starRow = (n, tot) => `<div class="stars" aria-label="${n} dari ${tot} bintang">${Array.from({ length: tot }, (_, k) => `<i class="${k < n ? 'on' : ''}" style="--i:${k}">★</i>`).join('')}</div>`;
 
-/* ---------- LATIHAN (Natsuki) ---------- */
+/* LATIHAN (Natsuki) */
 SC.latihan = () => {
   const S = scaffold('latihan'), DN = D.natsuki, N = 8, best = () => store.get('tkm_latihan_best', 0); let qs, i, sc, good, bad, wasBad, mx, lives;
   const begin = () => { qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; q() };
@@ -343,7 +344,7 @@ SC.latihan = () => {
   S.d.say([...entryExtra('natsuki'), ...pick(DN.intro), ...SL.enter('lat')]);
 };
 
-/* ---------- EVALUASI (Monika) ---------- */
+/* EVALUASI (Monika) */
 SC.evaluasi = () => {
   const S = scaffold('evaluasi'), DM = D.monika, N = EVAL_N, best = () => store.get('tkm_eval_best', null); let qs, i, right, log, lastK, late;
   const bestTxt = () => best() == null ? 'Belum ada' : `${best() * 10} (${best()}/${N} benar)`;
@@ -382,7 +383,7 @@ SC.evaluasi = () => {
   S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 
-/* ---------- suara hover: scrollMenu HANYA saat pointer berpindah ke sebuah opsi ---------- */
+/* suara hover: scrollMenu HANYA saat pointer berpindah ke sebuah opsi */
 // .sw (kotak A/B Simulasi) sengaja tidak masuk daftar: tanpa suara hover
 const HOV = '.btn,.tab,.opt,.cell,.mbtn'; let hv = null, lp = null;
 document.addEventListener('pointermove', e => {
@@ -393,7 +394,7 @@ document.addEventListener('pointermove', e => {
   Snd.sfx(t.matches('.opt,.cell') ? 'metronomeBar' : 'scrollMenu'); // opsi jawaban: metronomeBar
 });
 
-/* ---------- boot ---------- */
+/* boot */
 (async () => {
   Layout.init();
   document.addEventListener('pointerdown', e => spark(e, 5));
@@ -405,9 +406,11 @@ document.addEventListener('pointermove', e => {
     together = new Actor(await loadAtlas('assets/img/dokitogether'), { t: { name: 'Doki together club monika', fps: 12, loop: true } });
     await Snd.preload();   // SFX didecode sebelum tombol MULAI aktif
     const keys = Object.keys(CHARS);
-    warm = Promise.all([...keys.map(k => Character.load(k).then(c => chars[k] = c)), loadAtlas('assets/img/Text_Boxes'), loadImg('assets/img/DDLCbg.webp'), loadImg('assets/img/Music_Room.webp')]);
+    warm = Promise.all([loadAtlas('assets/img/Text_Boxes'), loadImg('assets/img/DDLCbg.webp'), loadImg('assets/img/Music_Room.webp')]);
     warm.catch(err => { msg.textContent = 'Gagal memuat asset.'; console.error(err) });
     msg.remove(); btn.disabled = false;
+    const pre = () => keys.reduce((p, k) => p.then(() => loadChar(k)), Promise.resolve()).catch(() => { });   // sisa karakter diunduh satu per satu di latar belakang
+    setTimeout(pre, 1500);
   } catch (err) { msg.textContent = 'Gagal memuat asset. Buka lewat GitHub Pages atau server lokal (python -m http.server), bukan dengan klik ganda file.'; console.error(err) }
   btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go('menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser)
 })();

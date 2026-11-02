@@ -1,4 +1,4 @@
-/* ===== story.js : MODE CERITA — Materi → Simulasi → Latihan → Evaluasi → akhir cerita, dengan keempat karakter =====
+/* story.js : MODE CERITA: Materi → Simulasi → Latihan → Evaluasi → akhir cerita, dengan keempat karakter 
    Dua sistem tampilan (sengaja dipisah):
    - Diskusi edukasi : potret statis di kiri (assets/img/portraits, satu gambar per ekspresi) + area materi besar di kanan.
    - Adegan cerita   : sprite TANPA mikrofon (assets/img/sprites, dari menucharacters Takeover), DIAM; yang berganti hanya pembicara.
@@ -12,7 +12,7 @@ const STEP_NAME = { n_intro: 'Pembukaan', materi: 'Materi', n_1: 'Menuju Simulas
 const NEXT_LABEL = { materi: 'LANJUT KE SIMULASI ▶', simulasi: 'LANJUT KE LATIHAN ▶', latihan: 'LANJUT KE EVALUASI ▶', evaluasi: 'LANJUT KE AKHIR CERITA ▶' };
 const L = (w, t, e) => [t, e, SK[w] ?? w];   // L('y', 'teks', 'explain')
 
-/* ---------- potret statis: ekspresi kode (sama dengan CHARS.expr) -> nama file di assets/img/portraits ---------- */
+/* potret statis: ekspresi kode (sama dengan CHARS.expr) -> nama file di assets/img/portraits */
 const PORT = {
   sayori: { neutral: 'neutral', calm: 'neutral', happy: 'happ', talk: 'wah', cheer: 'yeah', sad: 'concern', shock: 'ooh', down: 'concern' },
   yuri: { neutral: 'neutral', breath: 'neutral', shy: 'blush', talk: 'smile', happy: 'happy', explain: 'ahaha', shock: 'ahh', down: 'ehh' },
@@ -33,7 +33,7 @@ const PCACHE = {};   // satu objek Image per potret, dibuat sekali & didecode di
 const getPort = src => PCACHE[src] ??= (() => { const i = new Image(); i.src = src; i.decode && i.decode().catch(() => { }); return i })();
 const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set([...Object.values(PORT[k]), ...Object.values(POOL[k]).flat()]).forEach(n => getPort(`assets/img/portraits/${k}_${n}.webp`))); Object.keys(CHARS).forEach(k => getPort(`assets/img/sprites/${k}.webp`)) };
 
-/* ---------- kemajuan cerita (localStorage: tkm_story) ---------- */
+/* kemajuan cerita (localStorage: tkm_story) */
 Story.prog = () => store.get(Story.key, { step: 0, done: false, lat: null, ev: null });
 Story.save = p => store.set(Story.key, p);
 Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadExpr(); go(STEPS[p.step]) };
@@ -48,7 +48,7 @@ Story.chap = id => {
 };
 Story.menuSub = () => { const p = Story.prog(); return p.step > 0 ? `Lanjutkan: ${STEP_NAME[STEPS[p.step]]}` : p.done ? `Selesai · nilai ${p.ev * 10} · main lagi` : 'Belajar bareng semua karakter' };
 
-/* ---------- potret kiri (layout diskusi edukasi) ---------- */
+/* potret kiri (layout diskusi edukasi) */
 function makeCast(ptEl) {
   const img = $('img', ptEl), nm = $('.pn', ptEl), cast = {}; let cur = '';
   Object.keys(CHARS).forEach(k => cast[k] = {
@@ -63,7 +63,7 @@ function makeCast(ptEl) {
   return cast;
 }
 
-/* ---------- kerangka diskusi edukasi mode cerita (pengganti scaffold biasa, API sama) ---------- */
+/* kerangka diskusi edukasi mode cerita (pengganti scaffold biasa, API sama) */
 Story.scaffold = id => {
   const m = M[id], el = $('#scene'), n = STEPS.indexOf(id), tot = 4, no = [1, 3, 5, 7].indexOf(n) + 1;
   el.classList.add('story'); el.dataset.sec = id;
@@ -81,7 +81,7 @@ Story.scaffold = id => {
   return { ch: cast[m.key], d, panel: $('#panel'), chat };
 };
 
-/* ---------- adegan cerita: sprite diam + dialog multi-karakter ---------- */
+/* adegan cerita: sprite diam + dialog multi-karakter */
 const NPOS = { 1: [50], 2: [40, 60], 3: [31, 50, 69], 4: [24, 42, 59, 77] };   // pusat tiap karakter (% lebar layar) menurut jumlah karakter
 const NH = { sayori: 687, yuri: 782, natsuki: 628, monika: 793 };               // tinggi sprite (px asli, sudah dipangkas) -> tinggi relatif tetap
 /* ekspresi adegan cerita = sprite badan penuh per ekspresi (assets/img/expr/{k}_{nama}.webp, dari lembar ekspresi; sel berwatermark dibuang).
@@ -125,9 +125,7 @@ function narrScene(id) {
   scene = { cleanup() { clearInterval(watch); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
 }
 
-/* =====================================================================================
-   NASKAH CERITA
-   ===================================================================================== */
+/* NASKAH CERITA */
 const ST = {
   n_intro: {
     bg: 'DDLCbg', title: 'Klik kotak dialog untuk lanjut', go: 'MULAI BELAJAR: MATERI ▶', reveal: true,   // karakter masuk satu per satu saat pertama kali bicara
@@ -246,7 +244,7 @@ const ST = {
     }
   },
 
-  /* ----- komentar karakter lain di dalam tiap bagian (muncul kontekstual, bukan setiap baris) ----- */
+  /* komentar karakter lain di dalam tiap bagian (muncul kontekstual, bukan setiap baris) */
   materi: {
     enter: [L('y', 'Aku ikut menemani. Kalau ada istilah yang kurang jelas, tanya saja, nanti kujelaskan.', 'talk'), L('n', 'Dan kalau Sayori salah ngomong, aku yang koreksi!', 'smug'), L('s', 'Heiii~! Aku nggak sesering itu salah kok!', 'pout'), L('m', 'Sudah, sudah. Mulai dari halaman pertama saja.', 'calm')],
     pg: {
@@ -293,7 +291,7 @@ const ST = {
   }
 };
 
-/* ---------- pengait ke scene (dipanggil dari app.js; semuanya [] / no-op bila Mode Cerita mati) ---------- */
+/* pengait ke scene (dipanggil dari app.js; semuanya [] / no-op bila Mode Cerita mati) */
 const SL = {
   enter: k => Story.on ? ST[k].enter : [],
   materiPage: (p, first) => Story.on && first ? (ST.materi.pg[p] || []) : [],
@@ -303,7 +301,7 @@ const SL = {
   eval: (k, a) => Story.on ? (k === 'half' ? [pick(ST.eval.half)] : k === 'swap' ? (Math.random() < .5 ? ST.eval.swap : []) : ST.eval.end(a)) : []
 };
 
-/* ---------- tombol "lanjut cerita" yang muncul hanya setelah aktivitas wajib selesai ---------- */
+/* tombol "lanjut cerita" yang muncul hanya setelah aktivitas wajib selesai */
 Story.contBtn = (id, label = NEXT_LABEL[id]) => { const b = document.createElement('button'); b.className = 'btn big contstory'; b.textContent = label; b.onclick = () => { Snd.sfx('select'); Story.advance() }; return b };
 Story.record = (k, v) => { const p = Story.prog(); p[k] = v; Story.save(p) };
 

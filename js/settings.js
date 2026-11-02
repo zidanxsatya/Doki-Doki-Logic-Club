@@ -1,4 +1,4 @@
-/* ===== settings.js : pengaturan tersimpan (suara, mode tampilan, tata letak) + layout adaptif desktop/mobile ===== */
+/* settings.js : pengaturan tersimpan (suara, mode tampilan, tata letak) + layout adaptif desktop/mobile */
 const Settings = {
   data: { music: .55, sfx: .7, layout: 'auto', display: 'window', ...store.get('tkm_settings', {}) },
   save() { store.set('tkm_settings', this.data) },
@@ -36,6 +36,8 @@ const Layout = {
       s = por ? Math.min(w / 400, h / 640) : Math.min(h / 420, w / 700);
       st.style.cssText = `width:${w / s}px;height:${h / s}px;left:0;top:0;margin:0;transform-origin:0 0;transform:scale(${s})`;
     }
+    const cz = por ? Math.max(0, Math.min(230, 181 + (h / s - 711) * 1.58)) : 230;   // tinggi jatah karakter di layar potret: menyusut dulu, lalu hilang, supaya panel soal tidak terpotong di layar pendek
+    st.style.setProperty('--cz', cz + 'px'); st.style.setProperty('--cf', Math.max(.5, cz / 230)); document.body.classList.toggle('nochar', por && cz < 100);
     const changed = mob !== this.mobile || por !== this.portrait; this.mobile = mob; this.portrait = por;
     document.body.classList.toggle('m', mob); document.body.classList.toggle('p', por);
     if (changed) dispatchEvent(new Event('layoutchange'));

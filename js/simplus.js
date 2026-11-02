@@ -1,8 +1,8 @@
-/* ===== simplus.js : pemilih mode Simulasi (hanya mode mandiri) + SIMULASI+ (rangkaian gerbang gabungan) =====
+/* simplus.js : pemilih mode Simulasi (hanya mode mandiri) + SIMULASI+ (rangkaian gerbang gabungan) 
    Memakai ulang dari core.js/app.js: F, GL, wc, INK, gBody, Snd, go, SC, $, $$, M.
    Mode Cerita tidak lewat file ini: Story memanggil go('simulasi') langsung. Simulasi+ tanpa sprite, potret, atau dialog. */
 
-/* ---------- geometri & gambar gerbang (koordinat lokal sama dengan gateSVG) ---------- */
+/* geometri & gambar gerbang (koordinat lokal sama dengan gateSVG) */
 const gGeo = g => { const neg = /^(NAND|NOR|XNOR|NOT)$/.test(g), tip = g === 'NOT' ? 118 : /AND/.test(g) ? 127 : 130, ox = tip + (neg ? 12 : 0); return { neg, tip, ox, xi: 30, xo: ox + 22, ys: g === 'NOT' ? [50] : [32, 68] } };
 // (tx,ty) = posisi ujung kaki masuk (tengah) pada kanvas, s = skala
 const gGfx = (g, tx, ty, s) => {
@@ -15,7 +15,7 @@ const gGfx = (g, tx, ty, s) => {
   return h + '</g>';
 };
 
-/* ---------- suara Simulasi+: sintetis (tanpa file), mengikuti slider SFX & mute; hanya bunyi jika AudioContext sudah aktif ---------- */
+/* suara Simulasi+: sintetis (tanpa file), mengikuti slider SFX & mute; hanya bunyi jika AudioContext sudah aktif */
 const Sfx = (() => {
   const tone = (c, t, f0, f1, dur, type, vol, at = 0) => { const o = c.createOscillator(), g = c.createGain(), s = t + at; o.type = type; o.frequency.setValueAtTime(f0, s); if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, s + dur); g.gain.setValueAtTime(.0001, s); g.gain.exponentialRampToValueAtTime(vol, s + .006); g.gain.exponentialRampToValueAtTime(.0001, s + dur); o.connect(g); g.connect(c.destination); o.start(s); o.stop(s + dur + .03) };
   const S = {
@@ -32,7 +32,7 @@ const Sfx = (() => {
   return k => { const c = Snd.ac; if (Snd.muted || Snd.sv <= 0 || !c || c.state !== 'running') return; S[k](c, c.currentTime, clamp01(Snd.sv)) };
 })();
 
-/* ---------- pemilih mode: SIMULASI DASAR / SIMULASI+ ---------- */
+/* pemilih mode: SIMULASI DASAR / SIMULASI+ */
 SC.simpick = () => {
   const el = $('#scene');
   const plus = `<svg class="pkic" viewBox="0 0 200 90" aria-hidden="true">${gGfx('AND', 6, 26, .5)}${gGfx('XOR', 6, 64, .5)}${gGfx('OR', 118, 45, .55)}<path d="M66 26C92 26 92 35 118 35M67 64C92 64 92 55 118 55" stroke="#ff7eb6" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`;
@@ -46,14 +46,14 @@ SC.simpick = () => {
   scene = { cleanup() { el.innerHTML = ''; document.onkeydown = null } };
 };
 
-/* ---------- saklar input (pil) : dipakai di kanvas dan di kartu palet ---------- */
+/* saklar input (pil) : dipakai di kanvas dan di kartu palet */
 const pillG = (v, x0, cy, k) => `<rect x="${x0}" y="${cy - 15}" width="56" height="30" rx="15" fill="${v ? '#ff9cc6' : '#e6dcf5'}" stroke="${INK}" stroke-width="3"/><circle cx="${v ? x0 + 41 : x0 + 15}" cy="${cy}" r="11" fill="${INK}"/><text x="${v ? x0 + 41 : x0 + 15}" y="${cy + 5}" font-size="14" font-weight="800" fill="#fff" text-anchor="middle">${k}</text><text x="${v ? x0 + 15 : x0 + 41}" y="${cy + 7}" font-size="19" font-weight="800" fill="${v ? INK : '#8a6b86'}" text-anchor="middle">${v}</text>`;
 
-/* ---------- SIMULASI+ ---------- */
+/* SIMULASI+ */
 SC.simplus = () => {
   const el = $('#scene');
   const inCard = v => `<button class="xpi xin" data-g="in${v}" aria-label="Tambah input dengan nilai awal ${v}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 60 34" aria-hidden="true">${pillG(v, 2, 17, '+')}</svg><b>INPUT<span class="xv"> ${v}</span></b></button>`;
-  el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ PILIH MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari input dan gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
+  el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ <span class="lg">PILIH </span>MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari input dan gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
   <div class="xp">
     <div class="xpal" aria-label="Palet gerbang dan input">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}${inCard(0)}${inCard(1)}</div>
     <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xundo"><button class="btn sm" id="xun" aria-label="Urungkan (Ctrl+Z)" title="Urungkan (Ctrl+Z)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button><button class="btn sm xre" id="xre" aria-label="Ulangi (Ctrl+Y)" title="Ulangi (Ctrl+Y)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>

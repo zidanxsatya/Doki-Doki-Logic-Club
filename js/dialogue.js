@@ -1,9 +1,9 @@
-/* ===== dialogue.js : semua dialog karakter, dikelompokkan per kepribadian =====
+/* dialogue.js : semua dialog karakter, dikelompokkan per kepribadian 
    Format baris: [teks, ekspresi]. Kelompok berupa array -> dipilih acak oleh pick().
    Placeholder: {g} gerbang, {s} keadaan input, {y} output, {i} nomor soal, {N} jumlah soal, {r} benar, {t} kategori. */
 const D = {
 
-  /* ---------- SAYORI: ceria, hangat, sedikit ceroboh, suka melantur ---------- */
+  /* SAYORI: ceria, hangat, sedikit ceroboh, suka melantur */
   sayori: {
     intro: [
       [['Hai! Aku Sayori. Hari ini aku yang nemenin kamu belajar, jadi kalau nanti aku salah ngomong, pura-pura nggak dengar aja ya.', 'cheer'], ['Pelan-pelan aja. Kita mulai dari awal.', 'happy']],
@@ -40,7 +40,7 @@ const D = {
     ]
   },
 
-  /* ---------- YURI: pelan, memilih kata, bicara runtut; bersemangat kalau sudah menjelaskan ---------- */
+  /* YURI: pelan, memilih kata, bicara runtut; bersemangat kalau sudah menjelaskan */
   yuri: {
     intro: [
       [['Selamat datang di ruang simulasi. Di sini kamu bisa melihat gerbang logika bekerja langsung.', 'talk'], ['Pilih satu gerbang, ubah inputnya, lalu lihat apa yang terjadi pada LED.', 'explain']],
@@ -86,7 +86,7 @@ const D = {
     all: 'Ketujuh gerbang sudah kamu coba semuanya. Aku terkesan, kamu tekun sekali.'
   },
 
-  /* ---------- NATSUKI: ketus, blak-blakan, tsundere, diam-diam peduli ---------- */
+  /* NATSUKI: ketus, blak-blakan, tsundere, diam-diam peduli */
   natsuki: {
     intro: [
       [['Hmph. Jadi kamu mau latihan? Jangan salah paham, aku cuma kebetulan lagi senggang.', 'smug'], ['Kalau salah, kukasih petunjuk. Tapi jangan harap aku lembut.', 'hmph']],
@@ -137,7 +137,7 @@ const D = {
     record: ['Rekor barumu. ...Jangan geer, itu kebetulan.', 'Rekor baru? Selamat. Sekali ini aja aku bilang gitu.']
   },
 
-  /* ---------- MONIKA: tenang, percaya diri, hangat, suka menggoda; sedikit sadar diri ---------- */
+  /* MONIKA: tenang, percaya diri, hangat, suka menggoda; sedikit sadar diri */
   monika: {
     intro: [
       [['Oh, kamu datang. Pas sekali, aku baru selesai merapikan buku-buku klub.', 'happy'], ['Ada sepuluh soal hari ini. Aku nggak segalak kelihatannya, kok.', 'wink'], ['Duduk dulu, tarik napas. Tekan MULAI kalau sudah siap.', 'talk']],
@@ -184,13 +184,13 @@ const D = {
 };
 
 
-/* =====================================================================
+/* 
    DIALOG TAMBAHAN (ditambahkan di sekitar dialog yang sudah ada)
    from      : komentar saat pemain datang dari mode lain  { modeAsal: [[teks, ekspresi], ...] }
    enterBest : komentar tentang skor terbaik tersimpan ({b} = skor)
    poke      : reaksi saat karakter diklik berulang cepat
    lainnya   : reaksi khusus pada tindakan/kemajuan pemain
-   ===================================================================== */
+ */
 Object.assign(D.sayori, {
   from: {
     simulasi: [['Udah balik dari tempat Yuri? Dia pasti ngejelasinnya rapi. Aku suka dengerin dia, kayak dengerin dongeng.', 'happy'], ['Tadi main gerbang di tempat Yuri? Aku pernah mencet semua tombolnya barengan, terus bingung sendiri.', 'happy']],
