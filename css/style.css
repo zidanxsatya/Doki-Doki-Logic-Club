@@ -952,3 +952,9 @@ body.nochar.m.p .cw{display:none}
 .startcard:has(.goes){padding-bottom:18px}
 .qhd:has(.twrap)~.qo .mtime{visibility:hidden}
 .ck{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+
+/* v25: polish Mode Waktu + daftar tantangan */
+.qhd:has(.twrap){position:sticky;top:0;z-index:4;background:#fffafd;border:3px solid var(--ink);border-radius:14px;padding:6px 10px;box-shadow:0 3px 0 var(--ink);margin-bottom:8px}
+.m .qhd:has(.twrap){padding:4px 8px;margin-bottom:6px;border-width:2px;box-shadow:0 2px 0 var(--ink)}
+.xlh small{font:800 13px Nunito,sans-serif;letter-spacing:0;margin-left:10px;color:#8a6b86}
+.m.p .qo.c2 .opt{flex:1 1 calc(50% - 8px)}

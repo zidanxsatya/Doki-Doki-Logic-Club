@@ -248,14 +248,18 @@ const kindLed = (o, qv, Q, done) => {
 /* renderer soal (dipakai Latihan & Evaluasi) */
 const EVAL_TIME = 60;   // detik per soal Evaluasi
 function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, lives }) {
-  clearInterval(panel._tm); clearInterval(panel._tt);
+  clearInterval(panel._tm); clearInterval(panel._tt); document.removeEventListener('visibilitychange', panel._vc);
   panel.innerHTML = `<div class="qhd"><div class="qh">Soal ${i + 1} / ${n}</div>${reveal ? `<div class="qs" aria-hidden="true">${Array.from({ length: n }, (_, k) => `<i class="${k < i ? 'done' : k === i ? 'cur' : ''}"></i>`).join('')}</div>` : ''}${lives != null ? `<div class="lives" role="status" aria-label="Sisa nyawa ${lives}">${hearts(lives)}</div>` : ''}</div><div class="qq">${Q.q}</div><div class="qv">${Q.vis || ''}</div><div class="qo"></div><div class="qf"></div>`;
   const o = $('.qo', panel), f = $('.qf', panel); let locked = false, choice = -1;   // jawaban boleh diganti sampai menekan CEK JAWABAN (Latihan) / LANJUT (Evaluasi)
-  const done = ok => { locked = true; clearInterval(panel._tt); $('.tbar', panel)?.classList.add('stop'); onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
+  const done = ok => { locked = true; clearInterval(panel._tt); document.removeEventListener('visibilitychange', panel._vc); $('.tbar', panel)?.classList.add('stop'); onAns(ok); f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`; $('#qn').onclick = () => { Snd.sfx('select'); next() }; f.scrollIntoView({ block: 'nearest' }) }; // tombol aksi selalu terlihat di layar kecil
   if (timer) {   // Evaluasi: habis waktu = jawaban terpilih dihitung lalu pindah soal. Mode Waktu Latihan: soal dikunci, jawaban benar ditunjukkan, pemain menekan LANJUT.
     const tb = `<div class="tbar" aria-hidden="true"><i style="--t:${timer}s"></i></div><div class="tmr" role="timer" aria-label="Sisa waktu soal"></div>`;
     $('.qhd', panel).insertAdjacentHTML('beforeend', reveal ? `<div class="twrap">${tb}</div>` : tb);
-    const tm = $('.tmr', panel), bar = $('.tbar', panel), t0 = performance.now();
+    const tm = $('.tmr', panel), bar = $('.tbar', panel); let t0 = performance.now(), hid = 0, lastS = 99;
+    panel._vc = () => {   // layar mati / pindah tab: waktu berhenti, bar ikut berhenti
+      const now = performance.now(); if (document.hidden) { hid = now; bar.classList.add('stop') } else if (hid) { t0 += now - hid; hid = 0; if (!locked) bar.classList.remove('stop') }
+    };
+    document.addEventListener('visibilitychange', panel._vc);
     const timeUp = () => {
       $('.qo', panel).inert = $('.qv', panel).inert = true; clearInterval(panel._tm);
       const mc = !['det', 'match', 'led', 'tt'].includes(Q.kind), bs = $$('.opt', o); let ok = false;
@@ -264,9 +268,11 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
       onTime && onTime(choice < 0); done(ok);
     };
     const tick = () => {
-      if (!panel.isConnected) { clearInterval(panel._tt); return }
+      if (!panel.isConnected) { clearInterval(panel._tt); document.removeEventListener('visibilitychange', panel._vc); return }
+      if (hid) return;
       const left = Math.max(0, timer - (performance.now() - t0) / 1000), s = Math.ceil(left), low = left <= 10;
       tm.textContent = `${s >= 60 ? 1 : 0}:${String(s % 60).padStart(2, '0')}`; tm.classList.toggle('low', low); bar.classList.toggle('low', low);
+      if (reveal && s <= 3 && s !== lastS && left > 0) Snd.tick(); lastS = s;   // detak 3 detik terakhir (Mode Waktu)
       if (left <= 0) { clearInterval(panel._tt); if (locked) return; locked = true; Snd.sfx('cancelMenu'); if (reveal) return timeUp(); onAns(choice >= 0 && choice === Q.a); onTime && onTime(choice < 0); next() }
     };
     panel._tt = setInterval(tick, 250); tick();
@@ -296,7 +302,8 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
     else f.innerHTML = `<button class="btn" id="qn">${i + 1 < n ? 'LANJUT ▶' : 'SELESAI ▶'}</button>`, $('#qn').onclick = () => { Snd.sfx('select'); clearInterval(panel._tt); onAns(choice === Q.a); next() };
     f.scrollIntoView({ block: 'nearest' });
   };
-  o.classList.toggle('n5', Q.opts.length > 4);   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
+  o.classList.toggle('n5', Q.opts.length > 4);   // 4 pilihan pendek: 2 kolom di HP tegak
+  o.classList.toggle('c2', Q.opts.length === 4 && Q.opts.every(s => s.length <= 20));   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
   Q.opts.forEach((t, k) => {
     const b = document.createElement('button'); b.className = 'opt'; b.innerHTML = t; if (t.includes('<')) b.setAttribute('aria-label', t.replace(/<span class="ov">(.*?)<\/span>/g, 'bukan ($1)').replace(/<[^>]+>/g, ''));   // opsi bernotasi garis atas (NOT)
     b.onclick = () => {
@@ -317,8 +324,8 @@ const starRow = (n, tot) => `<div class="stars" aria-label="${n} dari ${tot} bin
 /* LATIHAN (Natsuki) */
 SC.latihan = () => {
   const S = scaffold('latihan'), DN = D.natsuki, N = 8, W = () => mode === 'waktu', bk = () => W() ? 'tkm_latihan_best_w' : 'tkm_latihan_best', best = () => store.get(bk(), 0), LIM = { tt: 45, det: 45, match: 45, led: 35 };   // detik per soal di Mode Waktu
-  let qs, i, sc, good, bad, wasBad, mx, lives, mode = 'santai', late = false, tout = 0;
-  const begin = m => { mode = m || mode; qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; late = false; tout = 0; q() };
+  let qs, i, sc, good, bad, wasBad, mx, lives, mode = 'santai', late = false, tout = 0, tq = 0, tsum = 0, tn = 0;
+  const begin = m => { mode = m || mode; qs = makeSet(N); i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; late = false; tout = 0; tsum = 0; tn = 0; q() };
   const cmb = pop => {   // lencana COMBO di kepala soal; hanya selama sesi, tidak disimpan
     const h = $('.qhd', S.panel); if (!h) return; let c = $('.combo', h); if (good < 2) { c?.remove(); return }
     if (!c) { c = document.createElement('div'); c.className = 'combo'; c.setAttribute('role', 'status'); h.append(c) }
@@ -332,10 +339,10 @@ SC.latihan = () => {
     else if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
     else if (i > 0 && i < N - 1 && Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(i === N - 1 ? pick(DN.last) : pick(DN.mid), 'talk');
-    queueMicrotask(() => cmb(false));
+    queueMicrotask(() => cmb(false)); tq = performance.now();
     renderQ(S.panel, qs[i], i, N, { reveal: true, lives, timer: W() ? LIM[qs[i].kind] || 30 : 0, onTime: () => { late = true; tout++ }, next: () => ++i < N && lives > 0 ? q() : end(),
       onPick: (k, prev) => { if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
-      const tu = late; late = false; const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
+      const tu = late; late = false; tsum += performance.now() - tq; tn++; const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
       if (!ok) { lives--; heartsUI() }
       if (ok) S.d.say([[DN.streakGood[good] ? pick(DN.streakGood[good]) : wb && Math.random() < .6 ? pick(DN.comeback) : pick(DN.praise), pick(['happy', 'smug'])], ...SL.lat('ok')]);
       else S.d.say([[(tu ? pick(LIFE_SAY.timeUp) : bad >= 2 ? pick(DN.streakBad[Math.min(bad, 3)]) : qs[i].kind === 'tt' && Math.random() < .6 ? pick(DN.ttOops) : pick(DN.oops)) + ' ' + pick(DN.hintIntro) + ' ' + qs[i].hint, pick(['angry', 'hmph'])], [lives ? `Nyawamu tinggal ${lives}.` : pick(LIFE_SAY.out), lives ? 'hmph' : 'angry'], ...SL.lat('bad')]);
@@ -343,7 +350,7 @@ SC.latihan = () => {
   };
   const end = () => {
     const out = lives <= 0 && i < N, prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set(bk(), sc);
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${tout ? `<p class="bestp">${IC.clock.replace('<svg','<svg class="ck"')}Kehabisan waktu: <b>${tout}×</b></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${W() && tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}Rata-rata <b>${Math.round(tsum / tn / 1000)} dtk</b>${tout ? ` · habis waktu <b>${tout}×</b>` : ''}</p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
     if (!Story.on) $('#go2').onclick = () => { Snd.sfx('select'); begin(W() ? 'santai' : 'waktu') };
     countUp($('.score', S.panel), sc, x => `${x} / ${N}`); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1);

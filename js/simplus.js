@@ -135,26 +135,37 @@ SC.simplus = () => {
 
   /* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi) */
   const CH = [
-    { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'] },
-    { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'] },
-    { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'] },
-    { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'] },
-    { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'] },
-    { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null },
-    { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null },
-    { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null }
+    { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'], lv: 'Mudah' },
+    { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'], lv: 'Mudah' },
+    { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'], lv: 'Sedang' },
+    { t: 'AND dari NOR saja', n: 2, y: '0001', ok: ['NOR'], lv: 'Sedang' },
+    { t: 'OR dari NOR saja', n: 2, y: '0111', ok: ['NOR'], lv: 'Sedang' },
+    { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
+    { t: 'XNOR dari AND, OR, dan NOT', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
+    { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'], lv: 'Sulit' },
+    { t: 'Sama atau beda: X = 1 bila A = B, tanpa XOR dan XNOR', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT', 'NAND', 'NOR'], lv: 'Sedang' },
+    { t: 'Brankas: X = 1 hanya untuk kode A = 1, B = 0, C = 1', n: 3, y: '00000100', ok: null, lv: 'Mudah' },
+    { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null, lv: 'Sedang' },
+    { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null, lv: 'Sedang' },
+    { t: 'Tombol kuis: X = 1 bila tepat satu input = 1', n: 3, y: '01101000', ok: null, lv: 'Sedang' },
+    { t: 'Pemilih (MUX): A = 0 pilih B, A = 1 pilih C', n: 3, y: '00110101', ok: null, lv: 'Sulit' },
+    { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null, lv: 'Sulit' },
+    { t: 'Paritas genap: X = 1 bila jumlah input 1 genap', n: 3, y: '10010110', ok: null, lv: 'Sulit' },
+    { t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, lv: 'Sulit' }
   ];
   const allowed = t => chi < 0 || (t[0] !== 'i' && (!CH[chi].ok || CH[chi].ok.includes(t)));
   const deny = t => { Sfx('bad'); say(t[0] === 'i' ? 'Input tantangan sudah disediakan. Pakai A, B, ... yang ada di kanvas.' : `Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad') };
   const list = $('.xlist', el);
   const openList = () => {
-    list.innerHTML = `<div class="xlh"><b>PILIH TANTANGAN</b><button class="xlx" aria-label="Tutup daftar">✕</button></div><div class="xlg">${CH.map((c, i) => `<button class="xli${i === chi ? ' cur' : ''}" data-i="${i}"><b>${i + 1}</b><span>${c.t}</span><i>${c.n} input${done.has(i) ? ' · ✓ selesai' : ''}</i></button>`).join('')}</div>`;
+    list.innerHTML = `<div class="xlh"><b>PILIH TANTANGAN<small>${done.size} / ${CH.length} selesai</small></b><button class="xlx" aria-label="Tutup daftar">✕</button></div><div class="xlg">${CH.map((c, i) => `<button class="xli${i === chi ? ' cur' : ''}" data-i="${i}"><b>${i + 1}</b><span>${c.t}</span><i>${c.n} input · ${c.lv}${done.has(i) ? ' · ✓ selesai' : ''}</i></button>`).join('')}</div>`;
     list.hidden = false; $('.xlx', list).onclick = () => { list.hidden = true };
     $$('.xli', list).forEach(b => b.onclick = () => startCh(+b.dataset.i)); Sfx('tick');
   };
   const startCh = i => {
     const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
-    for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: ch * (j + 1) / (c.n + 1) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
+    const yIn = j => c.n >= 4 ? (mob() ? 58 : 70) + j * (ch - 40 - (mob() ? 58 : 70)) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
+    for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: yIn(j) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
+    if (c.n >= 4) requestAnimationFrame(() => requestAnimationFrame(() => { if (chi === i) { I.forEach((n, j) => { n.y = yIn(j); clampI(n) }); render() } }));   // tinggi kanvas berubah setelah bilah tujuan muncul
     Sfx('tick'); say(`Tantangan ${i + 1}: ${c.t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
   };
   const exitCh = () => { chi = -1; solved = false; I.forEach(n => { delete n.lock }); Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };

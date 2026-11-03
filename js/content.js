@@ -71,7 +71,28 @@ const CONCEPT = [
   { q: 'Logika 1 sama dengan keadaan…', o: ['HIGH / ON', 'LOW / OFF', 'Tidak terdefinisi', 'Selalu salah'], a: 0, hint: '1 = HIGH = ON = benar.' },
   { q: 'Berapa banyak baris tabel kebenaran untuk 2 input?', o: ['4', '2', '3', '8'], a: 0, hint: '2 pangkat jumlah input.' },
   { q: 'NAND sama dengan…', o: ['NOT AND', 'AND NOT', 'OR NOT', 'NOT OR'], a: 0, hint: 'Nama "N" di depan berarti dibalik.' },
-  { q: 'Sensor dan tombol pada sistem kontrol berperan sebagai…', o: ['Input', 'Output', 'Gerbang', 'Catu daya'], a: 0, hint: 'Mereka mengirim informasi ke sistem.' }
+  { q: 'Sensor dan tombol pada sistem kontrol berperan sebagai…', o: ['Input', 'Output', 'Gerbang', 'Catu daya'], a: 0, hint: 'Mereka mengirim informasi ke sistem.' },
+  { q: 'Dua saklar yang dirangkai SERI (arus harus melewati keduanya) berperilaku seperti gerbang…', o: ['AND', 'OR', 'XOR', 'NOT'], a: 0, hint: 'Lampu hanya menyala kalau kedua saklar tertutup.' },
+  { q: 'Dua saklar yang dirangkai PARALEL (arus boleh lewat salah satunya) berperilaku seperti gerbang…', o: ['OR', 'AND', 'NAND', 'XNOR'], a: 0, hint: 'Cukup satu saklar tertutup agar lampu menyala.' },
+  { q: 'Salah satu gerbang universal, yang bisa dipakai menyusun semua gerbang lain, adalah…', o: ['NAND', 'XOR', 'AND', 'XNOR'], a: 0, hint: 'NAND dan NOR bisa membentuk gerbang apa pun.' },
+  { q: 'Hasil dari NOT (NOT A) adalah…', o: ['A', 'NOT A', '0', '1'], a: 0, hint: 'Dibalik dua kali, kembali ke nilai awal.' },
+  { q: 'Hasil dari A AND 0 selalu…', o: ['0', '1', 'A', 'NOT A'], a: 0, hint: 'AND butuh semua input 1, sedangkan satu inputnya sudah 0.' },
+  { q: 'Hasil dari A OR 1 selalu…', o: ['1', '0', 'A', 'NOT A'], a: 0, hint: 'OR cukup satu input 1, dan satu inputnya sudah 1.' },
+  { q: 'Hasil dari A XOR A (kedua inputnya sama) selalu…', o: ['0', '1', 'A', 'NOT A'], a: 0, hint: 'XOR hanya 1 kalau kedua input berbeda.' },
+  { q: 'Menurut hukum De Morgan, NOT (A AND B) sama dengan…', o: ['(NOT A) OR (NOT B)', '(NOT A) AND (NOT B)', 'A OR B', 'NOT A'], a: 0, hint: 'Balik tiap input, lalu tukar AND menjadi OR.' },
+  { q: 'Berapa banyak baris tabel kebenaran untuk 3 input?', o: ['8', '6', '9', '3'], a: 0, hint: '2 pangkat jumlah input: 2 × 2 × 2.' }
+];
+// situasi sehari-hari -> gerbang yang cocok
+const SKEN = [
+  ['AND', 'Brankas bank hanya terbuka kalau kunci fisik DAN kode PIN sama-sama benar.'],
+  ['AND', 'Mesin pemotong hanya jalan kalau tombol kiri dan tombol kanan ditekan bersamaan.'],
+  ['OR', 'Alarm rumah berbunyi kalau sensor pintu ATAU sensor jendela aktif.'],
+  ['OR', 'Lampu lorong menyala kalau ada gerakan atau tombol manual ditekan.'],
+  ['NOT', 'Lampu taman menyala saat sensor cahaya TIDAK mendeteksi cahaya (malam hari).'],
+  ['XOR', 'Lampu tangga dengan dua saklar (atas dan bawah): lampu menyala kalau posisi kedua saklar berbeda.'],
+  ['NAND', 'Lampu peringatan lift menyala kecuali kalau kedua pintu tertutup rapat.'],
+  ['NOR', 'Mode hemat daya aktif hanya kalau tidak ada gerakan dan tidak ada suara.'],
+  ['XNOR', 'Lampu hijau menyala kalau status dua sensor SAMA (sama-sama aktif atau sama-sama mati).']
 ];
 // ekspresi Boolean (HTML, NOT = garis atas); par: hasil AND/OR/XOR dikurung saat jadi input gerbang lain
 const BX = { AND: (a, b) => `${a} · ${b}`, OR: (a, b) => `${a} + ${b}`, XOR: (a, b) => `${a} ⊕ ${b}`, NAND: (a, b) => nb(`${a} · ${b}`), NOR: (a, b) => nb(`${a} + ${b}`), XNOR: (a, b) => nb(`${a} ⊕ ${b}`), NOT: a => nb(a) }, par = (g, s) => /^(AND|OR|XOR)$/.test(g) ? `(${s})` : s;
@@ -109,7 +130,18 @@ const QGEN = [
     return { kind: 'led', g, a: s0[0], b: two ? s0[1] : null, t, one, good, f, q: `Atur saklar agar LED ${t ? 'NYALA' : 'MATI'}${one ? ', dengan tepat satu saklar ON' : ''}.`, hint: `${HINT[g]}${one ? ' Cari kombinasi yang hanya menyalakan satu saklar.' : ''}` } },
   () => { // tabel kebenaran rangkaian gerbang + NOT
     const g = pick(G2);
-    return { kind: 'tt', g: g + '+NOT', n: 4, ans: [0, 1, 2, 3].map(i => F.NOT(F[g](i >> 1, i & 1))), vis: `<div class="card sm">${circ(g, 'NOT', { names: true, out: 'Y' })}</div>`, q: 'Lengkapi tabel kebenaran rangkaian ini (klik kotak "?" untuk mengubah 0/1).', hint: `Hitung ${g}(A,B) dulu, lalu balik hasilnya dengan NOT. ${HINT[g]}` } }
+    return { kind: 'tt', g: g + '+NOT', n: 4, ans: [0, 1, 2, 3].map(i => F.NOT(F[g](i >> 1, i & 1))), vis: `<div class="card sm">${circ(g, 'NOT', { names: true, out: 'Y' })}</div>`, q: 'Lengkapi tabel kebenaran rangkaian ini (klik kotak "?" untuk mengubah 0/1).', hint: `Hitung ${g}(A,B) dulu, lalu balik hasilnya dengan NOT. ${HINT[g]}` } },
+  () => { const [g, s] = pick(SKEN), opts = shuffle([g, ...shuffle(GL.filter(x => x !== g)).slice(0, 3)]);   // situasi nyata -> gerbang
+    return { kind: 'mc', q: `<b>Situasi:</b> ${s}<br>Gerbang logika yang paling cocok adalah ….`, opts, a: opts.indexOf(g), hint: HINT[g] } },
+  () => { const g = pick(G2), r = Math.random() * 4 | 0, y = i => i === r ? 1 - F[g](i >> 1, i & 1) : F[g](i >> 1, i & 1);   // cari baris yang salah
+    return { kind: 'mc', q: `Tabel kebenaran gerbang ${g} ini punya SATU baris yang salah. Baris yang mana?`, vis: `<div class="card sm"><table class="tt"><tr><th>A</th><th>B</th><th>Y</th></tr>${[0, 1, 2, 3].map(i => `<tr><td>${i >> 1}</td><td>${i & 1}</td><td>${y(i)}</td></tr>`).join('')}</table></div>`, opts: ['A = 0, B = 0', 'A = 0, B = 1', 'A = 1, B = 0', 'A = 1, B = 1'], a: r, hint: `${HINT[g]} Cocokkan tiap baris dengan aturan itu.` } },
+  () => { const g = pick(G2), c = [0, 1, 2, 3].filter(i => F[g](i >> 1, i & 1)).length, opts = shuffle([c, ...shuffle([0, 1, 2, 3, 4].filter(x => x !== c)).slice(0, 3)]);   // hitung baris bernilai 1
+    return { kind: 'mc', q: `Dari 4 kombinasi input (A, B), berapa kombinasi yang membuat gerbang ${g} berkeluaran 1?`, opts: opts.map(String), a: opts.indexOf(c), hint: `${HINT[g]} Isi tabelnya, lalu hitung angka 1 di kolom Y.` } },
+  () => { const a = rnd(), b = rnd(), y = rnd(), no = G2.filter(g => F[g](a, b) !== y), ok = G2.filter(g => F[g](a, b) === y), bad = pick(no), opts = shuffle([bad, ...shuffle(ok).slice(0, 3)]);   // gerbang yang mustahil
+    return { kind: 'mc', q: `Input A = ${a}, B = ${b} menghasilkan Y = ${y}. Gerbang mana yang TIDAK mungkin?`, opts, a: opts.indexOf(bad), hint: `Hitung tiap pilihan untuk A = ${a}, B = ${b}. Yang hasilnya bukan ${y} adalah jawabannya.` } },
+  () => { let g1, g2, c; do { [g1, g2] = [pick(G2), pick(['AND', 'OR', 'XOR', 'NAND', 'NOR'])]; c = [...Array(8).keys()].filter(i => F[g2](F[g1](i >> 2, (i >> 1) & 1), i & 1)).length } while (c < 1 || c > 7);   // hitung kombinasi rangkaian
+    const opts = shuffle([c, ...shuffle([1, 2, 3, 4, 5, 6, 7].filter(x => x !== c)).slice(0, 3)]);
+    return { kind: 'mc', q: 'Dari 8 kombinasi input A, B, C, berapa kombinasi yang membuat output X = 1?', vis: `<div class="card sm">${circ(g1, g2, { names: true, out: 'X' })}</div>`, opts: opts.map(String), a: opts.indexOf(c), hint: `Hitung ${g1}(A,B) dulu, lalu ${g2} dengan C, untuk tiap kombinasi. ${HINT[g1]}` } }
 ];
 const LIFE_SAY = {
   start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
@@ -118,8 +150,8 @@ const LIFE_SAY = {
   out: ['Nyawamu habis. Padahal tadi lumayan.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }
-// indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT
-const makeSet = n => shuffle([0, 1, 2, 3, 4, 5, 6, 10, 0, 2, 4, 5, 6, 1, 3, 7, 8, 9, 7, 9]).slice(0, n).map(i => QGEN[i]());
+// indeks QGEN: 0-6 soal lama, 7 detektif gerbang, 8 cocokkan simbol, 9 nyalakan LED, 10 tabel rangkaian gerbang+NOT, 11 situasi nyata, 12 cari baris salah, 13 hitung baris 1, 14 gerbang mustahil, 15 hitung kombinasi rangkaian
+const makeSet = n => shuffle([0, 2, 4, 5, 6, 1, 3, 10, 7, 8, 9, 11, 12, 13, 14, 15, 11, 12, 14, 15, 0, 2, 4, 7]).slice(0, n).map(i => QGEN[i]());
 
 
 
