@@ -932,3 +932,23 @@ body.m{--cs:.6}
 .m.p .panel{height:calc((100% - 36px - 140px - var(--cz,230px))/var(--pz))}
 .m.p .cw{transform:scale(calc(var(--cs) * var(--cf,1)))}
 body.nochar.m.p .cw{display:none}
+
+/* v24: Mode Waktu Latihan */
+.goes{display:flex;gap:12px;align-items:stretch}
+.goes .btn.big{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:7px 12px;font-size:26px;line-height:1.1}
+.goes .btn.big b{display:inline-flex;align-items:center;gap:7px;font-weight:inherit}
+.goes small{font:800 13px/1.2 Nunito,sans-serif;letter-spacing:0;opacity:.8}
+.goes svg{width:.9em;height:.9em;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.btn.big.tw{background:#ffd54a}
+.btn.big.tw:hover:not(:disabled){background:#ffe27a}
+@media (hover:none){.btn.big.tw:hover:not(:disabled){background:#ffd54a}}
+.twrap{flex:1 1 100%;order:9;display:flex;align-items:center;gap:10px}
+.heart.brk{transform-box:fill-box;transform-origin:center;animation:hbrk .5s var(--ease)}
+@keyframes hbrk{0%{transform:scale(1.5);fill:#ff4d7a}100%{transform:scale(1);fill:#e6dcf5}}
+.rside .btn.sm{margin-top:8px}
+.m .goes{gap:8px}.m .goes .btn.big{font-size:18px;padding:7px 6px}.m .goes small{font-size:11px}
+.m .twrap{gap:8px}.m .twrap .tbar{height:10px}
+.tbar.stop i{animation-play-state:paused}
+.startcard:has(.goes){padding-bottom:18px}
+.qhd:has(.twrap)~.qo .mtime{visibility:hidden}
+.ck{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
