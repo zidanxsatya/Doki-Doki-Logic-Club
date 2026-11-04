@@ -958,3 +958,35 @@ body.nochar.m.p .cw{display:none}
 .m .qhd:has(.twrap){padding:4px 8px;margin-bottom:6px;border-width:2px;box-shadow:0 2px 0 var(--ink)}
 .xlh small{font:800 13px Nunito,sans-serif;letter-spacing:0;margin-left:10px;color:#8a6b86}
 .m.p .qo.c2 .opt{flex:1 1 calc(50% - 8px)}
+
+/* v26: poles UI hasil + HUD Mode Waktu di layar mendatar */
+.ring{flex:none}
+.bestp{max-width:100%;box-sizing:border-box;text-align:center}.bestp span{min-width:0}
+body:not(.p) .qhd:has(.twrap){flex-wrap:nowrap;gap:8px;padding:3px 8px}
+body:not(.p) .qhd:has(.twrap) .twrap{order:2;flex:1 1 90px;min-width:0}
+body:not(.p) .qhd:has(.twrap) .lives{order:3;margin-left:0}
+body:not(.p) .qhd:has(.twrap) .combo{order:4;margin-left:0}
+body:not(.p) .qhd:has(.twrap) .qs{flex:none}body:not(.p) .qhd:has(.twrap) .qs i{width:18px}
+body:not(.p) .qhd:has(.twrap) .heart{width:22px;height:22px}
+.m:not(.p) .startcard.res .rside .bestp{margin-bottom:5px;padding:3px 12px;font-size:12px}
+.m:not(.p) .startcard.res .stars{margin-bottom:4px}.m:not(.p) .startcard.res .stars i{font-size:16px}
+.m:not(.p) .startcard.res .rside .btn.big{font-size:16px;padding:4px 16px}
+.m:not(.p) .startcard.res .rside .btn.sm{margin-top:4px;font-size:12px;padding:2px 10px}
+.m:not(.p) .startcard.res .ring{width:100px;height:100px}.m:not(.p) .startcard.res .ring .score{font-size:30px}
+.m:not(.p) .startcard.res .rbody{margin:0}
+.m:not(.p) .startcard.res h2{font-size:28px;padding:10px 0 0;margin-bottom:4px}
+.bestp span{text-wrap:balance}
+.m:not(.p) .startcard.res h2{margin-bottom:8px}
+
+/* v26b: soal harus muat di atas kotak dialog (desktop) */
+body:not(.m) .qhd:has(.twrap){padding:2px 10px;margin-bottom:6px}
+body:not(.p) .qo.detq{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;column-gap:18px}
+body:not(.p) .qo.detq .dact{grid-column:1/-1}
+body:not(.p) .qo.detq .dgrid{width:100%}
+body:not(.m) .qo.ttq{flex-direction:row;justify-content:center;align-items:center;gap:22px}
+body:not(.m) .mk,body:not(.m) .mn{min-height:46px}body:not(.m) .mk svg{height:42px}body:not(.m) .mcol{gap:6px}
+body:not(.m) .qv .circ{max-height:120px}
+body:not(.m) .qq{margin-bottom:8px;padding:8px 16px}
+body:not(.m) .qo.ttq .tt td{padding-top:1px;padding-bottom:1px}
+body:not(.m) .qv{margin-bottom:4px}
+.qo[inert] .opt:not(.ok):not(.bad),.qo[inert] .cell:not(.ok):not(.bad){opacity:.55}

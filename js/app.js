@@ -261,7 +261,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
     };
     document.addEventListener('visibilitychange', panel._vc);
     const timeUp = () => {
-      $('.qo', panel).inert = $('.qv', panel).inert = true; clearInterval(panel._tm);
+      $('.qo', panel).inert = $('.qv', panel).inert = true; clearInterval(panel._tm); $$('#chk, #ck, #lchk, .dact', panel).forEach(e => e.remove());   // tombol cek tidak berlaku lagi
       const mc = !['det', 'match', 'led', 'tt'].includes(Q.kind), bs = $$('.opt', o); let ok = false;
       if (mc) { ok = choice >= 0 && choice === Q.a; if (choice >= 0) { bs[choice].classList.remove('picked'); bs[choice].classList.add(ok ? 'ok' : 'bad') } bs[Q.a].classList.add('ok') }
       else if (Q.kind === 'tt') $$('.cell', o).forEach((c, r) => { c.textContent = Q.ans[r]; c.classList.add('ok') });
@@ -350,7 +350,7 @@ SC.latihan = () => {
   };
   const end = () => {
     const out = lives <= 0 && i < N, prev = best(), rec = prev > 0 && sc > prev; if (sc > prev) store.set(bk(), sc);
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${W() && tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}Rata-rata <b>${Math.round(tsum / tn / 1000)} dtk</b>${tout ? ` · habis waktu <b>${tout}×</b>` : ''}</p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div><div class="rside">${starRow(sc, N)}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${W() && tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}<span>Rata-rata <b>${Math.round(tsum / tn / 1000)} dtk</b>${tout ? ` · habis waktu <b>${tout}×</b>` : ''}</span></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
     if (!Story.on) $('#go2').onclick = () => { Snd.sfx('select'); begin(W() ? 'santai' : 'waktu') };
     countUp($('.score', S.panel), sc, x => `${x} / ${N}`); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1);
