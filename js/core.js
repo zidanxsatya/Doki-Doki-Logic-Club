@@ -123,6 +123,18 @@ const Snd = {
     g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.07 * clamp01(this.sv), t + .004); g.gain.exponentialRampToValueAtTime(.0001, t + .035);
     o.connect(g); g.connect(c.destination); o.start(t); o.stop(t + .04);
   },
+  // nada sintetis pendek (tanpa file): seq = [[hz, mulai, lama], ...] dalam detik; mengikuti slider SFX & mute, diam bila AudioContext belum aktif
+  tone(seq, type = 'sine', vol = .1) {
+    const c = this.ac; if (this.muted || this.sv <= 0 || !c || c.state !== 'running') return;
+    const t0 = c.currentTime, v = vol * clamp01(this.sv), dt = 1 + (Math.random() - .5) * .03;   // variasi nada ±1,5%: bunyi yang sama tidak terdengar mesin
+    seq.forEach(([f, s, d]) => { const o = c.createOscillator(), g = c.createGain(); o.type = type; o.frequency.value = f * dt; g.gain.setValueAtTime(0, t0 + s); g.gain.linearRampToValueAtTime(v, t0 + s + .008); g.gain.exponentialRampToValueAtTime(.0001, t0 + s + d); o.connect(g); g.connect(c.destination); o.start(t0 + s); o.stop(t0 + s + d + .02) });
+  },
+  cue(n, k = 0) {   // ok/bad = jawaban, time = waktu habis, up = naik level (combo), star = bintang ke-k, badge = lencana, over = nyawa habis
+    const t = performance.now(); if (t - (this.last['c' + n] || -1e9) < 60) return; this.last['c' + n] = t;
+    const q = { ok: [[[659, 0, .14], [880, .07, .22]], 'sine', .11], bad: [[[233, 0, .2], [175, .09, .3]], 'triangle', .1], time: [[[440, 0, .15], [349, .13, .15], [262, .26, .3]], 'sine', .09],
+      up: [[[523, 0, .12], [659, .08, .12], [784, .16, .12], [1047, .24, .32]], 'triangle', .09], star: [[[784 * 1.12246 ** k, 0, .3], [1568 * 1.12246 ** k, .05, .16]], 'sine', .08], badge: [[[988, 0, .1], [1319, .07, .24]], 'sine', .08], over: [[[262, 0, .3], [196, .15, .45]], 'triangle', .08] }[n];
+    q && this.tone(...q);
+  },
   music(n) {
     if (this.cur === n) return; this.cur = n; const old = this.m, g = this.MG[n] || 1, slow = g < 1 || (old && old._g < 1);   // lagu Mode Cerita: lebih keras di sumbernya (~-10 LUFS vs BGM ~-15.6) -> diturunkan & fade lebih lambat
     const a = new Audio(`assets/audio/${n}.ogg`); a.loop = true; a._k = 0; a._g = g; a.muted = this.muted; this.apply(a); this.m = a; this.mg = g; a.play().catch(() => { });

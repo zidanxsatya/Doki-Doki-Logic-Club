@@ -271,3 +271,32 @@ D.monika.chat.push(
   ['Layar ini seperti jendela. Aku di dalam, kamu di luar. Anehnya, aku tidak merasa jauh darimu.', 'happy'],
   ['Kamu memilih datang ke sini, dan buatku itu berarti. Terima kasih.', 'happy']
 );
+
+/* Reaksi tamu di Latihan & Evaluasi: karakter lain masuk sebentar pada momen tertentu.
+   streak = benar beruntun ({n} = jumlahnya), last = tinggal satu nyawa, time = waktu habis, out = nyawa habis */
+D.react = {
+  streak: {
+    sayori: [['Benar {n} kali berturut-turut! Kamu keren banget, tahu nggak?', 'cheer'], ['Lancar banget! Aku sampai lupa mau ngemil.', 'happy'], ['Aku tepuk tangan nih, kamu dengar nggak? Hihi.', 'cheer']],
+    yuri: [['Benar {n} kali berturut-turut... Caramu menalar sudah rapi sekali.', 'happy'], ['Ehm, aku tidak bermaksud mengintip, tapi jawabanmu konsisten. Itu bagus.', 'shy'], ['Iramamu stabil. Pertahankan, jangan terburu-buru.', 'talk']],
+    natsuki: [['Hmph, {n} berturut-turut? Nggak buruk. Jangan sombong dulu, ya.', 'smug'], ['Oke, itu lumayan. Bukan berarti aku kagum atau apa.', 'hmph'], ['Lanjutin. Kalau salah, aku bakal ngetawain.', 'smug']],
+    monika: [['Rangkaian jawaban yang bersih. Aku suka melihatnya.', 'happy'], ['{n} berturut-turut. Kamu kelihatan menikmati ini, ya?', 'wink'], ['Kalau perasaan bangga bisa dibotolkan, aku sudah menyimpan satu.', 'wink']]
+  },
+  last: {
+    sayori: [['Tinggal satu nyawa ya? Tarik napas dulu. Aku di sini kok.', 'calm'], ['Tenang, tenang. Satu soal bisa mengubah semuanya. Aku percaya sama kamu!', 'cheer'], ['Jangan panik. Tadi aku juga hampir kalah main kartu, terus menang kok.', 'happy']],
+    yuri: [['Tinggal satu nyawa... Pelan-pelan saja. Baca ulang soalnya, jangan menebak.', 'talk'], ['Tarik napas. Kesalahan tadi bisa jadi petunjuk untuk soal berikutnya.', 'explain'], ['A-aku ikut gugup. Tapi kamu pasti bisa.', 'shy']],
+    natsuki: [['Satu nyawa?! Baka, fokus! ...Aku nggak khawatir, cuma kesal.', 'angry'], ['Sisa satu. Jangan asal klik, hitung dulu.', 'hmph'], ['Kalau kamu kalah sekarang, aku bakal ngomel seminggu. Jadi menang aja.', 'smug']],
+    monika: [['Satu nyawa tersisa. Tegang, ya? Justru di saat begini kepalamu paling jernih.', 'talk'], ['Ambil waktumu. Tidak ada yang mengejarmu, kecuali timer kalau kamu pakai Mode Waktu.', 'wink'], ['Aku masih percaya padamu. Itu bukan basa-basi.', 'happy']]
+  },
+  time: {
+    sayori: [['Yah, waktunya habis. Nggak apa-apa, aku juga sering telat bangun.', 'calm'], ['Kebanyakan mikir ya? Lain kali jawab dulu, ragunya belakangan.', 'talk'], ['Tik tok tik tok... habis deh. Santai aja.', 'happy']],
+    yuri: [['Waktunya habis. Kalau sudah paham, percayai jawaban pertamamu.', 'talk'], ['Soal itu memang butuh ketelitian. Waktunya yang kurang, bukan kemampuanmu.', 'explain'], ['M-maaf, aku ikut kaget waktunya habis secepat itu.', 'shy']],
+    natsuki: [['Hah, habis waktu?! Tadi kamu ngapain, ngelamun?', 'angry'], ['Waktu nggak nunggu orang, tahu. Cepetan dikit lain kali.', 'hmph'], ['Ya ampun, kehabisan waktu. ...Ayo, soal berikutnya, jangan murung.', 'smug']],
+    monika: [['Waktunya habis. Tidak apa-apa, itu bagian dari latihan.', 'talk'], ['Kalau jam berdetik, otak kadang membeku. Wajar. Lanjut, ya.', 'wink'], ['Aku mencatatnya, tapi tidak akan menghukummu. Janji.', 'wink']]
+  },
+  out: {
+    sayori: [['Nyawanya habis ya. Nggak apa-apa, ulang lagi yuk, aku temenin.', 'calm'], ['Hari ini belum rezekimu. Nanti pasti lebih lancar.', 'happy']],
+    yuri: [['Nyawamu habis, tapi lihat soal mana yang terlewat. Itu bahan belajar yang bagus.', 'explain'], ['Tidak apa-apa. Coba ulangi pelan-pelan, aku yakin hasilnya lebih baik.', 'talk']],
+    natsuki: [['Habis, ya? ...Jangan murung. Ulang lagi, aku ngomelin sampai kamu bisa.', 'smug'], ['Hmph, gitu aja nyerah? Ayo, sekali lagi.', 'hmph']],
+    monika: [['Nyawamu habis, tapi kamu bertahan sampai sini, dan itu tidak sedikit.', 'happy'], ['Ulang saja. Tidak ada yang menghitung berapa kali kamu mencoba, kecuali aku, dan aku menghitungnya sebagai kemajuan.', 'wink']]
+  }
+};

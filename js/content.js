@@ -147,6 +147,7 @@ const LIFE_SAY = {
   start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
   startT: 'Mode waktu. Tiap soal ada batasnya dan kamu tetap punya 3 nyawa. Kehabisan waktu dihitung salah, jadi jangan kelamaan mikir.',
   timeUp: ['Waktunya habis. Itu dihitung salah.', 'Keburu habis. Kalau sudah tahu, jawab dulu, ragunya belakangan.', 'Tuh kan, habis. Jangan diam saja.'],
+  last: ['Nyawamu tinggal satu. Sekarang bukan waktunya menebak.', 'Satu nyawa lagi. Baca soalnya dua kali, baka.'],
   out: ['Nyawamu habis. Padahal tadi lumayan.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
 function shuffleOpts(c) { const idx = shuffle(c.o.map((_, i) => i)); return { q: c.q, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), hint: c.hint, vis: c.vis, e: c.e } }

@@ -990,3 +990,20 @@ body:not(.m) .qq{margin-bottom:8px;padding:8px 16px}
 body:not(.m) .qo.ttq .tt td{padding-top:1px;padding-bottom:1px}
 body:not(.m) .qv{margin-bottom:4px}
 .qo[inert] .opt:not(.ok):not(.bad),.qo[inert] .cell:not(.ok):not(.bad){opacity:.55}
+
+/* v28: titik progres hasil, pilihan masuk berurutan, ikon benar/salah, lencana hasil */
+.qs i.done.ok{background:#6fdc8c}.qs i.done.bad{background:#ff8f9c}
+.qo.enter>.opt{animation:rise .26s var(--ease) backwards}
+.qo.enter>.opt:nth-child(2){animation-delay:.04s}.qo.enter>.opt:nth-child(3){animation-delay:.08s}.qo.enter>.opt:nth-child(4){animation-delay:.12s}.qo.enter>.opt:nth-child(5){animation-delay:.16s}
+.opt.ok::before,.opt.bad::before{content:'';flex:none;width:20px;height:20px;background:center/contain no-repeat}
+.opt.ok::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M3.5 10.5l4.2 4.2 8.8-9.4' fill='none' stroke='%234a2040' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.opt.bad::before{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 4.5l11 11M15.5 4.5l-11 11' fill='none' stroke='%234a2040' stroke-width='3.2' stroke-linecap='round'/%3E%3C/svg%3E")}
+.srule{margin:-2px 0 8px;max-width:260px;text-align:center;font:700 13px/1.3 Nunito,sans-serif;color:var(--ink);text-wrap:balance}
+.bdg{display:flex;flex-wrap:wrap;justify-content:center;gap:5px;max-width:300px;margin:0 0 10px}
+.bd{padding:2px 10px;border-radius:999px;border:2.5px solid var(--ink);background:#fff7fb;color:var(--ink);font:800 13px/1.35 Nunito,sans-serif;box-shadow:0 2px 0 var(--ink);animation:popin .34s var(--ease) calc(var(--i,0)*70ms + .9s) backwards}
+.m .srule{font-size:12px;max-width:230px}.m .bd{font-size:12px;padding:1px 8px}
+.m:not(.p) .srule{display:none}.m:not(.p) .bdg{margin-bottom:4px;gap:3px;max-width:240px}.m:not(.p) .bd{font-size:11px;padding:0 7px;border-width:2px;box-shadow:0 1px 0 var(--ink)}
+.rl{display:flex;flex-direction:column;align-items:center;gap:12px}.rl .bdg{margin:0}
+.lres .rside .bestp{margin-bottom:8px}
+.m .srule{display:none}
+.m.p .lres .rl{display:contents}.m.p .lres .rbody{flex-wrap:wrap;row-gap:8px}.m.p .lres .rl .bdg{order:3;flex:0 0 100%;max-width:none}
