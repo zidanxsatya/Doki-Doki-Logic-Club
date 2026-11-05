@@ -1007,3 +1007,8 @@ body:not(.m) .qv{margin-bottom:4px}
 .lres .rside .bestp{margin-bottom:8px}
 .m .srule{display:none}
 .m.p .lres .rl{display:contents}.m.p .lres .rbody{flex-wrap:wrap;row-gap:8px}.m.p .lres .rl .bdg{order:3;flex:0 0 100%;max-width:none}
+
+/* v29: sprite tamu masuk halus; di layar potret tingginya dibatasi sama dengan tuan rumah */
+.m.p .cw{transform:scale(calc(var(--cs) * var(--cf,1) * var(--cg,1)))}
+.cw canvas.gin{animation:gin .22s var(--ease) backwards}
+@keyframes gin{from{opacity:0;translate:0 10px}}

@@ -95,8 +95,14 @@ function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
   el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
-  ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch, id === 'latihan' || id === 'evaluasi' ? chars : null), chat = bag(D[m.key].chat); let cur = ch;
-  d.onSpeaker = k => { const n = chars[k], w = $('.cw', el); if (!n || n === cur) return; cur.unmount(); n.mount(w); w.dataset.k = k; cur = n };   // tamu: sprite & kotak dialog berganti sebentar, kembali ke tuan rumah di baris berikutnya
+  ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch, id === 'latihan' || id === 'evaluasi' ? chars : null), chat = bag(D[m.key].chat); let cur = ch, hostH = 0;
+  d.onSpeaker = k => {
+    const n = chars[k], w = $('.cw', el); if (!n || n === cur) return;
+    if (cur === ch) hostH = cur.actor.canvas.getBoundingClientRect().height;   // tinggi tuan rumah = jatah karakter di layar potret
+    cur.unmount(); n.mount(w); w.dataset.k = k; cur = n; w.style.removeProperty('--cg');
+    const cv = w.firstElementChild; if (cv) { cv.classList.remove('gin'); void cv.offsetWidth; cv.classList.add('gin') }
+    if (n !== ch && hostH && Layout.mobile && Layout.portrait) { const gh = cv.getBoundingClientRect().height; if (gh > hostH) w.style.setProperty('--cg', (hostH / gh).toFixed(3)) }   // tamu lebih tinggi: diperkecil agar tidak menutupi panel soal
+  };   // tamu: sprite & kotak dialog berganti sebentar, kembali ke tuan rumah di baris berikutnya
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };
   addEventListener('pointerdown', act, true); addEventListener('keydown', act, true);
