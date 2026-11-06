@@ -7,7 +7,8 @@ const M = {
   materi: { id: 'materi', label: 'MATERI', key: 'sayori', music: 'sayoc', bg: 'DDLCbg', sub: 'Belajar dasar bersama kelas' },
   simulasi: { id: 'simulasi', label: 'SIMULASI', key: 'yuri', music: 'yuric', bg: 'DDLCbg', sub: 'Coba gerbang logika' },
   latihan: { id: 'latihan', label: 'LATIHAN', key: 'natsuki', music: 'natsc', bg: 'Music_Room', sub: 'Asah kemampuanmu' },
-  evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room', sub: '10 soal penilaian akhir' }
+  evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room', sub: '10 soal penilaian akhir' },
+  tutor: { id: 'tutor', label: 'PANDUAN', key: 'sayori', music: 'freakyMenu', bg: 'DDLCbg' }   // bukan bagian dari MODES: dibuka otomatis sekali dan dari Pengaturan
 };
 const SM = { n_intro: 'A_Story_of_Everyday_Life', materi: 'A_Wonderful_Happening' };   // lagu khusus Mode Cerita: pembuka & diskusi materi
 const MODES = [M.materi, M.simulasi, M.latihan, M.evaluasi];
@@ -26,7 +27,7 @@ async function go(id) {
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
   else if (id === 'peta') buildPeta();
-  else { markSeen(id); if (id !== 'simpick') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
+  else { markSeen(id); if (id !== 'simpick' && id !== 'tutor') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
   curId = id; await wait(40); f.classList.remove('on'); busy = false; Story.chap?.(id);
   if (pend && pend !== id) go(pend)
 }
@@ -36,7 +37,7 @@ function buildMenu() {
   const el = $('#menu');
   const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? 9 : 0, nowI = [1, 3, 5, 7].find(x => x >= cur);
   const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = [1, 3, 5, 7][k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
-  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '8 soal acak · mode Berantai', evaluasi: 'Nilai & kategori' };
+  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
@@ -77,7 +78,32 @@ function buildPeta() {
   el.classList.add('on');
 }
 
+/* PANDUAN: tutorial empat halaman. Tampil otomatis sekali pada kunjungan pertama (belum ada data tersimpan), bisa dibuka lagi dari Pengaturan. */
+const TOUR = [
+  { t: 'SELAMAT DATANG', say: [['Hai, aku Sayori. Panduan ini tidak sampai satu menit.', 'cheer']], b: '<p>Di klub ini, empat anggota membantumu belajar gerbang logika: AND, OR, NOT, dan kawan-kawannya.</p><p>Kamu membaca materi, mencoba sendiri, berlatih, lalu diuji.</p>' },
+  { t: 'URUTAN BELAJAR', say: [['Paling mudah: Materi, Simulasi, Latihan, lalu Evaluasi. Mau ditemani cerita? Mulai dari Cerita.', 'happy']], b: [['Cerita', 'Ikuti kisahnya bersama keempat anggota klub.'], ['Materi', 'Sayori: 11 halaman dan kartu ulang.'], ['Simulasi', 'Yuri: nyalakan saklar, lihat LED menyala.'], ['Latihan', 'Natsuki: soal acak, 3 nyawa. Ada mode Waktu dan Berantai.'], ['Evaluasi', 'Monika: 10 soal dan nilai akhir.']] },
+  { t: 'CARA MAIN', say: [['Salah itu bagian dari belajar. Kalau nyawa habis, tinggal ulangi.', 'calm']], b: [['Dialog', 'Klik kotak dialog untuk lanjut. Klik karakter untuk mengajaknya mengobrol.'], ['Soal', 'Pilih jawaban, lalu tekan CEK JAWABAN. Di Latihan, jawaban salah mengurangi nyawa.'], ['Kembali', 'Tombol ◀ MENU di kiri atas, atau tombol Esc di keyboard.']] },
+  { t: 'PETA DAN PENGATURAN', say: [['Itu saja. Selamat belajar!', 'cheer']], b: [['Peta', 'Di menu: bagian yang sudah dicoba, tantangan Simulasi+ yang selesai, dan skor terbaik.'], ['Penyimpanan', 'Kemajuan tersimpan di browser ini. Kalau data browser dihapus, kemajuan ikut hilang.'], ['Pengaturan', 'Atur suara dan tampilan, pasang game ke layar utama, atau buka panduan ini lagi.']] }
+];
+const firstVisit = () => !['tkm_intro', 'tkm_seen', 'tkm_story', 'tkm_latihan_best', 'tkm_latihan_best_w', 'tkm_eval_best', 'tkm_chain_best', 'tkm_ch'].some(k => store.get(k, null) != null);
+SC.tutor = () => {
+  store.set('tkm_intro', 1);
+  const S = scaffold('tutor'); let p = 0; const last = TOUR.length - 1;
+  const show = () => {
+    const t = TOUR[p];
+    S.panel.innerHTML = `<div class="startcard sc tour" data-k="${S.ch.key}"><h2>${t.t}</h2><div class="scb tb" aria-live="polite">${typeof t.b === 'string' ? t.b : `<dl class="tl">${t.b.map(([a, c]) => `<dt>${a}</dt><dd>${c}</dd>`).join('')}</dl>`}</div><div class="tpg">${p + 1} / ${TOUR.length}</div><div class="goes"><button class="btn big" id="tprev">${p ? '◀ KEMBALI' : 'LEWATI'}</button><button class="btn big" id="tnext">${p < last ? 'LANJUT ▶' : 'KE MENU ▶'}</button></div></div>`;
+    $('#tprev').onclick = () => { Snd.sfx('select'); p ? (p--, show()) : go('menu') };
+    $('#tnext').onclick = () => { Snd.sfx('select'); p < last ? (p++, show()) : go('menu') };
+    S.d.say(t.say);
+  };
+  const esc = document.onkeydown; document.onkeydown = e => { if (e.key === 'ArrowRight' && p < last) $('#tnext').click(); else if (e.key === 'ArrowLeft' && p) $('#tprev').click(); else esc(e) };
+  show();
+};
+
 /* PENGATURAN: volume musik, volume efek, mode tampilan, tata letak (tersimpan di localStorage) */
+let installEv = null;   // 'beforeinstallprompt' (Chrome/Android): disimpan agar tombol Pasang di Pengaturan bisa memunculkan dialog pemasangan
+addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEv = e });
+addEventListener('appinstalled', () => { installEv = null });
 function buildSettings() {
   const el = $('#settings'), cfg = Settings.data;
   el.innerHTML = `<div class="mbg"></div><div class="top"><button class="btn sm" id="sback">◀ MENU</button><b id="stitle">PENGATURAN</b></div>
@@ -86,6 +112,7 @@ function buildSettings() {
     <div class="srow"><label>Volume Efek Suara <b id="svv"></b></label><input type="range" id="sv" min="0" max="100" step="1" aria-label="Volume Efek Suara"></div>
     <div class="srow"><label>Mode Tampilan</label><div class="seg" id="sdisp"><button class="btn sm" data-v="window">Jendela</button><button class="btn sm" data-v="full">Desktop Fullscreen</button></div><small id="fsn"></small></div>
     <div class="srow"><label>Tata Letak</label><div class="seg" id="slay"><button class="btn sm" data-v="auto">Otomatis</button><button class="btn sm" data-v="desktop">Desktop</button><button class="btn sm" data-v="mobile">Mobile / Android</button></div><small>Otomatis menyesuaikan ukuran layar. Pilih Mobile / Android untuk tampilan ponsel.</small></div>
+    <div class="srow"><label>Panduan dan Aplikasi</label><div class="seg"><button class="btn sm" id="stour">Lihat panduan</button><button class="btn sm" id="sinst" hidden>Pasang di perangkat</button></div><small id="insn"></small></div>
   </div>
   <div class="setcard credcard" hidden>
     <p class="cnote">${CREDIT.note}</p>
@@ -99,6 +126,12 @@ function buildSettings() {
   mv.oninput = () => { paint(mv, '#mvv'); Snd.setMusic(mv.value / 100); Settings.set('music', Snd.mv) };   // hanya musik latar
   sv.oninput = () => { paint(sv, '#svv'); Snd.setSfx(sv.value / 100); Settings.set('sfx', Snd.sv) };       // hanya efek suara
   sv.onchange = () => Snd.sfx('select');                                                                  // contoh suara efek
+  $('#stour').onclick = () => { Snd.sfx('select'); go('tutor') };
+  const inst = $('#sinst'), insn = $('#insn'), paintInst = () => {
+    inst.hidden = !installEv;
+    insn.textContent = matchMedia('(display-mode: standalone)').matches || navigator.standalone ? 'Game ini sudah berjalan sebagai aplikasi.' : installEv ? 'Dipasang ke layar utama, dibuka tanpa bilah alamat browser.' : 'standalone' in navigator ? 'Di iPhone atau iPad: ketuk Bagikan, lalu Tambah ke Layar Utama.' : 'Jika browser mendukung, pilih Pasang aplikasi atau Install dari menu browser.'
+  };
+  inst.onclick = async () => { if (!installEv) return; Snd.sfx('select'); installEv.prompt(); await installEv.userChoice.catch(() => { }); installEv = null; paintInst() };
   const mark = () => {
     $$('#sdisp .btn').forEach(b => { b.classList.toggle('on', b.dataset.v === (Full.on ? 'full' : 'window')); if (b.dataset.v === 'full') b.disabled = !Full.ok });
     $$('#slay .btn').forEach(b => b.classList.toggle('on', b.dataset.v === Settings.data.layout));
@@ -110,7 +143,7 @@ function buildSettings() {
   const back = () => { Snd.sfx('cancelMenu'); cred.hidden ? go('menu') : showCred(false) };
   $('#sback').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   scene = { cleanup() { removeEventListener('settingschange', mark); document.onkeydown = null; el.innerHTML = '' } };
-  mark(); el.classList.add('on');
+  mark(); paintInst(); el.classList.add('on');
 }
 
 /* kerangka scene umum (latar kelas + karakter + dialog) */
@@ -492,5 +525,5 @@ document.addEventListener('pointermove', e => {
     const pre = () => keys.reduce((p, k) => p.then(() => loadChar(k)), Promise.resolve()).catch(() => { });   // sisa karakter diunduh satu per satu di latar belakang
     setTimeout(pre, 1500);
   } catch (err) { msg.textContent = 'Gagal memuat asset. Buka lewat GitHub Pages atau server lokal (python -m http.server), bukan dengan klik ganda file.'; console.error(err) }
-  btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go('menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser)
+  btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go(firstVisit() ? 'tutor' : 'menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser); kunjungan pertama langsung ke panduan
 })();
