@@ -300,3 +300,17 @@ D.react = {
     monika: [['Nyawamu habis, tapi kamu bertahan sampai sini, dan itu tidak sedikit.', 'happy'], ['Ulang saja. Tidak ada yang menghitung berapa kali kamu mencoba, kecuali aku, dan aku menghitungnya sebagai kemajuan.', 'wink']]
   }
 };
+
+/* Mode Berantai di Latihan (Natsuki). {n} = nomor level */
+D.natsuki.chain = {
+  first: ['Berantai, ya. Berani juga. Soal pertama gampang, jangan sombong dulu.', 'Tanpa batas soal. Berhenti kalau nyawamu habis, bukan kalau kamu capek. Siap?'],
+  mid: ['Lanjut. Jangan berhenti di tengah jalan.', 'Soal berikutnya sudah antre.', 'Fokus. Rangkaianmu belum putus.', 'Jangan lirik jam terus, lirik soalnya.', 'Masih kuat? Bagus. Terusin.'],
+  up: ['Level {n}. Mulai ada soal yang licik, dan waktumu menyusut. Hati-hati.', 'Naik ke level {n}. Aku belum mau bilang selamat, ini baru mulai.', 'Level {n}. Dari sini nggak ada soal gratisan lagi.'],
+  heal: ['Lima beruntun, jadi satu nyawa kukembalikan. Jangan disia-siakan.', 'Nih, satu nyawa balik. Anggap bonus, bukan hadiah.'],
+  end: {
+    low: ['Putus di level {n}. Nggak apa, itu baru pemanasan.', 'Level {n} dan sudah putus. Ulang lagi, aku masih mau lihat kamu lebih jauh.'],
+    mid: ['Sampai level {n}. Lumayan untuk yang tadinya ragu.', 'Level {n}. Nggak buruk, tapi aku tahu kamu bisa lebih jauh.'],
+    high: ['Level {n}?! Tch, oke, itu keren. Jangan geer.', 'Sampai level {n}. Aku sampai lupa mau ngomel.']
+  },
+  record: ['Rekor baru. Ya, ya, kuakui, kamu lebih jauh dari sebelumnya.', 'Lebih tinggi dari rekor lamamu. Jangan puas dulu.']
+};

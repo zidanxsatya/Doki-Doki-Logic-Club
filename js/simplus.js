@@ -32,6 +32,27 @@ const Sfx = (() => {
   return k => { const c = Snd.ac; if (Snd.muted || Snd.sv <= 0 || !c || c.state !== 'running') return; S[k](c, c.currentTime, clamp01(Snd.sv)) };
 })();
 
+/* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi) */
+const CH = [
+  { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'], lv: 'Mudah' },
+  { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'], lv: 'Mudah' },
+  { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'], lv: 'Sedang' },
+  { t: 'AND dari NOR saja', n: 2, y: '0001', ok: ['NOR'], lv: 'Sedang' },
+  { t: 'OR dari NOR saja', n: 2, y: '0111', ok: ['NOR'], lv: 'Sedang' },
+  { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
+  { t: 'XNOR dari AND, OR, dan NOT', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
+  { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'], lv: 'Sulit' },
+  { t: 'Sama atau beda: X = 1 bila A = B, tanpa XOR dan XNOR', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT', 'NAND', 'NOR'], lv: 'Sedang' },
+  { t: 'Brankas: X = 1 hanya untuk kode A = 1, B = 0, C = 1', n: 3, y: '00000100', ok: null, lv: 'Mudah' },
+  { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null, lv: 'Sedang' },
+  { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null, lv: 'Sedang' },
+  { t: 'Tombol kuis: X = 1 bila tepat satu input = 1', n: 3, y: '01101000', ok: null, lv: 'Sedang' },
+  { t: 'Pemilih (MUX): A = 0 pilih B, A = 1 pilih C', n: 3, y: '00110101', ok: null, lv: 'Sulit' },
+  { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null, lv: 'Sulit' },
+  { t: 'Paritas genap: X = 1 bila jumlah input 1 genap', n: 3, y: '10010110', ok: null, lv: 'Sulit' },
+  { t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, lv: 'Sulit' }
+];
+
 /* pemilih mode: SIMULASI DASAR / SIMULASI+ */
 SC.simpick = () => {
   const el = $('#scene');
@@ -65,7 +86,7 @@ SC.simplus = () => {
   </div>`;
   const svg = $('#xsvg', el), cv = $('.xcv', el), pal = $('.xpal', el), toast = $('.xtoast', el), stg = $('#stage');
   const MAXIN = 6, LET = 'ABCDEF';   // input bebas: A..F (maks. 6 -> tabel 64 baris)
-  const G = [], W = [], I = []; let stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set();
+  const G = [], W = [], I = []; let stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set(store.get('tkm_ch', []))   // tantangan selesai tersimpan (Peta Kemajuan membacanya);
   const gate = id => G.find(n => n.id === id), inp = id => I.find(n => n.id === id), into = (id, pin) => W.find(w => w.to.t === 'g' && w.to.id === id && w.to.pin === pin), yw = () => W.find(w => w.to.t === 'y');
   const SI = () => I.slice().sort((a, b) => a.name < b.name ? -1 : 1), curV = () => { const o = {}; I.forEach(n => o[n.id] = n.v); return o };   // urutan kolom tabel = urutan nama (A paling kiri / bit tertinggi)
 
@@ -133,26 +154,6 @@ SC.simplus = () => {
   };
   const toggleIn = id => { const n = inp(id); if (!n) return; hideTip(); n.v ^= 1; Sfx(n.v ? 'on' : 'off'); render() };
 
-  /* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi) */
-  const CH = [
-    { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'], lv: 'Mudah' },
-    { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'], lv: 'Mudah' },
-    { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'], lv: 'Sedang' },
-    { t: 'AND dari NOR saja', n: 2, y: '0001', ok: ['NOR'], lv: 'Sedang' },
-    { t: 'OR dari NOR saja', n: 2, y: '0111', ok: ['NOR'], lv: 'Sedang' },
-    { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
-    { t: 'XNOR dari AND, OR, dan NOT', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
-    { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'], lv: 'Sulit' },
-    { t: 'Sama atau beda: X = 1 bila A = B, tanpa XOR dan XNOR', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT', 'NAND', 'NOR'], lv: 'Sedang' },
-    { t: 'Brankas: X = 1 hanya untuk kode A = 1, B = 0, C = 1', n: 3, y: '00000100', ok: null, lv: 'Mudah' },
-    { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null, lv: 'Sedang' },
-    { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null, lv: 'Sedang' },
-    { t: 'Tombol kuis: X = 1 bila tepat satu input = 1', n: 3, y: '01101000', ok: null, lv: 'Sedang' },
-    { t: 'Pemilih (MUX): A = 0 pilih B, A = 1 pilih C', n: 3, y: '00110101', ok: null, lv: 'Sulit' },
-    { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null, lv: 'Sulit' },
-    { t: 'Paritas genap: X = 1 bila jumlah input 1 genap', n: 3, y: '10010110', ok: null, lv: 'Sulit' },
-    { t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, lv: 'Sulit' }
-  ];
   const allowed = t => chi < 0 || (t[0] !== 'i' && (!CH[chi].ok || CH[chi].ok.includes(t)));
   const deny = t => { Sfx('bad'); say(t[0] === 'i' ? 'Input tantangan sudah disediakan. Pakai A, B, ... yang ada di kanvas.' : `Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad') };
   const list = $('.xlist', el);
@@ -294,7 +295,7 @@ SC.simplus = () => {
       if (tr && w.scrollHeight > w.clientHeight + 1) { const k = stg.getBoundingClientRect().width / stg.offsetWidth, wr = w.getBoundingClientRect(), tb = tr.getBoundingClientRect(), hh = $('#xtt th', el).getBoundingClientRect().height; if (tb.top < wr.top + hh) w.scrollTop += (tb.top - wr.top - hh) / k; else if (tb.bottom > wr.bottom) w.scrollTop += (tb.bottom - wr.bottom) / k }
     }
     const msg = $('#xmsg', el), has = yw(), now = !!C && !!has && !nul && okN === rows && n === C.n;
-    if (now && !solved) { solved = true; done.add(chi); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
+    if (now && !solved) { solved = true; done.add(chi); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
     msg.textContent = C && has && !nul ? (now ? `✓ Benar! Semua ${rows} baris cocok dengan target (${G.length} gerbang).` : `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`)
       : !n ? 'Belum ada input. Seret kartu INPUT 0 atau INPUT 1 dari palet ke kanvas.' : !G.length && !has ? 'Belum ada gerbang. Tambahkan gerbang lalu sambungkan ke X.' : !has ? 'Hasil belum tersedia: X belum tersambung ke output gerbang atau input.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${SIn.map(x => `${x.name} = ${x.v}`).join(', ')}, maka X = ${yv}.`;
     const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E);

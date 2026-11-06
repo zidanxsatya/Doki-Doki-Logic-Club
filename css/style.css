@@ -1012,3 +1012,40 @@ body:not(.m) .qv{margin-bottom:4px}
 .m.p .cw{transform:scale(calc(var(--cs) * var(--cf,1) * var(--cg,1)))}
 .cw canvas.gin{animation:gin .22s var(--ease) backwards}
 @keyframes gin{from{opacity:0;translate:0 10px}}
+
+/* v30: Mode Berantai + Peta Kemajuan */
+.goes.g3{flex-wrap:wrap}
+.goes.g3 .btn.big{flex:1 1 calc(50% - 6px)}
+.goes.g3 .btn.big.ch{flex:1 1 100%}
+.btn.big.ch{background:#e6dcf5}
+.btn.big.ch:hover:not(:disabled){background:#efe7fa}
+@media (hover:none){.btn.big.ch:hover:not(:disabled){background:#e6dcf5}}
+.m .goes.g3 .btn.big.ch{padding:5px 6px}
+.heart.up{transform-box:fill-box;transform-origin:center}
+.panel .qh.lvup{background:var(--pink);color:var(--ink)}
+@media (prefers-reduced-motion:no-preference){
+  .heart.up{animation:hup .55s var(--ease)}
+  .panel .qh.lvup{animation:lvup .6s var(--ease)}
+}
+@keyframes hup{0%{transform:scale(.3)}60%{transform:scale(1.35)}100%{transform:scale(1)}}
+@keyframes lvup{0%{transform:scale(.8)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.mtools{display:flex;gap:10px}
+.mtools .btn{font-size:20px}
+.m .mtools{gap:8px}.m .mtools .btn{font-size:13px;padding:6px 12px}
+.pcard{padding:16px 18px 8px}
+.prow{display:grid;grid-template-columns:150px 1fr auto;align-items:center;gap:14px;width:100%;text-align:left;font:inherit;color:var(--ink);background:#fff;border:4px solid var(--ink);border-radius:14px;padding:10px 14px;margin:0 0 10px;cursor:pointer;box-shadow:0 4px 0 var(--ink);transition:background .12s}
+.prow:hover{background:var(--soft)}
+.prn{font:22px Anton,Impact,sans-serif;letter-spacing:2px}
+.pb{display:flex;flex-direction:column;gap:6px;min-width:0;font-weight:800;font-size:16px}
+.pb>span:first-child{display:flex;flex-wrap:wrap;gap:4px 14px}
+.pst{opacity:.65}.pst.on{opacity:1}
+.pg{font-weight:800;font-size:13px;letter-spacing:1px;color:var(--ink);opacity:.55}
+.pseg{display:grid;grid-template-columns:repeat(9,1fr);gap:4px}
+.pgrid{display:grid;grid-template-columns:repeat(17,1fr);gap:4px}
+.pseg i,.pc{height:14px;border:2px solid var(--ink);border-radius:5px;background:#fff}
+.pseg i.on,.pc.on{background:var(--pink)}
+.m .pcard{padding:10px 10px 2px}
+.m .prow{grid-template-columns:1fr;gap:6px;padding:8px 10px;margin-bottom:8px}.m .prn{font-size:18px}.m .pb{font-size:14px}.m .pg{display:none}
+.m .pgrid{gap:3px}.m .pseg i,.m .pc{height:12px;border-width:1.5px;border-radius:4px}
+.goes.g3 .btn.big.ch{flex-direction:row;gap:10px;padding:4px 12px}
+.m .goes.g3 .btn.big.ch{padding:4px 6px;gap:6px}

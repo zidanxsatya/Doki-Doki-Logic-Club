@@ -147,6 +147,7 @@ const LIFE_SAY = {
   start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
   startT: 'Mode waktu. Tiap soal ada batasnya dan kamu tetap punya 3 nyawa. Kehabisan waktu dihitung salah, jadi jangan kelamaan mikir.',
   timeUp: ['Waktunya habis. Itu dihitung salah.', 'Keburu habis. Kalau sudah tahu, jawab dulu, ragunya belakangan.', 'Tuh kan, habis. Jangan diam saja.'],
+  startB: 'Mode Berantai. Soal datang terus tanpa jeda, makin lama makin licik, dan waktunya makin pendek. Nyawamu tiga, dan tiap lima jawaban benar berturut-turut memulihkan satu.',
   last: ['Nyawamu tinggal satu. Sekarang bukan waktunya menebak.', 'Satu nyawa lagi. Baca soalnya dua kali, baka.'],
   out: ['Nyawamu habis. Padahal tadi lumayan.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
