@@ -173,6 +173,6 @@ Proyek ini non-komersial dan dibuat untuk keperluan belajar. Karakter, grafis, m
 - **Doki Doki Literature Club** dibuat oleh Dan Salvato dan Team Salvato. Karakter Sayori, Yuri, Natsuki, dan Monika milik mereka. Proyek ini mengikuti [IP Guidelines Team Salvato](https://teamsalvato.com/ip-guidelines): gratis dan non-komersial. Karya aslinya bisa didukung di [teamsalvato.com](https://teamsalvato.com).
 - **Doki Doki Takeover** dibuat oleh Jorge-SunSpirit dan kontributornya. Sprite, potret, latar, musik, dan efek suara berasal dari [repositori Doki Doki Takeover](https://github.com/Jorge-SunSpirit/Doki-Doki-Takeover) yang berlisensi Apache 2.0. Teks lisensinya ada di [`LICENSE-DokiDokiTakeover.txt`](LICENSE-DokiDokiTakeover.txt).
 - Font Anton dan Nunito memakai SIL Open Font License 1.1. Teks lisensinya ada di folder `assets/fonts`.
-- Ikon aplikasi (gerbang AND berisi hati) digambar khusus untuk proyek ini.
+- Ikon aplikasi memakai gambar karakter buatan pemilik proyek (`assets/icons/`), dengan latar yang diperluas untuk versi maskable Android dan iOS.
 
 Rincian aset per folder ada di [`CREDITS.md`](CREDITS.md). Daftar kredit juga tampil di dalam game, lewat Pengaturan > Credit.
