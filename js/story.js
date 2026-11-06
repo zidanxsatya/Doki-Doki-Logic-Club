@@ -38,7 +38,6 @@ Story.prog = () => store.get(Story.key, { step: 0, done: false, lat: null, ev: n
 Story.save = p => store.set(Story.key, p);
 Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadExpr(); go(STEPS[p.step]) };
 Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, STEPS.length - 1); Story.save(p); Story.on = true; go(STEPS[p.step]) };
-Story.index = () => STEPS.indexOf(Journey.last);
 /* kartu judul bab: muncul sebentar saat masuk bagian belajar lewat Mode Cerita; tidak menghalangi sentuhan */
 Story.chap = id => {
   const n = [1, 3, 5, 7].indexOf(STEPS.indexOf(id)) + 1; if (!Story.on || !n) return;
