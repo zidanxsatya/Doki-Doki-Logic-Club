@@ -23,7 +23,7 @@ Menu utama punya lima bagian belajar, ditambah Peta dan Pengaturan. Tiap bagian 
 
 | Bagian | Pemandu | Isi |
 |---|---|---|
-| Cerita | Keempat karakter | Sembilan langkah dari materi sampai evaluasi, dengan adegan cerita di antaranya. Beberapa adegan memberi pilihan jawaban. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
+| Cerita | Keempat karakter | Tiga belas langkah dari materi sampai evaluasi, dengan adegan cerita di antaranya. Setelah Latihan ada tiga kasus nyata (alarm toko, lampu tangga, brankas klub) yang dikerjakan dengan gerbang yang sudah dipelajari. Beberapa adegan memberi pilihan jawaban. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
 | Materi | Sayori | 11 halaman: pengertian rangkaian logika, input dan output, logika 0 dan 1, gerbang AND, OR, NOT, NAND, NOR, XOR, XNOR, dan tabel kebenaran. Setelah halaman terakhir ada Flash Card. |
 | Simulasi | Yuri | Simulasi Dasar untuk 7 gerbang dengan saklar input, LED output, dan tabel kebenaran. Simulasi+ untuk menyusun rangkaian sendiri dan mengerjakan 17 tantangan. |
 | Latihan | Natsuki | 16 jenis soal dalam tiga mode: Santai, Waktu, dan Berantai. Hasil berupa bintang, lencana, dan skor terbaik. |
@@ -63,6 +63,8 @@ Di semua mode ada combo untuk jawaban benar beruntun, dan karakter lain sesekali
 
 ### Mode Cerita
 
+Tiga kasus nyata muncul setelah Latihan dan sebelum Evaluasi. Pemain memilih gerbang untuk tiap tahap rangkaian (misalnya OR lalu AND pada alarm), dan rangkaian langsung diuji dengan lima skenario. Setiap skenario menampilkan hasil yang diharapkan dan hasil rangkaian pemain. Tombol petunjuk menjelaskan tahap pertama yang masih salah, dan tombol lanjut baru muncul setelah semua skenario lolos.
+
 Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulasi terpenuhi, dan Latihan serta Evaluasi selesai. Keempat bagian lain bisa dibuka kapan saja dari menu.
 
 ### Pengaturan
@@ -85,6 +87,8 @@ Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulas
 | Simulasi Dasar | Simulasi+ |
 | ![Latihan](docs/screenshots/latihan.webp) | ![Evaluasi](docs/screenshots/evaluasi.webp) |
 | Latihan | Evaluasi |
+| ![Kasus alarm](docs/screenshots/kasus-alarm.webp) | ![Kasus brankas](docs/screenshots/kasus-brankas.webp) |
+| Kasus nyata: alarm toko | Kasus nyata: brankas klub |
 
 Tampilan di HP (potret):
 
@@ -143,6 +147,7 @@ CREDITS.md            daftar atribusi aset
 | Halaman materi, kartu Flash Card, bank soal, kategori nilai | `js/content.js` |
 | Gaya bicara karakter | `js/dialogue.js` |
 | Naskah dan pilihan di Mode Cerita | `js/story.js` |
+| Kasus nyata (sinyal, tahap, gerbang jawaban, skenario) | `js/story.js` (konstanta `KASUS`) |
 | Tantangan Simulasi+ | `js/simplus.js` (konstanta `CH`) |
 | Isi panduan kunjungan pertama | `js/app.js` (konstanta `TOUR`) |
 | Jumlah dan durasi soal Evaluasi | `EVAL_N` di `js/content.js`, `EVAL_TIME` di `js/app.js` |
@@ -157,7 +162,7 @@ Semuanya disimpan di `localStorage` browser pemain. Tidak ada data yang dikirim 
 | Kunci | Isi |
 |---|---|
 | `tkm_settings` | Volume, mode tampilan, tata letak |
-| `tkm_story` | Kemajuan Mode Cerita |
+| `tkm_story` | Kemajuan Mode Cerita, termasuk jumlah kasus nyata yang selesai |
 | `tkm_latihan_best` | Skor terbaik Latihan Santai |
 | `tkm_latihan_best_w` | Skor terbaik Latihan Mode Waktu |
 | `tkm_chain_best` | Rekor Mode Berantai (jumlah benar dan level) |

@@ -7,8 +7,9 @@
 
 const Story = { on: false, key: 'tkm_story' };
 const SK = { s: 'sayori', y: 'yuri', n: 'natsuki', m: 'monika' };
-const STEPS = ['n_intro', 'materi', 'n_1', 'simulasi', 'n_2', 'latihan', 'n_3', 'evaluasi', 'n_end'];
-const STEP_NAME = { n_intro: 'Pembukaan', materi: 'Materi', n_1: 'Menuju Simulasi', simulasi: 'Simulasi', n_2: 'Menuju Latihan', latihan: 'Latihan', n_3: 'Menuju Evaluasi', evaluasi: 'Evaluasi', n_end: 'Penutup' };
+const STEPS = ['n_intro', 'materi', 'n_1', 'simulasi', 'n_2', 'latihan', 'n_3', 'k_alarm', 'k_tangga', 'k_brankas', 'n_4', 'evaluasi', 'n_end'];
+const CHAPI = ['materi', 'simulasi', 'latihan', 'evaluasi'].map(id => STEPS.indexOf(id));   // indeks 4 bab belajar (kartu judul bab, langkah di menu)
+const STEP_NAME = { n_intro: 'Pembukaan', materi: 'Materi', n_1: 'Menuju Simulasi', simulasi: 'Simulasi', n_2: 'Menuju Latihan', latihan: 'Latihan', n_3: 'Menuju Kasus Nyata', k_alarm: 'Kasus 1: Alarm', k_tangga: 'Kasus 2: Lampu Tangga', k_brankas: 'Kasus 3: Brankas', n_4: 'Menuju Evaluasi', evaluasi: 'Evaluasi', n_end: 'Penutup' };
 const NEXT_LABEL = { materi: 'LANJUT KE SIMULASI ▶', simulasi: 'LANJUT KE LATIHAN ▶', latihan: 'LANJUT KE EVALUASI ▶', evaluasi: 'LANJUT KE AKHIR CERITA ▶' };
 const L = (w, t, e) => [t, e, SK[w] ?? w];   // L('y', 'teks', 'explain')
 
@@ -34,13 +35,14 @@ const getPort = src => PCACHE[src] ??= (() => { const i = new Image(); i.src = s
 const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set([...Object.values(PORT[k]), ...Object.values(POOL[k]).flat()]).forEach(n => getPort(`assets/img/portraits/${k}_${n}.webp`))); Object.keys(CHARS).forEach(k => getPort(`assets/img/sprites/${k}.webp`)) };
 
 /* kemajuan cerita (localStorage: tkm_story) */
-Story.prog = () => store.get(Story.key, { step: 0, done: false, lat: null, ev: null });
+/* v33 menyisipkan 4 langkah (3 kasus + jembatan) sebelum Evaluasi: simpanan lama (tanpa v) digeser sekali */
+Story.prog = () => { const p = store.get(Story.key, null); if (!p) return { step: 0, done: false, lat: null, ev: null, v: 2 }; if (p.v !== 2) { if (p.step >= 7) p.step += 4; p.v = 2; Story.save(p) } return p };
 Story.save = p => store.set(Story.key, p);
 Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadExpr(); go(STEPS[p.step]) };
 Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, STEPS.length - 1); Story.save(p); Story.on = true; go(STEPS[p.step]) };
 /* kartu judul bab: muncul sebentar saat masuk bagian belajar lewat Mode Cerita; tidak menghalangi sentuhan */
 Story.chap = id => {
-  const n = [1, 3, 5, 7].indexOf(STEPS.indexOf(id)) + 1; if (!Story.on || !n) return;
+  const n = CHAPI.indexOf(STEPS.indexOf(id)) + 1; if (!Story.on || !n) return;
   $('.chap')?.remove(); const c = document.createElement('div'); c.className = 'chap'; c.setAttribute('role', 'status'); c.setAttribute('aria-label', `Bab ${n}: ${STEP_NAME[id]}`);
   c.innerHTML = `<b class="cn">${n}</b><span class="ct">${STEP_NAME[id]}</span><span class="cd" aria-hidden="true">${[1, 2, 3, 4].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
   $('#stage').append(c); setTimeout(() => c.remove(), 2000);
@@ -64,7 +66,7 @@ function makeCast(ptEl) {
 
 /* kerangka diskusi edukasi mode cerita (pengganti scaffold biasa, API sama) */
 Story.scaffold = id => {
-  const m = M[id], el = $('#scene'), n = STEPS.indexOf(id), tot = 4, no = [1, 3, 5, 7].indexOf(n) + 1;
+  const m = M[id], el = $('#scene'), n = STEPS.indexOf(id), tot = 4, no = CHAPI.indexOf(n) + 1;
   el.classList.add('story'); el.dataset.sec = id;
   el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b><i class="hintc">Cerita ${no}/${tot}</i></div><div id="panel" class="panel"></div><div class="pt"><span class="pn"></span><img alt=""></div><div class="dlg"></div>`;
   const cast = makeCast($('.pt', el)), d = new Dialogue($('.dlg', el), cast[m.key], cast), bags = {}, chatOf = k => (bags[k] ??= bag(D[k].chat))();
@@ -95,8 +97,8 @@ const exSrc = (k, e) => { const pl = EX[k][e], n = pl && nextOf(pl, 's' + k + e)
 const preloadExpr = () => Object.keys(EX).forEach(k => new Set(Object.values(EX[k]).flat().filter(Boolean)).forEach(n => getPort(`assets/img/expr/${k}_${n}.webp`)));
 function narrScene(id) {
   const A = ST[id], el = $('#scene'), lines = typeof A.lines === 'function' ? A.lines() : A.lines;
-  const all = [...lines, ...(A.ask ? A.ask.opts.flatMap(o => o.lines) : [])], keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => all.some(l => l[2] === k)), pos = NPOS[keys.length];
-  el.classList.add('narr');
+  const all = [...lines, ...(A.win || []), ...(A.hints || []), ...(A.ask ? A.ask.opts.flatMap(o => o.lines) : [])], keys = ['sayori', 'yuri', 'natsuki', 'monika'].filter(k => all.some(l => l[2] === k)), pos = NPOS[keys.length];
+  el.classList.add('narr'); el.classList.toggle('kz', !!A.kz);
   el.innerHTML = `<div class="bg" data-b="${A.bg}" style="background-image:url(assets/img/${A.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>CERITA</b><i class="hintc">${A.title}</i></div>
   <div class="nar">${keys.map((k, i) => `<div class="ns" data-k="${k}" style="--x:${pos[i]}%;--h:${NH[k]}"><img alt="" src="assets/img/sprites/${k}.webp"></div>`).join('')}</div><div id="panel" class="panel npanel"></div><div class="dlg"></div><button class="btn big ngo" hidden>${A.go || 'LANJUT ▶'}</button>`;
   const cast = {}; keys.forEach(k => cast[k] = { key: k, cfg: CHARS[k], setExpression(e) { const im = $(`.ns[data-k=${k}] img`, el), src = exSrc(k, e); if (im && !im.src.endsWith(src)) im.src = src } });
@@ -105,7 +107,7 @@ function narrScene(id) {
   if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
   d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
-  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el)); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
+  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el), d); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
   /* pilihan (A.ask): dialog sampai pertanyaan -> kartu pilihan -> reaksi sesuai pilihan -> sisa dialog (setelah A.skip baris). Tanpa A.ask: perilaku lama. */
   const ask = A.ask, first = ask ? lines.slice(0, ask.at + 1) : lines, rest = ask ? lines.slice(ask.at + 1 + (ask.skip || 0)) : [];
   let phase = ask ? 0 : 2;   // 0 = sebelum pilihan, 1 = menunggu pilihan, 2 = setelah
@@ -121,7 +123,7 @@ function narrScene(id) {
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
   $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === lines[0][2]));
   el.classList.add('on');
-  scene = { cleanup() { clearInterval(watch); d.destroy(); el.classList.remove('narr'); el.innerHTML = ''; document.onkeydown = null } };
+  scene = { cleanup() { clearInterval(watch); d.destroy(); el.classList.remove('narr', 'kz'); el.innerHTML = ''; document.onkeydown = null } };
 }
 
 /* NASKAH CERITA */
@@ -198,14 +200,31 @@ const ST = {
     ]
   },
   n_3: {
-    bg: 'Music_Room', title: 'Latihan selesai', go: 'KE EVALUASI AKHIR ▶',
+    bg: 'Music_Room', title: 'Latihan selesai', go: 'KE KASUS NYATA ▶',
+    ask: { at: 4, q: 'Menurutmu, gerbang logika paling sering muncul di mana?', opts: [
+      { t: 'Alarm dan sensor', lines: [L('m', 'Tepat. Itu kasus pertama kita.', 'happy'), L('n', 'Jangan senang dulu. Menyusunnya tidak segampang menyebutnya.', 'smug')] },
+      { t: 'Lampu dan saklar', lines: [L('s', 'Lampu tangga di rumahku begitu! Nanti kita bahas.', 'cheer'), L('y', 'Itu kasus kedua. Kamu menebak urutannya dengan baik.', 'happy')] },
+      { t: 'Belum kepikiran', lines: [L('y', 'Wajar. Justru itu yang mau kita lihat sekarang.', 'calm'), L('s', 'Tenang, nanti kebayang sendiri!', 'happy')] }
+    ] },
+    lines: [
+      L('m', 'Latihan selesai. Sebelum Evaluasi, ada satu hal yang mau kami tunjukkan.', 'calm'),
+      L('s', 'Kasus nyata! Gerbang yang kamu pelajari ternyata dipakai di sekitar kita.', 'cheer'),
+      L('n', 'Bukan teori doang. Kamu yang menyusun rangkaiannya, kami yang mengujinya.', 'smug'),
+      L('y', 'Ada tiga kasus: alarm, lampu tangga, dan brankas. Masing-masing memakai gerbang yang sudah kamu kenal.', 'explain'),
+      L('m', 'Sebelum mulai: menurutmu gerbang logika paling sering muncul di mana?', 'talk'),
+      L('y', 'Alarm, lampu, pintu otomatis, mesin cuci. Semuanya memutuskan sesuatu dari beberapa sinyal.', 'explain'),
+      L('s', 'Ayo mulai dari alarm!', 'cheer')
+    ]
+  },
+  n_4: {
+    bg: 'Music_Room', title: 'Kasus selesai', go: 'KE EVALUASI AKHIR ▶',
     ask: { at: 6, q: 'Bagaimana perasaanmu menjelang evaluasi?', opts: [
       { t: 'Gugup sedikit', lines: [L('m', 'Wajar. Tarik napas dulu, lalu kerjakan satu soal demi satu soal.', 'calm'), L('s', 'Tenang, kamu nggak sendirian di sini!', 'cheer')] },
       { t: 'Siap!', lines: [L('n', 'Percaya diri itu bagus. Asal tetap teliti, ya.', 'smug'), L('m', 'Wah, semangatmu kebawa ke aku.', 'happy')] },
       { t: 'Lapar, mau cupcake', lines: [L('n', 'D-dasar! Fokus ujian dulu, cupcake belakangan!', 'angry'), L('s', 'Hehe, ujung-ujungnya selalu ke cupcake.', 'playful')] }
     ] },
     lines: [
-      L('m', 'Latihan selesai. Sekarang bagian yang paling kutunggu: Evaluasi akhir.', 'calm'),
+      L('m', 'Tiga kasus selesai. Sekarang bagian yang paling kutunggu: Evaluasi akhir.', 'calm'),
       L('s', 'Kamu pasti bisa! Aku sudah siapin permen keberuntungan!', 'playful'),
       L('n', 'Permen apanya... Tapi, ya, jangan gugup. Kamu sudah jauh lebih baik dibanding tadi pagi. B-bukan berarti aku khawatir, ya!', 'shy'),
       L('m', 'Dua kalimat pertama itu perhatian, Natsuki. Kalimat terakhirnya pembelaan diri.', 'wink'),
@@ -290,6 +309,95 @@ const ST = {
   }
 };
 
+/* KASUS NYATA (v33): pemain memilih gerbang untuk tiap tahap, rangkaiannya diuji dengan skenario.
+   in = sinyal masuk (urutan = urutan nilai di sc); st = tahap [{id, in, opts, ans, name, hint}], tahap terakhir = keluaran; sc = [...nilai input, teks skenario]. 'KABEL' = sinyal diteruskan tanpa gerbang. */
+const KASUS = {
+  k_alarm: {
+    no: 1, bg: 'DDLCbg', title: 'Kasus 1 dari 3: Alarm toko', go: 'KASUS BERIKUTNYA ▶', name: 'ALARM TOKO KUE',
+    desc: 'Alarm bunyi kalau sistem menyala dan ada gangguan di pintu atau jendela.',
+    in: { P: 'pintu', J: 'jendela', S: 'sistem' }, out: ['BUNYI', 'DIAM'],
+    st: [
+      { id: 'g1', in: ['P', 'J'], opts: ['AND', 'OR', 'XOR'], ans: 'OR', name: 'Sensor', hint: L('y', 'Gangguan itu pintu atau jendela. Satu yang terbuka saja sudah cukup, dua-duanya terbuka pun tetap gangguan.', 'explain') },
+      { id: 'Y', in: ['g1', 'S'], opts: ['AND', 'OR', 'NAND'], ans: 'AND', name: 'Alarm', hint: L('y', 'Alarm hanya boleh bunyi kalau ada gangguan dan sistem menyala. Dua syarat itu wajib terpenuhi bersamaan.', 'explain') }
+    ],
+    sc: [[1, 0, 1, 'Pintu terbuka, sistem menyala'], [0, 1, 1, 'Jendela terbuka, sistem menyala'], [1, 1, 1, 'Pintu dan jendela terbuka, sistem menyala'], [0, 0, 1, 'Semua tertutup, sistem menyala'], [1, 0, 0, 'Pintu terbuka, sistem mati']],
+    lines: [
+      L('n', 'Kasus pertama punyaku. Aku mau buka toko kue kecil di sekolah, jadi butuh alarm.', 'happy'),
+      L('n', 'Ada tiga sinyal: sensor pintu, sensor jendela, dan saklar sistem yang dipegang penjaga.', 'talk'),
+      L('s', 'Aku yang jadi pencuri percobaan!', 'playful'),
+      L('n', 'Diam, Sayori. Aturannya: alarm bunyi kalau sistem menyala dan ada yang mengganggu, lewat pintu atau jendela.', 'hmph'),
+      L('y', 'Jadi ada dua tahap. Tahap pertama menggabungkan pintu dan jendela. Tahap kedua menggabungkan hasilnya dengan saklar sistem.', 'explain'),
+      L('n', 'Pilih gerbang di tiap tahap. Aku uji dengan lima skenario, dan semuanya harus benar.', 'smug')
+    ],
+    win: [L('y', 'Tahap pertama OR: pintu atau jendela, satu saja cukup. Tahap kedua AND: ada gangguan dan sistem menyala, dua-duanya wajib.', 'explain'), L('n', 'Alarmku jadi bunyi di saat yang tepat. ...Lumayan. Eh, bagus!', 'happy'), L('s', 'Pencuri percobaannya tertangkap!', 'cheer')]
+  },
+  k_tangga: {
+    no: 2, bg: 'Music_Room', title: 'Kasus 2 dari 3: Lampu tangga', go: 'KASUS BERIKUTNYA ▶', name: 'LAMPU TANGGA',
+    desc: 'Satu saklar di bawah, satu di atas. Menekan salah satunya membalik keadaan lampu.',
+    in: { A: 'saklar bawah ditekan', B: 'saklar atas ditekan' }, out: ['NYALA', 'MATI'],
+    st: [{ id: 'Y', in: ['A', 'B'], opts: ['AND', 'OR', 'XOR', 'XNOR'], ans: 'XOR', name: 'Lampu', hint: L('y', 'Kalau kedua saklar sama posisinya, lampu mati. Kalau berbeda, lampu nyala. Gerbang mana yang menilai "beda atau sama"?', 'explain') }],
+    sc: [[0, 0, 'Belum ada saklar yang ditekan'], [1, 0, 'Naik tangga, saklar bawah ditekan'], [1, 1, 'Sampai atas, saklar atas ikut ditekan'], [0, 1, 'Hanya saklar atas yang ditekan']],
+    lines: [
+      L('s', 'Kasus kedua dari rumahku! Tangga di rumahku gelap banget kalau malam.', 'worry'),
+      L('s', 'Di bawah ada saklar, di atas juga ada. Mau pencet yang mana saja, lampunya harus ikut berubah.', 'talk'),
+      L('y', 'Awalnya kedua saklar di posisi biasa dan lampu mati. Menekan satu saklar menyalakan lampu. Menekan saklar yang satunya lagi mematikannya.', 'explain'),
+      L('m', 'Jadi lampu nyala saat kedua saklar berbeda posisi. Satu gerbang saja cukup. Pilih yang tepat.', 'wink')
+    ],
+    win: [L('y', 'XOR: output 1 kalau kedua input berbeda, 0 kalau sama. Cocok untuk dua saklar di dua tempat.', 'explain'), L('s', 'Jadi itu gunanya XOR! Kukira dia cuma ada di soal ujian.', 'shock'), L('n', 'Sekarang kamu tahu gunanya. Jangan tertukar dengan OR lagi.', 'smug')]
+  },
+  k_brankas: {
+    no: 3, bg: 'DDLCbg', title: 'Kasus 3 dari 3: Brankas klub', go: 'KE PENUTUP KASUS ▶', name: 'BRANKAS KLUB',
+    desc: 'Brankas terbuka kalau kedua kunci diputar dan tombol darurat tidak aktif.',
+    in: { K: 'kunci ketua', W: 'kunci wakil', D: 'tombol darurat' }, out: ['TERBUKA', 'TERKUNCI'],
+    st: [
+      { id: 'n1', in: ['D'], opts: ['NOT', 'KABEL'], ans: 'NOT', name: 'Tombol darurat', hint: L('y', 'Tombol darurat yang aktif harus menahan brankas. Sinyalnya perlu dibalik supaya "aktif" berubah jadi 0.', 'explain') },
+      { id: 'g1', in: ['K', 'W'], opts: ['AND', 'OR', 'XOR'], ans: 'AND', name: 'Dua kunci', hint: L('m', 'Kedua kunci harus diputar bersamaan. Kalau cuma satu, brankas tidak boleh terbuka.', 'talk') },
+      { id: 'Y', in: ['g1', 'n1'], opts: ['AND', 'OR', 'NOR'], ans: 'AND', name: 'Brankas', hint: L('y', 'Brankas terbuka kalau dua kunci sudah diputar dan tombol darurat tidak aktif. Dua syarat, keduanya wajib.', 'explain') }
+    ],
+    sc: [[1, 1, 0, 'Dua kunci diputar, darurat tidak aktif'], [1, 1, 1, 'Dua kunci diputar, darurat aktif'], [1, 0, 0, 'Hanya kunci ketua diputar'], [0, 1, 0, 'Hanya kunci wakil diputar'], [0, 0, 0, 'Tidak ada kunci diputar']],
+    lines: [
+      L('m', 'Kasus terakhir punyaku. Klub kita punya brankas kecil untuk menyimpan uang kas.', 'calm'),
+      L('m', 'Brankas terbuka kalau dua kunci diputar bersamaan: kunci ketua dan kunci wakil. Tapi ada satu syarat lagi.', 'talk'),
+      L('y', 'Tombol darurat. Kalau tombol itu aktif, brankas tetap terkunci walau kedua kuncinya diputar.', 'explain'),
+      L('n', 'Tiga sinyal, tiga tahap. Ini yang paling panjang, jadi jangan buru-buru.', 'smug'),
+      L('s', 'Wah, ada tiga gerbang! Aku bantu pegang kuncinya!', 'cheer'),
+      L('m', 'Tahap pertama untuk tombol darurat, kedua untuk dua kunci, ketiga menggabungkan keduanya.', 'calm')
+    ],
+    win: [L('y', 'NOT membalik tombol darurat: aktif jadi 0, dan 0 menahan AND terakhir. Dua kunci digabung AND, lalu digabung lagi dengan hasil NOT.', 'explain'), L('m', 'Cara berpikirnya sama dengan panel kontrol di mesin: beberapa sinyal masuk, gerbang yang memutuskan.', 'happy'), L('n', 'Tiga kasus selesai. Tinggal sekali lagi: Evaluasi.', 'smug')]
+  }
+};
+const kzCalc = (c, pick, v) => {   // keluaran rangkaian untuk nilai masukan v; null bila ada tahap belum dipilih
+  const sig = {}; Object.keys(c.in).forEach((k, i) => sig[k] = v[i]);
+  for (const s of c.st) { const g = pick[s.id]; if (!g) return null; const a = sig[s.in[0]]; sig[s.id] = s.in.length === 1 ? (g === 'NOT' ? F.NOT(a) : a) : F[g](a, sig[s.in[1]]) }
+  return sig[c.st[c.st.length - 1].id];
+};
+const kzExpr = (c, pick) => {   // teks rumus dari pilihan pemain
+  const sg = id => { const s = c.st.find(x => x.id === id); if (!s) return id; const g = pick[id], a = sg(s.in[0]); if (s.in.length === 1) return g ? (g === 'NOT' ? nb(a) : a) : '?'; return `(${a} ${g || '?'} ${sg(s.in[1])})` };
+  return 'Y = ' + sg('Y').replace(/^\((.*)\)$/, '$1');
+};
+function kasusCard(id, panel, d) {
+  const c = KASUS[id], pick = {}, n = c.sc.length, nIn = Object.keys(c.in).length, ans = Object.fromEntries(c.st.map(s => [s.id, s.ans])); let solved = false;
+  const go = $('.ngo'); go.hidden = true;   // tombol lanjut tampil setelah semua skenario lolos
+  panel.innerHTML = `<div class="startcard sc kz"><h2>${c.name}</h2><p class="kzd">${c.desc}</p><p class="kzl">${Object.entries(c.in).map(([k, v]) => `<b>${k}</b> ${v}`).join(' · ')}</p>
+    <div class="kzb"><div><div class="kzs">${c.st.map((s, i) => `<div class="kzt"><b class="kzn">${c.st.length > 1 ? `Tahap ${i + 1}: ` : ''}${s.name} <i>(${s.in.map(x => c.in[x] ? x : 'hasil tahap ' + (c.st.findIndex(y => y.id === x) + 1)).join(', ')})</i></b><div class="kzo" role="radiogroup" aria-label="${s.name}">${s.opts.map(o => `<button class="opt" role="radio" aria-checked="false" data-s="${s.id}" data-g="${o}">${o}</button>`).join('')}</div></div>`).join('')}</div>
+    <div class="kzf" aria-live="polite"></div></div>
+    <div class="kzr">${c.sc.map((r, i) => `<div class="kzrow" data-i="${i}"><span class="kzx">${r[nIn]}</span><span class="kze">harus ${c.out[kzCalc(c, ans, r) ? 0 : 1]}</span><span class="kzv"></span></div>`).join('')}</div></div>
+    <div class="kzm"><span class="kzp"></span><button class="btn sm" id="khint">PETUNJUK</button></div><div class="rfoot"></div></div>`;
+  const rows = $$('.kzrow', panel), msg = $('.kzp', panel), fm = $('.kzf', panel);
+  const draw = () => {
+    let ok = 0; c.sc.forEach((r, i) => { const o = kzCalc(c, pick, r), want = kzCalc(c, ans, r), el = rows[i], v = $('.kzv', el); const pass = o === want;
+      el.className = 'kzrow' + (o == null ? '' : pass ? ' ok' : ' bad'); v.textContent = o == null ? '...' : `${c.out[o ? 0 : 1]} ${pass ? '✓' : '✗'}`; if (pass) ok++ });
+    fm.innerHTML = kzExpr(c, pick);
+    $$('.opt', panel).forEach(b => { const on = pick[b.dataset.s] === b.dataset.g; b.classList.toggle('picked', on); b.setAttribute('aria-checked', on) });
+    msg.textContent = Object.keys(pick).length < c.st.length ? 'Pilih gerbang di tiap tahap.' : ok === n ? 'Semua skenario lolos!' : `${ok} dari ${n} skenario lolos.`;
+    if (ok === n && Object.keys(pick).length === c.st.length && !solved) { solved = true; Snd.cue('star'); Story.record('kasus', Math.max(Story.prog().kasus || 0, c.no)); $$('.opt', panel).forEach(b => b.disabled = true); $('#khint', panel).disabled = true; go.hidden = false; d.say(c.win) }
+  };
+  panel.onclick = e => { const b = e.target.closest('.opt'); if (!b || solved) return; Snd.sfx('select'); pick[b.dataset.s] = b.dataset.g; draw() };
+  $('#khint', panel).onclick = () => { if (solved) return; Snd.sfx('select'); const s = c.st.find(x => pick[x.id] !== x.ans); s && d.say([s.hint]) };
+  draw();
+}
+Object.keys(KASUS).forEach(id => { const c = KASUS[id]; ST[id] = { bg: c.bg, title: c.title, go: c.go, kz: true, lines: c.lines, win: c.win, hints: c.st.map(s => s.hint), card: (panel, d) => kasusCard(id, panel, d) }; SC[id] = () => narrScene(id) });
+
 /* pengait ke scene (dipanggil dari app.js; semuanya [] / no-op bila Mode Cerita mati) */
 const SL = {
   enter: k => Story.on ? ST[k].enter : [],
@@ -304,5 +412,5 @@ const SL = {
 Story.contBtn = (id, label = NEXT_LABEL[id]) => { const b = document.createElement('button'); b.className = 'btn big contstory'; b.textContent = label; b.onclick = () => { Snd.sfx('select'); Story.advance() }; return b };
 Story.record = (k, v) => { const p = Story.prog(); p[k] = v; Story.save(p) };
 
-SC.n_intro = () => narrScene('n_intro'); SC.n_1 = () => narrScene('n_1'); SC.n_2 = () => narrScene('n_2'); SC.n_3 = () => narrScene('n_3');
+SC.n_intro = () => narrScene('n_intro'); SC.n_1 = () => narrScene('n_1'); SC.n_2 = () => narrScene('n_2'); SC.n_3 = () => narrScene('n_3'); SC.n_4 = () => narrScene('n_4');
 SC.n_end = () => { const p = Story.prog(); p.step = 0; p.done = true; Story.save(p); narrScene('n_end') };

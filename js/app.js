@@ -35,8 +35,8 @@ async function go(id) {
 /* menu utama */
 function buildMenu() {
   const el = $('#menu');
-  const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? 9 : 0, nowI = [1, 3, 5, 7].find(x => x >= cur);
-  const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = [1, 3, 5, 7][k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
+  const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? STEPS.length : 0, nowI = CHAPI.find(x => x >= cur);
+  const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = CHAPI[k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
   const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>

@@ -1071,3 +1071,28 @@ body:not(.m) .qv{margin-bottom:4px}
 .m:not(.p) .tl{font-size:13px;gap:1px 10px}.m:not(.p) .tl dt{font-size:15px}
 .m:not(.p) .tour .tb{font-size:13px}.m:not(.p) .tpg{margin:3px 0}
 .m:not(.p) .tour .goes .btn.big{padding:4px 8px;font-size:16px}
+
+/* v33: kasus nyata (Mode Cerita): pilih gerbang tiap tahap, diuji lewat skenario */
+.narr.kz .panel{width:820px;top:60px}
+.kz.startcard.sc{width:100%;margin:0;padding:4px 16px 8px;text-align:left;background:#fff}
+.kz h2{text-align:center;font-size:26px;padding:0 0 3px;margin:0 0 3px}
+.kzd{margin:0;font-size:16px;text-align:center}
+.kzl{margin:2px 0 6px;font-size:14px;text-align:center;font-weight:600}.kzl b{display:inline-block;min-width:20px;padding:0 5px;border:2px solid var(--ink);background:var(--soft)}
+.kzb{display:grid;grid-template-columns:1fr 1.15fr;gap:6px 14px;align-items:start}
+.kzt{margin-bottom:5px}.kzn{display:block;font-size:16px;margin-bottom:3px}.kzn i{font-style:normal;font-weight:600;font-size:14px}
+.kzo{display:flex;flex-wrap:wrap;gap:6px}.kz .kzo .opt{flex:0 0 auto!important}.kz .opt{font-size:17px;padding:2px 12px;border-width:3px;background:#fff}
+.kz .opt.picked{background:var(--pink);color:#fff}.kz .opt:disabled{cursor:default}
+.kzf{margin-top:4px;padding:6px 10px;border:3px solid var(--ink);background:#fff;font-size:19px;text-align:center;overflow-wrap:anywhere}
+.kzr{display:flex;flex-direction:column;gap:4px}
+.kzrow{display:grid;grid-template-columns:1fr auto;gap:0 8px;padding:1px 9px;border:3px solid var(--ink);background:#fff;font-size:15px;line-height:1.2}
+.kzx{font-weight:800}.kze{grid-row:2;font-size:13px;font-weight:600;opacity:.8}.kzv{grid-row:1/3;grid-column:2;align-self:center;font-size:15px;min-width:92px;text-align:right}
+.kzrow.ok{background:#8ee89a}.kzrow.bad{background:#ff9aa8}
+.kzm{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px}.kzp{font-size:17px}.kzm .btn{font-size:16px;padding:3px 12px;margin:0}
+.kz .rfoot{margin-top:6px}
+.m .narr.kz .panel{width:min(820px,98%);top:34px;max-height:calc(100% - 34px - 140px);overflow-y:auto}
+.m .kz h2{font-size:24px;padding:2px 0}.m .kzd{font-size:14px}.m .kzl{font-size:12px;margin-bottom:4px}
+.m .kz .opt{font-size:15px;padding:3px 10px;flex:0 0 auto}.m .kzn{font-size:14px}.m .kzn i{font-size:12px}.m .kzf{font-size:16px;padding:3px 8px}
+.m .kzrow{font-size:13px;padding:2px 7px}.m .kze{font-size:11px}.m .kzv{font-size:13px;min-width:80px}.m .kzp{font-size:14px}.m .kzm .btn{font-size:13px}
+.m.p .narr.kz .panel{top:40px}.m.p .kzb{grid-template-columns:1fr}
+.m .kz.startcard.sc{padding:4px 10px 8px}
+@media (prefers-reduced-motion:reduce){.kzrow{transition:none}}
