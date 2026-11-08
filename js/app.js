@@ -8,6 +8,7 @@ const M = {
   simulasi: { id: 'simulasi', label: 'SIMULASI', key: 'yuri', music: 'yuric', bg: 'DDLCbg', sub: 'Coba gerbang logika' },
   latihan: { id: 'latihan', label: 'LATIHAN', key: 'natsuki', music: 'natsc', bg: 'Music_Room', sub: 'Asah kemampuanmu' },
   evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room', sub: '10 soal penilaian akhir' },
+  harian: { id: 'harian', label: 'HARIAN', key: 'monika', music: 'monic', bg: 'Music_Room', sub: 'Satu soal per hari' },   // bukan bagian dari MODES: dibuka dari menu (tombol HARIAN) dan Peta
   tutor: { id: 'tutor', label: 'PANDUAN', key: 'sayori', music: 'freakyMenu', bg: 'DDLCbg' }   // bukan bagian dari MODES: dibuka otomatis sekali dan dari Pengaturan
 };
 const SM = { n_intro: 'A_Story_of_Everyday_Life', materi: 'A_Wonderful_Happening' };   // lagu khusus Mode Cerita: pembuka & diskusi materi
@@ -15,11 +16,32 @@ const MODES = [M.materi, M.simulasi, M.latihan, M.evaluasi];
 const Journey = { prev: null, last: null }; // mode terakhir yang dikunjungi, agar karakter bisa bereaksi saat pemain berpindah bagian
 
 
+/* TANTANGAN HARIAN: satu soal per hari dari tanggal perangkat. tkm_daily = { h: { nomorHari: 1 benar | 0 salah }, best }.
+   Hari beruntun dihitung dari riwayat: hari yang dijawab (benar atau salah) berturut-turut sampai hari ini, atau sampai kemarin bila hari ini belum dijawab. */
+const Daily = {
+  day: () => { const d = new Date(); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5) },   // tanggal lokal perangkat sebagai nomor hari
+  data: () => { const v = store.get('tkm_daily', null); return v && v.h && typeof v.h === 'object' ? { h: v.h, best: +v.best || 0 } : { h: {}, best: 0 } },
+  streak: (h, t) => { let n = 0, d = h[t] != null ? t : t - 1; while (h[d] != null) { n++; d-- } return n },   // riwayat bertanggal setelah hari ini (jam dimundurkan) diabaikan
+  save: (h, t, ok) => {
+    const d = Daily.data(); d.h[t] = ok ? 1 : 0;
+    Object.keys(d.h).forEach(k => { if (+k > Daily.day() || +k < t - 90) delete d.h[k] });   // buang tanggal masa depan (jam dimundurkan) dan riwayat lama
+    d.best = Math.max(d.best, Daily.streak(d.h, t)); store.set('tkm_daily', d); return d;
+  },
+  week: (h, t) => Array.from({ length: 7 }, (_, k) => { const d = t - 6 + k; return d === t && h[d] == null ? 'now' : h[d] === 1 ? 'ok' : h[d] === 0 ? 'bad' : 'miss' })
+};
+const dailyQ = day => {   // soal hari ini: urutan bank soal berputar per hari, urutan pilihan diacak dengan benih tanggal (soal sama seharian)
+  const c = EVAL[((day % EVAL.length) + EVAL.length) % EVAL.length]; let x = day * 2654435761 >>> 0;
+  const rnd = () => { x = x + 0x6D2B79F5 >>> 0; let t = Math.imul(x ^ x >>> 15, 1 | x); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296 };
+  const idx = c.o.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = rnd() * (i + 1) | 0; [idx[i], idx[j]] = [idx[j], idx[i]] }
+  return { kind: 'mc', q: c.q, vis: c.vis, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), e: c.e };
+};
+const dayDots = w => `<span class="dqd" role="img" aria-label="7 hari terakhir: ${w.filter(x => x === 'ok' || x === 'bad').length} dijawab">${w.map(x => `<i class="${x}"></i>`).join('')}</span>`;
+
 /* pindah layar (fade + ganti musik) */
 let pend = null, curId = null;
 async function go(id) {
   if (busy) { if (id !== curId) pend = id; return }   // klik saat transisi: yang terakhir diantre, bukan dibuang
-  busy = true; pend = null;
+  busy = true; pend = null; if (!/^k_/.test(id)) Story.replay = false;   // ulang kasus dari Peta hanya berlaku di layar kasus
   const f = $('#fade'); f.classList.add('on'); await wait(240);
   if (id !== 'menu' && id !== 'settings' && id !== 'peta') await Promise.all([warm, !Story.on && M[id] && loadChar(M[id].key)]);   // hanya sprite karakter layar ini yang ditunggu
   if (scene) { scene.cleanup(); scene = null }
@@ -27,7 +49,7 @@ async function go(id) {
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
   else if (id === 'peta') buildPeta();
-  else { markSeen(id); if (id !== 'simpick' && id !== 'tutor') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
+  else { markSeen(id); if (id !== 'simpick' && id !== 'tutor' && id !== 'harian') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
   curId = id; await wait(40); f.classList.remove('on'); busy = false; Story.chap?.(id);
   if (pend && pend !== id) go(pend)
 }
@@ -41,9 +63,9 @@ function buildMenu() {
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
-  <div class="mtools setbtn"><button class="btn" id="setb">PENGATURAN</button><button class="btn" id="petab">PETA</button></div><div class="mkeys"><kbd>↑↓</kbd> pilih menu <kbd>Enter</kbd> buka</div>`;
+  <div class="mtools setbtn"><button class="btn" id="hrb">HARIAN${Daily.data().h[Daily.day()] == null ? '<i class="hnew" aria-label="belum dikerjakan hari ini"></i>' : ''}</button><button class="btn" id="setb">PENGATURAN</button><button class="btn" id="petab">PETA</button></div><div class="mkeys"><kbd>↑↓</kbd> pilih menu <kbd>Enter</kbd> buka</div>`;
   $('.mchar', el).appendChild(together.canvas); together.start(); together.play('t', { loop: true });
-  $('#setb').onclick = () => { Snd.sfx('select'); go('settings') }; $('#petab').onclick = () => { Snd.sfx('select'); go('peta') };
+  $('#setb').onclick = () => { Snd.sfx('select'); go('settings') }; $('#petab').onclick = () => { Snd.sfx('select'); go('peta') }; $('#hrb').onclick = () => { Snd.sfx('select'); Story.on = false; go('harian') };
   const btns = $$('.mbtn', el); let sel = -1;
   const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu') }; // snd=false untuk mouse (suara hover ditangani global)
   btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
@@ -62,6 +84,7 @@ function buildPeta() {
   const el = $('#peta'), seen = store.get('tkm_seen', {}), sp = Story.prog(), done = new Set(store.get('tkm_ch', [])), nS = sp.done ? STEPS.length : sp.step,
     bs = store.get('tkm_latihan_best', 0), bw = store.get('tkm_latihan_best_w', 0), bc = store.get('tkm_chain_best', null), ev = store.get('tkm_eval_best', null),
     st = (a, b) => `<span class="pst ${a ? 'on' : ''}">${a ? '✓ ' : ''}${b}</span>`, lat = (n, v) => `<span class="pst ${v ? 'on' : ''}">${n}: ${v ? v + ' / ' + N8 : 'belum dicoba'}</span>`, N8 = 8,
+    dd = Daily.data(), dday = Daily.day(), dstr = Daily.streak(dd.h, dday), kOpen = sp.done || sp.step >= STEPS.indexOf('k_alarm'), kDone = sp.done ? 3 : sp.kasus || 0,
     row = (go, name, body) => `<button class="prow" data-go="${go}"><b class="prn">${name}</b><span class="pb">${body}</span><span class="pg">BUKA</span></button>`;
   el.innerHTML = `<div class="mbg"></div><div class="top"><button class="btn sm" id="pback">◀ MENU</button><b id="ptitle">PETA KEMAJUAN</b></div>
   <div class="setcard pcard">
@@ -69,23 +92,25 @@ function buildPeta() {
     ${row('materi', 'MATERI', st(seen.materi, seen.materi ? 'Sudah dibuka' : 'Belum dibuka'))}
     ${row('simpick', 'SIMULASI', `<span>${st(seen.simulasi, 'Dasar ' + (seen.simulasi ? 'dicoba' : 'belum dicoba'))}${st(seen.simplus, 'Simulasi+ ' + done.size + ' / ' + CH.length)}</span><span class="pgrid" role="img" aria-label="${done.size} dari ${CH.length} tantangan Simulasi+ selesai">${CH.map((c, k) => `<i class="pc${done.has(k) ? ' on' : ''}" title="${c.t}"></i>`).join('')}</span>`)}
     ${row('latihan', 'LATIHAN', `<span>${lat('Santai', bs)}${lat('Waktu', bw)}<span class="pst ${bc ? 'on' : ''}">Berantai: ${bc ? bc.n + ' benar · Level ' + bc.lv : 'belum dicoba'}</span></span>`)}
+    <div class="prow pkz"><b class="prn">KASUS NYATA</b><span class="pb"><span>${st(kDone >= 3, kOpen ? `${kDone} / 3 selesai` : 'Terbuka setelah Cerita sampai Kasus Nyata')}</span><span class="pkb">${Object.keys(KASUS).map(id => `<button class="btn sm" data-k="${id}"${kOpen ? '' : ' disabled'}>${KASUS[id].no}. ${{ k_alarm: 'Alarm', k_tangga: 'Lampu tangga', k_brankas: 'Brankas' }[id]}</button>`).join('')}</span></span></div>
+    ${row('harian', 'HARIAN', `<span>${st(dd.h[dday] != null, dd.h[dday] != null ? 'Hari ini selesai' : 'Hari ini belum')}<span class="pst ${dstr ? 'on' : ''}">${dstr} hari beruntun${dd.best > dstr ? ' · terbaik ' + dd.best : ''}</span></span>${dayDots(Daily.week(dd.h, dday))}`)}
     ${row('evaluasi', 'EVALUASI', ev == null ? st(0, 'Belum dicoba') : st(1, `Terbaik ${ev * 10} · ${GRADES.find(g => ev >= g.min).t}`))}
   </div>`;
   $('#pback').onclick = () => { Snd.sfx('select'); go('menu') };
-  $$('.prow', el).forEach(b => b.onclick = () => { Snd.sfx('select'); const g = b.dataset.go; if (g === 'story') Story.start(false); else { Story.on = false; go(g) } });
+  $$('.pkb .btn', el).forEach(b => b.onclick = () => { Snd.sfx('select'); Story.on = true; Story.replay = true; go(b.dataset.k) });   // ulang kasus tanpa mengulang Cerita; tombol akhir kembali ke Peta
+  $$('.prow[data-go]', el).forEach(b => b.onclick = () => { Snd.sfx('select'); const g = b.dataset.go; if (g === 'story') Story.start(false); else { Story.on = false; go(g) } });
   document.onkeydown = e => { if (el.classList.contains('on') && e.key === 'Escape') $('#pback').click() };
   scene = { cleanup() { document.onkeydown = null; el.innerHTML = '' } };
   el.classList.add('on');
 }
 
-/* PANDUAN: tutorial empat halaman. Tampil otomatis sekali pada kunjungan pertama (belum ada data tersimpan), bisa dibuka lagi dari Pengaturan. */
+/* PANDUAN: tutorial empat halaman. Tampil otomatis satu kali (tkm_intro): pemain baru dan pemain lama yang belum pernah melihatnya. Bisa dibuka lagi dari Pengaturan. */
 const TOUR = [
   { t: 'SELAMAT DATANG', say: [['Hai, aku Sayori. Panduan ini tidak sampai satu menit.', 'cheer']], b: '<p>Di klub ini, empat anggota membantumu belajar gerbang logika: AND, OR, NOT, dan kawan-kawannya.</p><p>Kamu membaca materi, mencoba sendiri, berlatih, lalu diuji.</p>' },
   { t: 'URUTAN BELAJAR', say: [['Paling mudah: Materi, Simulasi, Latihan, lalu Evaluasi. Mau ditemani cerita? Mulai dari Cerita.', 'happy']], b: [['Cerita', 'Ikuti kisahnya bersama keempat anggota klub.'], ['Materi', 'Sayori: 11 halaman dan kartu ulang.'], ['Simulasi', 'Yuri: nyalakan saklar, lihat LED menyala.'], ['Latihan', 'Natsuki: soal acak, 3 nyawa. Ada mode Waktu dan Berantai.'], ['Evaluasi', 'Monika: 10 soal dan nilai akhir.']] },
   { t: 'CARA MAIN', say: [['Salah itu bagian dari belajar. Kalau nyawa habis, tinggal ulangi.', 'calm']], b: [['Dialog', 'Klik kotak dialog untuk lanjut. Klik karakter untuk mengajaknya mengobrol.'], ['Soal', 'Pilih jawaban, lalu tekan CEK JAWABAN. Di Latihan, jawaban salah mengurangi nyawa.'], ['Kembali', 'Tombol ◀ MENU di kiri atas, atau tombol Esc di keyboard.']] },
-  { t: 'PETA DAN PENGATURAN', say: [['Itu saja. Selamat belajar!', 'cheer']], b: [['Peta', 'Di menu: bagian yang sudah dicoba, tantangan Simulasi+ yang selesai, dan skor terbaik.'], ['Penyimpanan', 'Kemajuan tersimpan di browser ini. Kalau data browser dihapus, kemajuan ikut hilang.'], ['Pengaturan', 'Atur suara dan tampilan, pasang game ke layar utama, atau buka panduan ini lagi.']] }
+  { t: 'PETA DAN PENGATURAN', say: [['Itu saja. Selamat belajar!', 'cheer']], b: [['Harian', 'Satu soal per hari lewat tombol HARIAN. Jawab tiap hari untuk menjaga hari beruntun.'], ['Peta', 'Bagian yang sudah dicoba dan skor terbaik. Kemajuan tersimpan di browser ini dan hilang bila datanya dihapus.'], ['Pengaturan', 'Atur suara dan tampilan, pasang game ke layar utama, atau buka panduan ini lagi.']] }
 ];
-const firstVisit = () => !['tkm_intro', 'tkm_seen', 'tkm_story', 'tkm_latihan_best', 'tkm_latihan_best_w', 'tkm_eval_best', 'tkm_chain_best', 'tkm_ch'].some(k => store.get(k, null) != null);
 SC.tutor = () => {
   store.set('tkm_intro', 1);
   const S = scaffold('tutor'); let p = 0; const last = TOUR.length - 1;
@@ -496,6 +521,39 @@ SC.evaluasi = () => {
   S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 
+/* TANTANGAN HARIAN (Monika): satu soal per hari, satu kali jawab. Menjawab (benar atau salah) menjaga hari beruntun. */
+const DQ_MILE = [3, 7, 14, 30, 60, 100];
+SC.harian = () => {
+  const S = scaffold('harian'), day = Daily.day(), Q = dailyQ(day);
+  const hoursLeft = () => { const n = new Date(); return Math.max(1, Math.ceil((new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n) / 36e5)) };
+  const result = fx => {
+    const d = Daily.data(), st = Daily.streak(d.h, day), ok = d.h[day] === 1, k = Math.max(0, d.best - st);
+    S.panel.innerHTML = `<div class="startcard sc dq res"><h2>HARIAN</h2><div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${k ? ` · terbaik ${d.best}` : ''}</span></div>${dayDots(Daily.week(d.h, day))}<p class="dqr ${ok ? 'ok' : 'bad'}">${ok ? 'Jawabanmu benar.' : `Belum tepat. Jawaban benar: <b>${Q.opts[Q.a]}</b>`}</p><p class="rve">${Q.e}</p><p class="dqt">Soal berikutnya muncul besok, sekitar ${hoursLeft()} jam lagi.</p><div class="rbtn"><button class="btn" id="dqb">◀ MENU</button></div></div>`;
+    $('#dqb').onclick = () => { Snd.sfx('cancelMenu'); go('menu') };
+    if (fx) { countUp($('.dqn', S.panel), st); if (ok) { confetti($('.startcard', S.panel), DQ_MILE.includes(st) ? 24 : 10); hop(1) } }
+  };
+  const ask = () => {
+    renderQ(S.panel, Q, 0, 1, {
+      reveal: true,
+      onAns: ok => {
+        const d = Daily.save(Daily.data().h, day, ok), st = Daily.streak(d.h, day), mile = DQ_MILE.includes(st);
+        Snd.cue(ok ? 'ok' : 'bad'); if (mile) setTimeout(() => Snd.cue('badge'), 300);
+        S.d.say([[ok ? pick(['Tepat. Satu hari lagi tercatat.', 'Benar. Konsisten begini, hasilnya pasti kelihatan.', 'Betul. Itu gerbang yang kamu kuasai sekarang.']) : pick(['Belum tepat, tapi hari ini tetap tercatat. Baca penjelasannya, ya.', 'Salah itu wajar. Yang penting kamu datang hari ini.']), ok ? 'happy' : 'talk'],
+          ...(mile ? [[`${st} hari beruntun! Aku bangga sama kamu.`, 'cheer']] : st === 1 ? [] : [[`Sudah ${st} hari beruntun. Jangan putus, ya.`, 'wink']])]);
+      },
+      next: () => result(true)
+    });
+    $('.qh', S.panel).textContent = 'Soal hari ini'; $('.qs', S.panel)?.remove();
+  };
+  const d0 = Daily.data();
+  if (d0.h[day] != null) { result(false); S.d.say([['Soal hari ini sudah kamu jawab. Penjelasannya masih bisa dibaca di sini.', 'talk'], ['Besok ada soal baru.', 'happy']]) }
+  else {
+    const st = Daily.streak(d0.h, day);
+    startCard(S, 'TANTANGAN HARIAN', `${chipRow([['out', '1 soal sehari'], ['gate', 'Satu kali jawab'], ['clock', 'Ganti tiap tengah malam']])}<div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${d0.best > st ? ` · terbaik ${d0.best}` : ''}</span></div>${dayDots(Daily.week(d0.h, day))}<p class="bestp">${st ? 'Jawab hari ini supaya hari beruntunmu tidak putus.' : 'Jawab hari ini untuk memulai hari beruntun.'}</p>`, ask);
+    S.d.say([[st ? `Kamu sudah ${st} hari beruntun. Ayo lanjutkan.` : 'Satu soal saja per hari. Cukup untuk menjaga ingatan tetap hangat.', st ? 'happy' : 'talk'], ['Soalnya cuma satu dan hanya bisa dijawab sekali. Pikirkan baik-baik.', 'wink']]);
+  }
+};
+
 /* suara hover: scrollMenu HANYA saat pointer berpindah ke sebuah opsi */
 // .sw (kotak A/B Simulasi) sengaja tidak masuk daftar: tanpa suara hover
 const HOV = '.btn,.tab,.opt,.cell,.mbtn'; let hv = null, lp = null;
@@ -525,5 +583,5 @@ document.addEventListener('pointermove', e => {
     const pre = () => keys.reduce((p, k) => p.then(() => loadChar(k)), Promise.resolve()).catch(() => { });   // sisa karakter diunduh satu per satu di latar belakang
     setTimeout(pre, 1500);
   } catch (err) { msg.textContent = 'Gagal memuat asset. Buka lewat GitHub Pages atau server lokal (python -m http.server), bukan dengan klik ganda file.'; console.error(err) }
-  btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go(firstVisit() ? 'tutor' : 'menu') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser); kunjungan pertama langsung ke panduan
+  btn.onclick = () => { Snd.sfx('confirmMenu'); if (Settings.data.display === 'full' && !Full.on) Full.set(true); go(store.get('tkm_intro', null) ? 'menu' : 'tutor') }; // preferensi layar penuh diterapkan saat klik pertama (syarat browser); panduan tampil sekali untuk semua pemain (pemain lama juga) lalu tidak lagi otomatis
 })();

@@ -107,7 +107,7 @@ function narrScene(id) {
   if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
   d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
-  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el), d); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.advance() } };
+  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el), d); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } if (Story.replay) goBtn.textContent = 'KEMBALI KE PETA ▶'; goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.replay ? Story.leave() : Story.advance() } };
   /* pilihan (A.ask): dialog sampai pertanyaan -> kartu pilihan -> reaksi sesuai pilihan -> sisa dialog (setelah A.skip baris). Tanpa A.ask: perilaku lama. */
   const ask = A.ask, first = ask ? lines.slice(0, ask.at + 1) : lines, rest = ask ? lines.slice(ask.at + 1 + (ask.skip || 0)) : [];
   let phase = ask ? 0 : 2;   // 0 = sebelum pilihan, 1 = menunggu pilihan, 2 = setelah
@@ -410,6 +410,7 @@ const SL = {
 
 /* tombol "lanjut cerita" yang muncul hanya setelah aktivitas wajib selesai */
 Story.contBtn = (id, label = NEXT_LABEL[id]) => { const b = document.createElement('button'); b.className = 'btn big contstory'; b.textContent = label; b.onclick = () => { Snd.sfx('select'); Story.advance() }; return b };
+Story.leave = () => { Story.replay = false; Story.on = false; go('peta') };
 Story.record = (k, v) => { const p = Story.prog(); p[k] = v; Story.save(p) };
 
 SC.n_intro = () => narrScene('n_intro'); SC.n_1 = () => narrScene('n_1'); SC.n_2 = () => narrScene('n_2'); SC.n_3 = () => narrScene('n_3'); SC.n_4 = () => narrScene('n_4');

@@ -19,7 +19,7 @@ Proyek ini dibuat dengan HTML, CSS, dan JavaScript biasa. Tidak ada framework, d
 
 ## Fitur
 
-Menu utama punya lima bagian belajar, ditambah Peta dan Pengaturan. Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
+Menu utama punya lima bagian belajar, ditambah Tantangan Harian, Peta dan Pengaturan. Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
 
 | Bagian | Pemandu | Isi |
 |---|---|---|
@@ -29,13 +29,17 @@ Menu utama punya lima bagian belajar, ditambah Peta dan Pengaturan. Tiap bagian 
 | Latihan | Natsuki | 16 jenis soal dalam tiga mode: Santai, Waktu, dan Berantai. Hasil berupa bintang, lencana, dan skor terbaik. |
 | Evaluasi | Monika | 10 soal acak dari bank 19 soal, 60 detik per soal, dengan empat kategori nilai dari "Perlu Belajar Lagi" sampai "Sangat Baik" dan pembahasan soal yang salah. |
 
-### Panduan kunjungan pertama
+### Panduan sekali tampil
 
-Saat game dibuka untuk pertama kali, Sayori membawakan panduan empat halaman: urutan belajar, cara bermain, dan cara memakai Peta serta Pengaturan. Panduan bisa dilewati kapan saja dan dibuka lagi dari Pengaturan > Lihat panduan. Pemain yang sudah punya kemajuan tersimpan tidak melihatnya otomatis.
+Saat game dibuka, Sayori membawakan panduan empat halaman (urutan belajar, cara bermain, Tantangan Harian, Peta dan Pengaturan) satu kali saja. Pemain baru dan pemain lama yang belum pernah melihatnya sama-sama mendapatkannya, tanpa menghapus kemajuan mereka. Panduan bisa dilewati kapan saja dan dibuka lagi dari Pengaturan > Panduan dan Aplikasi.
+
+### Tantangan Harian
+
+Tombol HARIAN di menu memberi satu soal per hari (Monika), diambil dari bank soal Evaluasi. Soalnya sama seharian dan berganti tiap tengah malam menurut tanggal perangkat. Soal hanya bisa dijawab sekali; setelah itu muncul penjelasan dan jawaban benar. Menjawab, benar atau salah, menambah hari beruntun (streak). Melewatkan satu hari mengembalikan hitungan ke 0, sedangkan rekor terbaik tetap tersimpan. Titik kecil di tombol menandai bahwa soal hari ini belum dijawab, dan tujuh kotak menunjukkan tujuh hari terakhir. Tanggal diambil dari jam perangkat, jadi pemain yang mengubah jam bisa mengakali hitungan; game ini tidak punya server untuk memeriksanya.
 
 ### Peta Kemajuan
 
-Tombol Peta di menu membuka satu layar ringkas: langkah Cerita yang sudah dicapai, bagian yang sudah dicoba, tantangan Simulasi+ yang selesai (misalnya 9 dari 17), dan skor terbaik tiap mode Latihan serta Evaluasi. Tiap baris membuka bagiannya. Peta hanya membaca data yang sudah ada di browser.
+Tombol Peta di menu membuka satu layar ringkas: langkah Cerita yang sudah dicapai, bagian yang sudah dicoba, tantangan Simulasi+ yang selesai (misalnya 9 dari 17), dan skor terbaik tiap mode Latihan serta Evaluasi. Peta juga menampilkan hari beruntun Harian dan baris Kasus Nyata. Setelah Cerita mencapai kasus pertama, ketiga kasus bisa dibuka ulang dari Peta tanpa mengulang Cerita; tombol akhirnya kembali ke Peta dan kemajuan Cerita tidak berubah. Tiap baris lain membuka bagiannya. Peta hanya membaca data yang sudah ada di browser.
 
 ### Flash Card
 
@@ -80,7 +84,7 @@ Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulas
 | | |
 |---|---|
 | ![Peta Kemajuan](docs/screenshots/peta.webp) | ![Panduan](docs/screenshots/panduan.webp) |
-| Peta Kemajuan | Panduan kunjungan pertama |
+| Peta Kemajuan | Panduan sekali tampil |
 | ![Materi](docs/screenshots/materi.webp) | ![Flash Card](docs/screenshots/flash-card.webp) |
 | Materi | Flash Card |
 | ![Simulasi](docs/screenshots/simulasi.webp) | ![Simulasi+](docs/screenshots/simulasi-plus.webp) |
@@ -89,6 +93,8 @@ Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulas
 | Latihan | Evaluasi |
 | ![Kasus alarm](docs/screenshots/kasus-alarm.webp) | ![Kasus brankas](docs/screenshots/kasus-brankas.webp) |
 | Kasus nyata: alarm toko | Kasus nyata: brankas klub |
+| ![Tantangan Harian](docs/screenshots/harian.webp) | |
+| Tantangan Harian | |
 
 Tampilan di HP (potret):
 
@@ -149,7 +155,7 @@ CREDITS.md            daftar atribusi aset
 | Naskah dan pilihan di Mode Cerita | `js/story.js` |
 | Kasus nyata (sinyal, tahap, gerbang jawaban, skenario) | `js/story.js` (konstanta `KASUS`) |
 | Tantangan Simulasi+ | `js/simplus.js` (konstanta `CH`) |
-| Isi panduan kunjungan pertama | `js/app.js` (konstanta `TOUR`) |
+| Isi panduan sekali tampil | `js/app.js` (konstanta `TOUR`) |
 | Jumlah dan durasi soal Evaluasi | `EVAL_N` di `js/content.js`, `EVAL_TIME` di `js/app.js` |
 | Kesulitan Mode Berantai (soal per level, penyusutan waktu, pemulihan nyawa) | `SC.latihan` di `js/app.js` (fungsi `lv`, `lim`, dan `good % 5`) |
 
@@ -169,7 +175,8 @@ Semuanya disimpan di `localStorage` browser pemain. Tidak ada data yang dikirim 
 | `tkm_eval_best` | Jumlah benar terbaik di Evaluasi (0 sampai 10) |
 | `tkm_ch` | Daftar tantangan Simulasi+ yang sudah selesai |
 | `tkm_seen` | Bagian yang pernah dibuka, dipakai Peta |
-| `tkm_intro` | Penanda panduan kunjungan pertama sudah ditampilkan |
+| `tkm_intro` | Penanda panduan sudah ditampilkan satu kali |
+| `tkm_daily` | Riwayat Tantangan Harian (tanggal, benar atau salah) dan hari beruntun terbaik |
 
 ## Atribusi dan hak cipta
 
