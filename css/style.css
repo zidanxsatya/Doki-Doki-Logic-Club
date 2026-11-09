@@ -582,10 +582,10 @@ body.m{--cs:.6}
 
 /* hover & fokus tombol LANJUTKAN / MULAI CERITA di menu (tanpa menggeser layout: hanya transform) */
 .pbtn{transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s}
-.mbtn .pbtn:hover{background:#ff95c4;transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}
+@media (hover:hover){.mbtn .pbtn:hover{background:#ff95c4;transform:translateY(-2px);box-shadow:0 6px 0 var(--ink)}}
 .mbtn .pbtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}
 .mbtn:focus-visible .pbtn{background:#ff95c4;outline:3px solid var(--blue);outline-offset:3px}
-.m .mbtn .pbtn:hover{box-shadow:0 5px 0 var(--ink)}.m .mbtn .pbtn:active{box-shadow:0 1px 0 var(--ink)}
+@media (hover:hover){.m .mbtn .pbtn:hover{box-shadow:0 5px 0 var(--ink)}}.m .mbtn .pbtn:active{box-shadow:0 1px 0 var(--ink)}
 
 /* kartu pembuka Latihan & Evaluasi: header memudar ke isi panel, tanpa garis pemisah */
 .startcard.sc[data-k=natsuki] h2,.startcard.sc[data-k=monika] h2{position:relative;isolation:isolate;background:none;border-bottom:0}
@@ -594,7 +594,7 @@ body.m{--cs:.6}
 /* Pemilih mode Simulasi & SIMULASI+ */
 .pick{position:absolute;left:50%;top:54%;translate:-50% -50%;display:flex;gap:30px;width:min(860px,calc(100% - 60px));z-index:3}
 .pickc{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px 24px 26px;font-family:inherit;color:var(--ink);background:#fff;border:5px solid var(--ink);border-radius:22px;box-shadow:0 8px 0 var(--ink);cursor:pointer;text-align:center;transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s}
-.pickc:hover{transform:translateY(-4px);box-shadow:0 12px 0 var(--ink);background:var(--soft)}
+@media (hover:hover){.pickc:hover{transform:translateY(-4px);box-shadow:0 12px 0 var(--ink);background:var(--soft)}}
 .pickc:active{transform:translateY(3px);box-shadow:0 4px 0 var(--ink)}
 .pickc:focus-visible{outline:4px solid var(--blue);outline-offset:4px}
 .pickc b{font:42px/1 Anton,Impact,sans-serif;letter-spacing:2px}
@@ -606,7 +606,7 @@ body.m{--cs:.6}
 .xpal{padding:8px;display:grid;grid-auto-rows:minmax(0,1fr);gap:6px;min-height:0}
 .xpi{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;padding:0 2px 2px;font-family:inherit;color:var(--ink);background:#fff7fb;border:3px solid var(--ink);border-radius:12px;cursor:grab;touch-action:none;box-shadow:0 3px 0 var(--ink);transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s}
 .xpi svg{width:100%;min-height:0;flex:1;pointer-events:none}.xpi b{font-weight:800;font-size:13px;letter-spacing:1px;pointer-events:none}
-.xpi:hover{background:var(--soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}.xpi:active{cursor:grabbing;transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+@media (hover:hover){.xpi:hover{background:var(--soft);transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}}.xpi:active{cursor:grabbing;transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
 .xpi:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .xcv{position:relative;overflow:hidden;min-height:0;background:radial-gradient(#ffd1e6 1.6px,transparent 2.2px) 0 0/22px 22px,#fffafd;touch-action:none}
 .xsvg{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;user-select:none;-webkit-user-select:none}
@@ -619,7 +619,7 @@ body.m{--cs:.6}
 .xlab{font-weight:800;font-size:12px;letter-spacing:1.5px;color:var(--pink);margin-bottom:6px}
 .xrow{display:flex;gap:8px;align-items:center}
 .xtg{flex:1;font:800 20px Nunito,sans-serif;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:999px;padding:4px 0;cursor:pointer;box-shadow:0 3px 0 var(--ink);transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s}
-.xtg:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}.xtg:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+@media (hover:hover){.xtg:hover{transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}}.xtg:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
 .xtg:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
 .xy{font-weight:800;font-size:18px;border:3px solid var(--ink);border-radius:999px;padding:3px 14px;background:#e6dcf5;white-space:nowrap}.xy.na{background:#fff;color:#8a6b86;border-style:dashed}
 .xtt{width:100%;font-size:19px}.xtt td{text-align:center}.xtt .na{color:#a8809f}
@@ -681,7 +681,7 @@ body.m{--cs:.6}
 .xlx{width:34px;height:30px;padding:0;font-size:14px;border-width:3px}
 .xlg{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;overflow:auto;min-height:0;padding:2px 2px 6px}
 .xli{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"n t" "n i";align-items:center;column-gap:10px;text-align:left;font-family:inherit;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:12px;padding:6px 10px;cursor:pointer;box-shadow:0 3px 0 var(--ink);transition:transform .14s var(--ease),background-color .16s}
-.xli:hover{background:var(--soft);transform:translateY(-2px)}.xli.cur{background:var(--soft);border-color:var(--pink)}
+@media (hover:hover){.xli:hover{background:var(--soft);transform:translateY(-2px)}}.xli.cur{background:var(--soft);border-color:var(--pink)}
 .xli b{grid-area:n;font:28px Anton,Impact,sans-serif;color:var(--pink)}.xli span{grid-area:t;font-weight:800;font-size:14px;line-height:1.2}.xli i{grid-area:i;font-style:normal;font-weight:700;font-size:12px;color:#8a6b86}
 .xtt .xth{font-size:.6em}.xtt .xtgt{color:#6b4a66;font-weight:800;border-left:2px dashed #cdbfd6}
 .xtt .xyc.ok{background:#d6f5df;color:#12803a;font-weight:800}.xtt .xyc.bad{background:#ffd9df;color:#b3304f;font-weight:800}
@@ -892,8 +892,8 @@ body.m{--cs:.6}
 .m .setcard input[type=range]{margin:14px 0}
 
 /* v21: tombol ULANG di kartu CERITA mengikuti gerak angkat kartu menu lain */
-.mre:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 8px 0 var(--ink);background:var(--soft)}.mre:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.mre:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
-@media (prefers-reduced-motion:reduce){.mre:hover:not(:disabled){transform:none;box-shadow:0 4px 0 var(--ink)}}
+@media (hover:hover){.mre:hover:not(:disabled){transform:translateY(-4px);box-shadow:0 8px 0 var(--ink);background:var(--soft)}}.mre:active:not(:disabled){transform:translateY(2px);box-shadow:0 2px 0 var(--ink)}.mre:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){@media (hover:hover){.mre:hover:not(:disabled){transform:none;box-shadow:0 4px 0 var(--ink)}}}
 
 /* v21b: nyawa Latihan, dan tombol ULANG ikut terangkat saat kartu CERITA di-hover/dipilih */
 .lives{display:flex;gap:4px;margin-left:auto}.lives.hit{animation:badshake .32s}
@@ -1115,3 +1115,10 @@ body:not(.m) .qv{margin-bottom:4px}
 .m .dqd{grid-template-columns:repeat(7,22px);gap:4px}
 .m .dqn{font-size:36px}
 .pb>.dqd{display:grid;margin:0;grid-template-columns:repeat(7,1fr);max-width:260px}
+
+/* v35: Harian muat di landscape, kotak hari tidak bergantung warna saja */
+.dqd i{position:relative;height:16px}
+.dqd i.ok::after,.dqd i.bad::after{position:absolute;inset:0;display:grid;place-items:center;font:800 11px/1 Nunito,sans-serif;color:var(--ink)}
+.dqd i.ok::after{content:"\2713"}.dqd i.bad::after{content:"\2717"}
+.m:not(.p) .dq .dqs{margin:0}.m:not(.p) .dq .dqn{font-size:30px}.m:not(.p) .dq .dqd{margin:0 0 4px}
+.m:not(.p) .dq .dqr,.m:not(.p) .dq .rve{margin:2px 0}.m:not(.p) .dq .dqt{display:none}
