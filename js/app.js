@@ -29,11 +29,17 @@ const Daily = {
   },
   week: (h, t) => Array.from({ length: 7 }, (_, k) => { const d = t - 6 + k; return d === t && h[d] == null ? 'now' : h[d] === 1 ? 'ok' : h[d] === 0 ? 'bad' : 'miss' })
 };
-const dailyQ = day => {   // soal hari ini: urutan bank soal berputar per hari, urutan pilihan diacak dengan benih tanggal (soal sama seharian)
-  const c = EVAL[((day % EVAL.length) + EVAL.length) % EVAL.length]; let x = day * 2654435761 >>> 0;
+const DQ_SLOTS = [0, 'E', 11, 4, 5, 'E', 1, 13, 12, 'E', 6, 14, 3, 15];   // siklus 14 hari: 11 jenis soal pilihan ganda dari QGEN (tiap jenis tidak muncul lagi dalam 14 hari) + 3 hari soal Evaluasi
+const dailyQ = day => {   // soal hari ini dibuat dari benih nomor hari: soal dan urutan pilihan sama seharian, beda tiap hari
+  const mod = (a, n) => ((a % n) + n) % n, m = mod(day, DQ_SLOTS.length), slot = DQ_SLOTS[m]; let x = day * 2654435761 >>> 0;
   const rnd = () => { x = x + 0x6D2B79F5 >>> 0; let t = Math.imul(x ^ x >>> 15, 1 | x); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296 };
-  const idx = c.o.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = rnd() * (i + 1) | 0; [idx[i], idx[j]] = [idx[j], idx[i]] }
-  return { kind: 'mc', q: c.q, vis: c.vis, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), e: c.e };
+  if (slot === 'E') {
+    const c = EVAL[mod(Math.floor(day / DQ_SLOTS.length) * 3 + DQ_SLOTS.slice(0, m).filter(v => v === 'E').length, EVAL.length)];
+    const idx = c.o.map((_, i) => i); for (let i = idx.length - 1; i > 0; i--) { const j = rnd() * (i + 1) | 0; [idx[i], idx[j]] = [idx[j], idx[i]] }
+    return { kind: 'mc', q: c.q, vis: c.vis, opts: idx.map(i => c.o[i]), a: idx.indexOf(c.a), e: c.e };
+  }
+  const r = Math.random; Math.random = rnd;   // QGEN, pick, rnd, dan shuffle memakai Math.random: dipinjamkan sebentar supaya hasilnya ditentukan benih
+  try { const Q = QGEN[slot](); return { ...Q, e: Q.e || Q.hint } } finally { Math.random = r }
 };
 const dayDots = w => `<span class="dqd" role="img" aria-label="7 hari terakhir: ${w.filter(x => x === 'ok' || x === 'bad').length} dijawab">${w.map(x => `<i class="${x}"></i>`).join('')}</span>`;
 
@@ -429,8 +435,8 @@ const starSnd = n => { for (let k = 0; k < n; k++) setTimeout(() => Snd.cue('sta
 /* LATIHAN (Natsuki) */
 SC.latihan = () => {
   const S = scaffold('latihan'), DN = D.natsuki, N = 8, W = () => mode === 'waktu', C = () => mode === 'berantai', lv = () => Math.floor(i / 4) + 1, bk = () => W() ? 'tkm_latihan_best_w' : 'tkm_latihan_best', best = () => store.get(bk(), 0), LIM = { tt: 45, det: 45, match: 45, led: 35 };   // detik per soal di Mode Waktu
-  let qs, i, sc, good, bad, wasBad, mx, heals = 0, lives, mode = 'santai', late = false, tout = 0, tq = 0, tsum = 0, tn = 0, marks = [], hb = 0, cb = false, gap = 9;   // marks: hasil tiap soal (titik progres); hb/cb: lencana Bangkit; gap: jarak sejak tamu terakhir
-  const begin = m => { mode = m || mode; qs = C() ? [] : makeSet(N); heals = 0; i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; late = false; tout = 0; tsum = 0; tn = 0; marks = []; hb = 0; cb = false; gap = 9; q() };
+  let qs, i, sc, good, bad, wasBad, mx, heals = 0, lives, mode = 'santai', late = false, tout = 0, tq = 0, tsum = 0, tn = 0, marks = [], hb = 0, cb = false, gap = 9, log = [], pk = -1;   // log: tiap soal yang dijawab (untuk PEMBAHASAN); pk: pilihan terakhir pada soal berjalan; marks: hasil tiap soal (titik progres); hb/cb: lencana Bangkit; gap: jarak sejak tamu terakhir
+  const begin = m => { mode = m || mode; qs = C() ? [] : makeSet(N); heals = 0; i = 0; sc = 0; good = 0; bad = 0; wasBad = false; mx = 0; lives = 3; late = false; tout = 0; tsum = 0; tn = 0; marks = []; hb = 0; cb = false; gap = 9; log = []; q() };
   const POOL = [[0, 1, 3, 11, 8], [2, 4, 13, 14, 12, 0, 1, 11], [5, 6, 10, 7, 9, 15, 2, 4], [5, 6, 7, 9, 10, 15, 12, 14]];   // Berantai: indeks QGEN per tingkat level
   const gen = () => { const p = POOL[Math.min(lv(), 4) - 1]; let x; for (let t = 0; t < 6; t++) if ((x = QGEN[pick(p)]()).kind !== qs[i - 1]?.kind) break; return x };
   const lim = () => Math.round(Math.max(.6, 1 - .08 * (lv() - 1)) * (LIM[qs[i].kind] || 30));
@@ -443,6 +449,7 @@ SC.latihan = () => {
   const lose = () => { const c = $('.combo', S.panel); if (c) { c.className = 'combo lost'; c.textContent = 'COMBO PUTUS' } };
   const heartsUI = up => { const l = $('.lives', S.panel); if (!l) return; l.innerHTML = hearts(lives); l.setAttribute('aria-label', 'Sisa nyawa ' + lives); if (up) return l.children[lives - 1]?.classList.add('up'); l.children[lives]?.classList.add('brk'); l.classList.remove('hit'); void l.offsetWidth; l.classList.add('hit') };
   const q = () => {
+    pk = -1;
     if (C()) { qs[i] ||= gen(); if (i === 0) S.d.say([[pick(DN.chain.first), 'smug'], [LIFE_SAY.startB, 'talk']]); else if (i % 4 === 0) S.d.say([[pick(DN.chain.up).replace('{n}', lv()), 'smug']]); else if (!heals || Math.random() < .5) S.d.line(pick(DN.chain.mid), 'talk') }
     else if (i === 0) S.d.say([[pick(DN.first), 'smug'], [W() ? LIFE_SAY.startT : LIFE_SAY.start, 'talk']]);
     else if (i === N / 2) { const g = sc >= N / 2 - 1; S.d.say([[pick(g ? DN.halfGood : DN.halfBad), g ? 'smug' : 'hmph'], ...SL.lat('half', g)]) } // komentar kemajuan di tengah latihan
@@ -450,8 +457,8 @@ SC.latihan = () => {
     else S.d.line(i === N - 1 ? pick(DN.last) : pick(DN.mid), 'talk');
     queueMicrotask(() => cmb(false)); tq = performance.now();
     renderQ(S.panel, qs[i], i, N, { reveal: true, lives, marks, chain: C() && { lv: lv() }, last: () => C() ? lives <= 0 : i + 1 >= N || lives <= 0, timer: C() ? lim() : W() ? LIM[qs[i].kind] || 30 : 0, onTime: () => { late = true; tout++ }, next: () => (C() ? (++i, lives > 0) : ++i < N && lives > 0) ? q() : end(),
-      onPick: (k, prev) => { if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
-      const tu = late; late = false; tsum += performance.now() - tq; tn++; const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0, hb = Math.max(hb, bad)); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
+      onPick: (k, prev) => { pk = k; if (prev >= 0 && k !== prev && Math.random() < .7) S.d.line(pick(DN.change), pick(['hmph', 'smug'])) }, onAns: ok => {
+      const tu = late; late = false; log.push({ Q: qs[i], ok, k: pk, tu }); tsum += performance.now() - tq; tn++; const had = good; sc += ok ? 1 : 0; ok ? (good++, bad = 0, mx = Math.max(mx, good)) : (bad++, good = 0, hb = Math.max(hb, bad)); const wb = wasBad; wasBad = !ok; ok ? cmb(true) : had >= 2 && lose();
       if (ok && good >= 3 && hb >= 2) cb = true;
       marks[i] = ok ? 'ok' : 'bad'; $$('.qs i', S.panel)[i]?.classList.add(ok ? 'ok' : 'bad'); if (!tu) Snd.cue(ok ? 'ok' : 'bad');
       if (!ok) { lives--; heartsUI() }
@@ -462,12 +469,31 @@ SC.latihan = () => {
     } });
     if (C() && i && i % 4 === 0) { $('.qh', S.panel)?.classList.add('lvup'); Snd.cue('up') }
   };
+  const bad$ = () => log.filter(l => !l.ok), rvBtn = () => bad$().length ? `<button class="btn sm rvb" id="rv">PEMBAHASAN (${bad$().length})</button>` : '';
+  const ansText = Q => {   // jawaban benar dalam kata, untuk PEMBAHASAN; kosong bila tidak ada satu jawaban tunggal
+    if (!Q.kind || Q.kind === 'mc') return Q.opts[Q.a];
+    if (Q.kind === 'tt') return Q.g === 'NOT' ? `A = 0 → Y = ${Q.ans[0]}, A = 1 → Y = ${Q.ans[1]}` : `Kolom Y dari baris atas ke bawah: ${Q.ans.join(', ')}`;
+    if (Q.kind === 'det') return 'Gerbang ' + Q.g;
+    if (Q.kind === 'led') { const two = Q.b !== null, s = (two ? [[0, 0], [0, 1], [1, 0], [1, 1]] : [[0], [1]]).find(Q.good); return s ? `A = ${s[0]}${two ? `, B = ${s[1]}` : ''}` : '' }
+    return '';
+  };
+  const review = back => {   // soal salah saja, soal pertama terbuka (<details> bawaan browser); lanjutan Evaluasi: PEMBAHASAN
+    const ws = bad$();
+    S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${ws.map((l, n) => { const Q = l.Q, mc = !Q.kind || Q.kind === 'mc', a = ansText(Q);
+      return `<details class="bad"${n ? '' : ' open'}><summary>${n + 1}. ${Q.q}</summary>${Q.vis || ''}${mc ? `<p>Jawabanmu: <b>${l.k >= 0 ? Q.opts[l.k] : 'Tidak dijawab (waktu habis)'}</b></p>` : l.tu ? '<p>Waktu habis sebelum kamu selesai menjawab.</p>' : ''}${a ? `<p>Jawaban benar: <b>${a}</b></p>` : ''}<p class="rve">${Q.e || Q.hint || ''}</p></details>` }).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
+    $('#rb').onclick = () => { Snd.sfx('select'); back() };
+    S.d.line(pick(DN.review), 'talk');
+  };
   const endC = () => {
     const L = Math.floor((Math.max(tn, 1) - 1) / 4) + 1, pn = store.get('tkm_chain_best', null)?.n || 0, rec = pn > 0 && sc > pn; if (sc > pn) store.set('tkm_chain_best', { n: sc, lv: L });
     const bn = Math.max(sc, pn), avg = tn ? tsum / tn / 1000 : 0, bd = [rec && ['Rekor baru', 'Lebih jauh dari rekor sebelumnya'], heals && ['Hati pulih ×' + heals, 'Nyawa kembali berkat jawaban beruntun']].filter(Boolean);
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>RANGKAIAN PUTUS</h2><div class="rbody"><div class="rl"><div class="ring" style="--p:${bn ? sc / bn * 100 : 0}%"><p class="score">${sc}</p></div>${bd.length ? `<div class="bdg" role="list" aria-label="Lencana">${bd.map(([a, b], k) => `<span class="bd" role="listitem" style="--i:${k}" title="${b}" aria-label="${a}: ${b}">${a}</span>`).join('')}</div>` : ''}</div><div class="rside"><p class="bestp">${IC.best}Rekor: <b>${bn}</b></p><p class="bestp">${IC.chain}Level tertinggi: <b>${L}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}<span>Rata-rata <b>${Math.round(avg)} dtk</b>${tout ? ` · habis waktu <b>${tout}×</b>` : ''}</span></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button><button class="btn sm" id="go2">MODE LAIN</button></div></div></div>`;
+    const show = fx => {
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>RANGKAIAN PUTUS</h2><div class="rbody"><div class="rl"><div class="ring" style="--p:${bn ? sc / bn * 100 : 0}%"><p class="score">${sc}</p></div>${bd.length ? `<div class="bdg" role="list" aria-label="Lencana">${bd.map(([a, b], k) => `<span class="bd" role="listitem" style="--i:${k}" title="${b}" aria-label="${a}: ${b}">${a}</span>`).join('')}</div>` : ''}${rvBtn()}</div><div class="rside"><p class="bestp">${IC.best}Rekor: <b>${bn}</b></p><p class="bestp">${IC.chain}Level tertinggi: <b>${L}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}<span>Rata-rata <b>${Math.round(avg)} dtk</b>${tout ? ` · habis waktu <b>${tout}×</b>` : ''}</span></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button><button class="btn sm" id="go2">MODE LAIN</button></div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() }; $('#go2').onclick = () => { Snd.sfx('select'); go('latihan') };
-    countUp($('.score', S.panel), sc, x => x); Snd.cue('over'); if (rec) { setTimeout(() => Snd.cue('up'), 500); confetti($('.startcard', S.panel), 18); hop(1) }
+    if ($('#rv')) $('#rv').onclick = () => { Snd.sfx('select'); review(() => show(false)) };
+    if (fx) { countUp($('.score', S.panel), sc, x => x); Snd.cue('over'); if (rec) { setTimeout(() => Snd.cue('up'), 500); confetti($('.startcard', S.panel), 18); hop(1) } }
+    };
+    show(true);
     S.d.say([[pick(LIFE_SAY.out), 'hmph'], ...cameo('natsuki', 'out'), [pick(DN.chain.end[L === 1 ? 'low' : L <= 3 ? 'mid' : 'high']).replace('{n}', L), L > 3 ? 'happy' : L > 1 ? 'smug' : 'hmph'], ...(rec ? [[pick(DN.chain.record), 'smug']] : [])]);
   };
   const end = () => {
@@ -476,11 +502,16 @@ SC.latihan = () => {
     const avg = tn ? tsum / tn / 1000 : 99, stars = out ? 0 : sc >= 7 && avg <= 22 ? 3 : sc >= 5 ? 2 : 1,   // bintang: 3 = skor 7+ dan rata-rata <= 22 dtk, 2 = skor 5+, 1 = selesai, 0 = nyawa habis
       bd = [!out && lives === 3 && ['Hati utuh', 'Tidak kehilangan satu nyawa pun'], !out && lives === 3 || mx < 5 ? 0 : ['Beruntun ×' + mx, mx + ' jawaban benar berturut-turut'], !out && lives === 1 && ['Lolos tipis', 'Selesai dengan satu nyawa tersisa'], !out && sc >= 6 && avg <= 12 && ['Kilat', 'Rata-rata di bawah 12 detik per soal'], W() && !out && !tout && ['Tepat waktu', 'Tidak ada soal yang kehabisan waktu'], !out && cb && ['Bangkit', 'Benar 3 kali berturut-turut setelah 2 kali salah'], rec && ['Rekor baru', 'Mengalahkan skor terbaik sebelumnya']].filter(Boolean),
       nxt = ['Selesaikan semua soal tanpa kehabisan nyawa untuk mendapat bintang.', 'Skor 5 atau lebih untuk bintang kedua.', 'Skor 7 atau lebih dengan rata-rata di bawah 22 detik untuk bintang ketiga.', ''][stars];
-    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="rl"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div>${bd.length ? `<div class="bdg" role="list" aria-label="Lencana">${bd.map(([a, b], k) => `<span class="bd" role="listitem" style="--i:${k}" title="${b}" aria-label="${a}: ${b}">${a}</span>`).join('')}</div>` : ''}</div><div class="rside">${starRow(stars, 3)}${nxt ? `<p class="srule">${nxt}</p>` : ''}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}<span>Rata-rata <b>${Math.round(avg)} dtk</b>${W() && tout ? ` · habis waktu <b>${tout}×</b>` : ''}</span></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
+    const show = fx => {
+    S.panel.innerHTML = `<div class="startcard sc res lres"><h2>${out ? 'NYAWA HABIS' : W() ? 'Hasil Mode Waktu' : 'Hasil Latihan'}</h2><div class="rbody"><div class="rl"><div class="ring" style="--p:${sc / N * 100}%"><p class="score">${sc} / ${N}</p></div>${bd.length ? `<div class="bdg" role="list" aria-label="Lencana">${bd.map(([a, b], k) => `<span class="bd" role="listitem" style="--i:${k}" title="${b}" aria-label="${a}: ${b}">${a}</span>`).join('')}</div>` : ''}${rvBtn()}</div><div class="rside">${starRow(stars, 3)}${nxt ? `<p class="srule">${nxt}</p>` : ''}${out ? `<p class="bestp">Berhenti di soal ${i} dari ${N}</p>` : ''}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b></p>${mx >= 2 ? `<p class="bestp">Beruntun terbaik: <b>×${mx}</b></p>` : ''}${tn ? `<p class="bestp">${IC.clock.replace('<svg', '<svg class="ck"')}<span>Rata-rata <b>${Math.round(avg)} dtk</b>${W() && tout ? ` · habis waktu <b>${tout}×</b>` : ''}</span></p>` : ''}<button class="btn big" id="go">ULANGI ↻</button>${Story.on ? '' : `<button class="btn sm" id="go2">${W() ? 'COBA MODE SANTAI' : 'COBA MODE WAKTU'}</button>`}</div></div></div>`;
     $('#go').onclick = () => { Snd.sfx('select'); begin() };
     if (!Story.on) $('#go2').onclick = () => { Snd.sfx('select'); begin(W() ? 'santai' : 'waktu') };
-    countUp($('.score', S.panel), sc, x => `${x} / ${N}`); starSnd(stars); bd.slice(0, 3).forEach((_, k) => setTimeout(() => Snd.cue('badge'), 450 + stars * 110 + 150 + k * 140)); if (out) Snd.cue('over'); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1);
-    if (Story.on) { Story.record('lat', sc); $('.startcard', S.panel).appendChild(Story.contBtn('latihan')) }
+    if ($('#rv')) $('#rv').onclick = () => { Snd.sfx('select'); review(() => show(false)) };
+    if (Story.on) $('.startcard', S.panel).appendChild(Story.contBtn('latihan'));
+    if (fx) { countUp($('.score', S.panel), sc, x => `${x} / ${N}`); starSnd(stars); bd.slice(0, 3).forEach((_, k) => setTimeout(() => Snd.cue('badge'), 450 + stars * 110 + 150 + k * 140)); if (out) Snd.cue('over'); if (sc >= 6) confetti($('.startcard', S.panel), sc === N ? 30 : 14); if (sc >= 6) hop(sc === N ? 2 : 1) }
+    };
+    if (Story.on) Story.record('lat', sc);
+    show(true);
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([...(out ? [[pick(LIFE_SAY.out), 'hmph'], ...cameo('natsuki', 'out')] : []), [pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };

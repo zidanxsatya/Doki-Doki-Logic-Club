@@ -109,6 +109,7 @@ const D = {
     ],
     change: ['Ganti jawaban? Plin-plan banget. ...Ya sudah, pikirin baik-baik.', 'Berubah pikiran? Bagus, mending mikir dulu daripada asal. Bukan pujian, ya.', 'Nah, gitu. Jangan buru-buru, tapi jangan kelamaan juga.', 'Ragu-ragu ya? Percaya sama otakmu sendiri dong.'],
     first: ['Soal pertama. Pilih jawabanmu, boleh diganti sebelum kamu tekan CEK. Tapi jangan plin-plan.', 'Soal pertama. Jangan bikin aku malu.', 'Pemanasan dulu. Kalau yang ini aja salah, aku nyerah.', 'Soal satu. Fokus, jangan bengong.'],
+    review: ['Nih, soal yang salah tadi. Baca penjelasannya, jangan cuma lihat skor.', 'Soal pertama sudah kubuka. Kalau mau lihat yang lain, tinggal ketuk.', 'Salah itu bukan akhir dunia. Yang bodoh itu salah dua kali di soal yang sama, tahu.'],
     mid: ['Soal berikutnya. Fokus.', 'Lanjut. Jangan melamun.', 'Nih, soal selanjutnya. Buktikan.', 'Ayo, jangan lembek. Tinggal sedikit lagi.', 'Belum selesai. Lanjut.', 'Masih kuat? Kita lihat nanti.', 'Soal berikutnya. Cupcake-ku tadi hampir gosong gara-gara nungguin kamu. ...Bukan salahmu juga sih. Fokus.', 'Lanjut. Aku lagi pengin es krim, jadi cepetan.'],
     last: ['Soal terakhir. Jangan sampai gagal di garis finis.', 'Yang terakhir. ...Kamu pasti bisa. Maksudku, semoga.', 'Tinggal satu. Selesaikan dengan keren, atau kuejek.'],
     praise: [

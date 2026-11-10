@@ -1153,3 +1153,22 @@ body:not(.m) .qv{margin-bottom:4px}
 
 /* v36: area tap tombol kasus hanya vertikal, supaya kartu Peta tidak scroll horizontal */
 .m .pkb .btn:not(#startBtn)::after,.m:not(.p) .pkb .btn:not(#startBtn)::after{inset:-8px 0}
+
+/* v37: tombol PEMBAHASAN Latihan berada di kolom kiri kartu hasil (di bawah ring dan lencana), jadi tinggi kartu tidak bertambah */
+.rl .rvb{margin-top:10px}
+.m.p .lres .rl .rvb{order:4;margin-top:0}
+/* v37: kartu hasil Latihan dan kartu PEMBAHASAN di desktop dipadatkan supaya tidak masuk ke bawah kotak dialog (y=498) */
+body:not(.m) .startcard.lres h2{line-height:1.05;padding-top:14px;margin-bottom:6px}
+body:not(.m) .startcard.lres{padding-bottom:14px}
+body:not(.m) .lres .rside .bestp{margin-bottom:6px}
+body:not(.m) .lres .stars{margin-bottom:6px}
+body:not(.m) .rv h2{line-height:1.05;padding-top:14px}
+body:not(.m) .rv .rvl{max-height:30vh}
+/* v37: hasil Latihan di Mode Cerita (desktop) memuat tombol lanjut di bawah kartu: ring dan pil dipadatkan */
+body:not(.m) .story .startcard.lres{padding:8px 18px 8px}
+body:not(.m) .story .startcard.lres h2{line-height:1.05}
+body:not(.m) .story .lres .ring{width:150px;height:150px}
+body:not(.m) .story .lres .ring::after{inset:13px}
+body:not(.m) .story .lres .ring .score{font-size:48px}
+body:not(.m) .story .lres .rside .bestp{padding:3px 16px;font-size:16px;margin-bottom:4px}
+body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}

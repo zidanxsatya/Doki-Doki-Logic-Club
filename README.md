@@ -26,7 +26,7 @@ Menu utama punya lima bagian belajar, ditambah Tantangan Harian, Peta dan Pengat
 | Cerita | Keempat karakter | Tiga belas langkah dari materi sampai evaluasi, dengan adegan cerita di antaranya. Setelah Latihan ada tiga kasus nyata (alarm toko, lampu tangga, brankas klub) yang dikerjakan dengan gerbang yang sudah dipelajari. Beberapa adegan memberi pilihan jawaban. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
 | Materi | Sayori | 11 halaman: pengertian rangkaian logika, input dan output, logika 0 dan 1, gerbang AND, OR, NOT, NAND, NOR, XOR, XNOR, dan tabel kebenaran. Setelah halaman terakhir ada Flash Card. |
 | Simulasi | Yuri | Simulasi Dasar untuk 7 gerbang dengan saklar input, LED output, dan tabel kebenaran. Simulasi+ untuk menyusun rangkaian sendiri dan mengerjakan 17 tantangan. |
-| Latihan | Natsuki | 16 jenis soal dalam tiga mode: Santai, Waktu, dan Berantai. Hasil berupa bintang, lencana, dan skor terbaik. |
+| Latihan | Natsuki | 16 jenis soal dalam tiga mode: Santai, Waktu, dan Berantai. Hasil berupa bintang, lencana, dan skor terbaik. Tombol PEMBAHASAN di layar hasil membuka soal yang salah beserta jawaban benar dan penjelasannya. |
 | Evaluasi | Monika | 10 soal acak dari bank 19 soal, 60 detik per soal, dengan empat kategori nilai dari "Perlu Belajar Lagi" sampai "Sangat Baik" dan pembahasan soal yang salah. |
 
 ### Panduan sekali tampil
@@ -35,7 +35,7 @@ Saat game dibuka, Sayori membawakan panduan empat halaman (urutan belajar, cara 
 
 ### Tantangan Harian
 
-Tombol HARIAN di menu memberi satu soal per hari (Monika), diambil dari bank soal Evaluasi. Soalnya sama seharian dan berganti tiap tengah malam menurut tanggal perangkat. Soal hanya bisa dijawab sekali; setelah itu muncul penjelasan dan jawaban benar. Menjawab, benar atau salah, menambah hari beruntun (streak). Melewatkan satu hari mengembalikan hitungan ke 0, sedangkan rekor terbaik tetap tersimpan. Titik kecil di tombol menandai bahwa soal hari ini belum dijawab, dan tujuh kotak menunjukkan tujuh hari terakhir. Tanggal diambil dari jam perangkat, jadi pemain yang mengubah jam bisa mengakali hitungan; game ini tidak punya server untuk memeriksanya.
+Tombol HARIAN di menu memberi satu soal per hari (Monika). Soal dibuat dari tanggal perangkat: sebagian dari generator soal Latihan (output gerbang, membaca rangkaian, persamaan Boolean, situasi nyata, dan jenis lain) dan sebagian dari bank soal Evaluasi, dengan siklus 14 hari yang tidak mengulang jenis soal. Soalnya sama seharian dan berganti tiap tengah malam menurut tanggal perangkat. Soal hanya bisa dijawab sekali; setelah itu muncul penjelasan dan jawaban benar. Menjawab, benar atau salah, menambah hari beruntun (streak). Melewatkan satu hari mengembalikan hitungan ke 0, sedangkan rekor terbaik tetap tersimpan. Titik kecil di tombol menandai bahwa soal hari ini belum dijawab, dan tujuh kotak menunjukkan tujuh hari terakhir. Tanggal diambil dari jam perangkat, jadi pemain yang mengubah jam bisa mengakali hitungan; game ini tidak punya server untuk memeriksanya.
 
 ### Peta Kemajuan
 
