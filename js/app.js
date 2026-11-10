@@ -47,8 +47,8 @@ async function go(id) {
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
-  else if (id === 'settings') buildSettings();   // musik menu tetap berjalan
-  else if (id === 'peta') buildPeta();
+  else if (id === 'settings') { buildSettings(); scrollHint('#settings') }   // musik menu tetap berjalan
+  else if (id === 'peta') { buildPeta(); scrollHint('#peta') }
   else { markSeen(id); if (id !== 'simpick' && id !== 'tutor' && id !== 'harian') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
   curId = id; await wait(40); f.classList.remove('on'); busy = false; Story.chap?.(id);
   if (pend && pend !== id) go(pend)
@@ -80,6 +80,12 @@ function buildMenu() {
 
 /* PETA KEMAJUAN: ringkasan dari data yang sudah tersimpan di browser (tkm_seen, tkm_ch, skor terbaik) */
 const markSeen = id => { const k = id === 'simpick' ? '' : id; if (!['materi', 'simulasi', 'simplus', 'latihan', 'evaluasi'].includes(k)) return; const v = store.get('tkm_seen', {}); if (!v[k]) { v[k] = 1; store.set('tkm_seen', v) } };
+/* bayangan di tepi bawah kartu yang bisa digulir, hilang setelah isi paling bawah terlihat */
+function scrollHint(sel) {
+  const c = $('.setcard', $(sel)); if (!c) return;
+  const u = () => c.classList.toggle('scr', c.scrollTop + c.clientHeight < c.scrollHeight - 4);
+  c.addEventListener('scroll', u); [60, 500].forEach(t => setTimeout(u, t)); u();
+}
 function buildPeta() {
   const el = $('#peta'), seen = store.get('tkm_seen', {}), sp = Story.prog(), done = new Set(store.get('tkm_ch', [])), nS = sp.done ? STEPS.length : sp.step,
     bs = store.get('tkm_latihan_best', 0), bw = store.get('tkm_latihan_best_w', 0), bc = store.get('tkm_chain_best', null), ev = store.get('tkm_eval_best', null),
@@ -92,7 +98,7 @@ function buildPeta() {
     ${row('materi', 'MATERI', st(seen.materi, seen.materi ? 'Sudah dibuka' : 'Belum dibuka'))}
     ${row('simpick', 'SIMULASI', `<span>${st(seen.simulasi, 'Dasar ' + (seen.simulasi ? 'dicoba' : 'belum dicoba'))}${st(seen.simplus, 'Simulasi+ ' + done.size + ' / ' + CH.length)}</span><span class="pgrid" role="img" aria-label="${done.size} dari ${CH.length} tantangan Simulasi+ selesai">${CH.map((c, k) => `<i class="pc${done.has(k) ? ' on' : ''}" title="${c.t}"></i>`).join('')}</span>`)}
     ${row('latihan', 'LATIHAN', `<span>${lat('Santai', bs)}${lat('Waktu', bw)}<span class="pst ${bc ? 'on' : ''}">Berantai: ${bc ? bc.n + ' benar · Level ' + bc.lv : 'belum dicoba'}</span></span>`)}
-    <div class="prow pkz"><b class="prn">KASUS NYATA</b><span class="pb"><span>${st(kDone >= 3, kOpen ? `${kDone} / 3 selesai` : 'Terbuka setelah Cerita sampai Kasus Nyata')}</span><span class="pkb">${Object.keys(KASUS).map(id => `<button class="btn sm" data-k="${id}"${kOpen ? '' : ' disabled'}>${KASUS[id].no}. ${{ k_alarm: 'Alarm', k_tangga: 'Lampu tangga', k_brankas: 'Brankas' }[id]}</button>`).join('')}</span></span></div>
+    <div class="prow pkz"><b class="prn">KASUS NYATA</b><span class="pb"><span>${st(kDone >= 3, kOpen ? `${kDone} / 3 selesai` : 'Terbuka setelah Cerita sampai Kasus Nyata')}</span><span class="pkb">${Object.keys(KASUS).map(id => `<button class="btn sm" data-k="${id}"${kOpen ? '' : ' disabled'}>${KASUS[id].no <= kDone ? '✓ ' : ''}${KASUS[id].no}. ${{ k_alarm: 'Alarm', k_tangga: 'Lampu tangga', k_brankas: 'Brankas' }[id]}</button>`).join('')}</span></span></div>
     ${row('harian', 'HARIAN', `<span>${st(dd.h[dday] != null, dd.h[dday] != null ? 'Hari ini selesai' : 'Hari ini belum')}<span class="pst ${dstr ? 'on' : ''}">${dstr} hari beruntun${dd.best > dstr ? ' · terbaik ' + dd.best : ''}</span></span>${dayDots(Daily.week(dd.h, dday))}`)}
     ${row('evaluasi', 'EVALUASI', ev == null ? st(0, 'Belum dicoba') : st(1, `Terbaik ${ev * 10} · ${GRADES.find(g => ev >= g.min).t}`))}
   </div>`;

@@ -107,7 +107,7 @@ function narrScene(id) {
   if (A.reveal) place();   // adegan pembuka: hanya pembicara pertama yang tampil, lainnya masuk saat pertama bicara
   d.onSpeaker = k => { if (!vis.has(k)) { vis.add(k); place() } $$('.ns', el).forEach(n => n.classList.toggle('on', n.dataset.k === k)) };
   const goBtn = $('.ngo', el); let finished = false;
-  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el), d); const ft = $('.rfoot', el); if (ft) ft.append(goBtn) } if (Story.replay) goBtn.textContent = 'KEMBALI KE PETA ▶'; goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.replay ? Story.leave() : Story.advance() } };
+  const done = () => { if (finished) return; finished = true; goBtn.hidden = false; if (A.card) { A.card($('#panel', el), d); const ft = $('.kzm', el) || $('.rfoot', el); if (ft) ft.append(goBtn) } if (Story.replay) goBtn.textContent = 'KEMBALI KE PETA ▶'; goBtn.onclick = () => { Snd.sfx('select'); A.next ? A.next() : Story.replay ? Story.leave() : Story.advance() } };
   /* pilihan (A.ask): dialog sampai pertanyaan -> kartu pilihan -> reaksi sesuai pilihan -> sisa dialog (setelah A.skip baris). Tanpa A.ask: perilaku lama. */
   const ask = A.ask, first = ask ? lines.slice(0, ask.at + 1) : lines, rest = ask ? lines.slice(ask.at + 1 + (ask.skip || 0)) : [];
   let phase = ask ? 0 : 2;   // 0 = sebelum pilihan, 1 = menunggu pilihan, 2 = setelah
@@ -390,11 +390,17 @@ function kasusCard(id, panel, d) {
     fm.innerHTML = kzExpr(c, pick);
     $$('.opt', panel).forEach(b => { const on = pick[b.dataset.s] === b.dataset.g; b.classList.toggle('picked', on); b.setAttribute('aria-checked', on) });
     msg.textContent = Object.keys(pick).length < c.st.length ? 'Pilih gerbang di tiap tahap.' : ok === n ? 'Semua skenario lolos!' : `${ok} dari ${n} skenario lolos.`;
-    if (ok === n && Object.keys(pick).length === c.st.length && !solved) { solved = true; Snd.cue('star'); Story.record('kasus', Math.max(Story.prog().kasus || 0, c.no)); $$('.opt', panel).forEach(b => b.disabled = true); $('#khint', panel).disabled = true; go.hidden = false; d.say(c.win) }
+    if (ok === n && Object.keys(pick).length === c.st.length && !solved) { solved = true; Snd.cue('star'); Story.record('kasus', Math.max(Story.prog().kasus || 0, c.no)); $$('.opt', panel).forEach(b => b.disabled = true); $('#khint', panel).disabled = true; go.hidden = false; $('#khint', panel).hidden = true; d.say(c.win) }
   };
   panel.onclick = e => { const b = e.target.closest('.opt'); if (!b || solved) return; Snd.sfx('select'); pick[b.dataset.s] = b.dataset.g; draw() };
   $('#khint', panel).onclick = () => { if (solved) return; Snd.sfx('select'); const s = c.st.find(x => pick[x.id] !== x.ans); s && d.say([s.hint]) };
   draw();
+  const fit = () => {   // panel kasus tidak boleh melewati kotak dialog, berapa pun tinggi dialog di layar itu
+    const dl = $('.dlg'), r = panel.getBoundingClientRect(), k = panel.offsetHeight ? r.height / panel.offsetHeight : 1;
+    if (!dl || !r.height) return; panel.style.maxHeight = Math.max(120, (dl.getBoundingClientRect().top - r.top - 6) / k) + 'px'; panel.style.overflowY = 'auto'; const kc = $('.kz', panel); kc.classList.remove('tight'); if (panel.scrollHeight > panel.clientHeight + 2) kc.classList.add('tight'); upd();   // masih meluap: rapatkan dulu sebelum menggulir
+  }, upd = () => panel.classList.toggle('scr', panel.scrollTop + panel.clientHeight < panel.scrollHeight - 4);   // bayangan di tepi bawah bila masih ada isi di bawah
+  panel.addEventListener('scroll', upd);
+  fit(); removeEventListener('resize', Story.kzFit); Story.kzFit = fit; addEventListener('resize', fit); setTimeout(fit, 400);
 }
 Object.keys(KASUS).forEach(id => { const c = KASUS[id]; ST[id] = { bg: c.bg, title: c.title, go: c.go, kz: true, lines: c.lines, win: c.win, hints: c.st.map(s => s.hint), card: (panel, d) => kasusCard(id, panel, d) }; SC[id] = () => narrScene(id) });
 
