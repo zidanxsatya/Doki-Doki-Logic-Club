@@ -1172,3 +1172,27 @@ body:not(.m) .story .lres .ring::after{inset:13px}
 body:not(.m) .story .lres .ring .score{font-size:48px}
 body:not(.m) .story .lres .rside .bestp{padding:3px 16px;font-size:16px;margin-bottom:4px}
 body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}
+
+/* v38: daftar PEMBAHASAN yang masih bisa digulir memudar di tepi bawah, tidak terpotong keras */
+.rvl.scr{-webkit-mask-image:linear-gradient(#000 calc(100% - 28px),transparent);mask-image:linear-gradient(#000 calc(100% - 28px),transparent)}
+
+/* v38: kartu hasil Latihan di ponsel tegak berlayar pendek (mis. 360x640) dipadatkan supaya tombol PEMBAHASAN tidak terpotong */
+@media (max-height:700px){
+.m.p .startcard.lres{padding:8px 12px}
+.m.p .startcard.lres h2{font-size:30px;padding:2px 0 4px;margin-bottom:4px}
+.m.p .lres .rbody{row-gap:4px}
+.m.p .lres .rside .bestp{margin-bottom:4px;padding:3px 12px}
+.m.p .lres .stars i{font-size:18px}
+.m.p .lres .rl .bdg{gap:4px}
+}
+/* v38: ponsel landscape sangat pendek (360 px): gambar gerbang/rangkaian di atas soal sedikit diperkecil supaya semua pilihan muat di atas dialog */
+@media (max-height:400px){.m:not(.p) .qv .circ{max-height:74px;width:auto;max-width:100%}.m:not(.p) .qv .tt,.m:not(.p) .qv .tt th,.m:not(.p) .qv .tt td{font-size:13px;line-height:1.15}.m:not(.p) .qv .tt th,.m:not(.p) .qv .tt td{padding:0 10px}}
+@media (max-height:400px){
+.m:not(.p) .qq{padding:3px 10px;font-size:15px;margin:0 0 3px}
+.m:not(.p) .qo{gap:5px}.m:not(.p) .qo .opt{padding:3px 8px}
+.m:not(.p) .qo.ttq{flex-direction:row;justify-content:center;align-items:center;gap:14px}
+.m:not(.p) .qo.ttq .tt,.m:not(.p) .qo.ttq .btn{margin:0}
+.m:not(.p) .qo .tt th,.m:not(.p) .qo .tt td{padding:0 10px;font-size:13px;line-height:1.1}
+}
+/* v38: tablet tegak (tinggi besar, dialog tinggi): daftar PEMBAHASAN dibatasi 300 px agar kartu tidak melewati dialog */
+.m.p .rvl{max-height:min(32vh,300px)}

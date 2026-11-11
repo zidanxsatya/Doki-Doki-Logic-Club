@@ -87,10 +87,13 @@ function buildMenu() {
 /* PETA KEMAJUAN: ringkasan dari data yang sudah tersimpan di browser (tkm_seen, tkm_ch, skor terbaik) */
 const markSeen = id => { const k = id === 'simpick' ? '' : id; if (!['materi', 'simulasi', 'simplus', 'latihan', 'evaluasi'].includes(k)) return; const v = store.get('tkm_seen', {}); if (!v[k]) { v[k] = 1; store.set('tkm_seen', v) } };
 /* bayangan di tepi bawah kartu yang bisa digulir, hilang setelah isi paling bawah terlihat */
+function fadeHint(c) {   // kelas .scr = masih ada isi di bawah (dipakai untuk fade); dihitung ulang saat gulir dan saat <details> dibuka atau ditutup
+  const u = () => c.classList.toggle('scr', c.scrollTop + c.clientHeight < c.scrollHeight - 4);
+  c.addEventListener('scroll', u); c.addEventListener('toggle', u, true); [60, 500].forEach(t => setTimeout(u, t)); u();
+}
 function scrollHint(sel) {
   const c = $('.setcard', $(sel)); if (!c) return;
-  const u = () => c.classList.toggle('scr', c.scrollTop + c.clientHeight < c.scrollHeight - 4);
-  c.addEventListener('scroll', u); [60, 500].forEach(t => setTimeout(u, t)); u();
+  fadeHint(c);
 }
 function buildPeta() {
   const el = $('#peta'), seen = store.get('tkm_seen', {}), sp = Story.prog(), done = new Set(store.get('tkm_ch', [])), nS = sp.done ? STEPS.length : sp.step,
@@ -405,7 +408,7 @@ function renderQ(panel, Q, i, n, { reveal, onAns, next, onPick, timer, onTime, l
     else f.innerHTML = `<button class="btn" id="qn">${(last ? last() : i + 1 >= n) ? 'SELESAI ▶' : 'LANJUT ▶'}</button>`, $('#qn').onclick = () => { Snd.sfx('select'); clearInterval(panel._tt); onAns(choice === Q.a); next() };
     f.scrollIntoView({ block: 'nearest' });
   };
-  o.classList.toggle('n5', Q.opts.length > 4);   // 4 pilihan pendek: 2 kolom di HP tegak
+  o.classList.toggle('n5', Q.opts.length > 4 || (!!Q.vis && Q.opts.length === 4 && Q.opts.every(t => String(t).replace(/<[^>]+>/g, '').length <= 14)));   // banyak pilihan, atau 4 pilihan pendek di bawah gambar rangkaian: 2 kolom di HP tegak supaya muat
   o.classList.toggle('c2', Q.opts.length === 4 && Q.opts.every(s => s.length <= 20));   // 5 pilihan: lebih rapat supaya tombol aksi tidak tertutup kotak dialog
   Q.opts.forEach((t, k) => {
     const b = document.createElement('button'); b.className = 'opt'; b.innerHTML = t; if (t.includes('<')) b.setAttribute('aria-label', t.replace(/<span class="ov">(.*?)<\/span>/g, 'bukan ($1)').replace(/<[^>]+>/g, ''));   // opsi bernotasi garis atas (NOT)
@@ -482,6 +485,7 @@ SC.latihan = () => {
     S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${ws.map((l, n) => { const Q = l.Q, mc = !Q.kind || Q.kind === 'mc', a = ansText(Q);
       return `<details class="bad"${n ? '' : ' open'}><summary>${n + 1}. ${Q.q}</summary>${Q.vis || ''}${mc ? `<p>Jawabanmu: <b>${l.k >= 0 ? Q.opts[l.k] : 'Tidak dijawab (waktu habis)'}</b></p>` : l.tu ? '<p>Waktu habis sebelum kamu selesai menjawab.</p>' : ''}${a ? `<p>Jawaban benar: <b>${a}</b></p>` : ''}<p class="rve">${Q.e || Q.hint || ''}</p></details>` }).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
     $('#rb').onclick = () => { Snd.sfx('select'); back() };
+    fadeHint($('.rvl'));
     S.d.line(pick(DN.review), 'talk');
   };
   const endC = () => {
@@ -548,6 +552,7 @@ SC.evaluasi = () => {
     const review = () => {   // soal salah terbuka, soal benar tertutup (<details> bawaan browser)
       S.panel.innerHTML = `<div class="startcard sc res rv"><h2>PEMBAHASAN</h2><div class="rvl">${log.map((l, n) => ({ ...l, n })).sort((x, y) => x.ok - y.ok).map(l => `<details class="${l.ok ? 'ok' : 'bad'}"${l.ok ? '' : ' open'}><summary>${l.n + 1}. ${l.Q.q}</summary>${l.Q.vis || ''}<p>Jawabanmu: <b>${l.k >= 0 ? l.Q.opts[l.k] : 'Tidak dijawab (waktu habis)'}</b></p>${l.ok ? '' : `<p>Jawaban benar: <b>${l.Q.opts[l.Q.a]}</b></p>`}<p class="rve">${l.Q.e}</p></details>`).join('')}</div><button class="btn" id="rb">◀ KEMBALI</button></div>`;
       $('#rb').onclick = () => { Snd.sfx('select'); show() };
+      fadeHint($('.rvl'));
       S.d.line(wrong ? 'Bagian paling penting belajar: lihat kenapa salah. Soal yang salah sudah kubuka, ya.' : 'Semuanya benar! Tapi baca-baca penjelasannya juga boleh, siapa tahu ada yang menarik.', wrong ? 'talk' : 'happy');
     };
     if (Story.on) Story.record('ev', right);
