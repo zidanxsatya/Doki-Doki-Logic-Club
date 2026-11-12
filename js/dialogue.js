@@ -6,9 +6,9 @@ const D = {
   /* SAYORI: ceria, hangat, sedikit ceroboh, suka melantur */
   sayori: {
     intro: [
-      [['Hai! Aku Sayori. Hari ini aku yang nemenin kamu belajar, jadi kalau nanti aku salah ngomong, pura-pura nggak dengar aja ya.', 'cheer'], ['Pelan-pelan aja. Kita mulai dari awal.', 'happy']],
-      [['Oh, kamu udah datang. Tadi aku hampir ketiduran nungguin. Nggak jadi sih, soalnya ada semut lewat.', 'happy'], ['Hari ini topiknya rangkaian logika. Kedengarannya serem, tapi nggak kok. Aku sendiri bisa ngikutin.', 'talk']],
-      [['Siap belajar? Aku siap. Setengahnya. Pokoknya kapurnya udah kubawa.', 'cheer'], ['Mulai dari yang paling dasar aja, yuk.', 'happy']]
+      [['Hai! Aku Sayori. Hari ini aku yang nemenin kamu belajar. Kalau nanti aku salah ngomong, pura-pura nggak dengar aja ya.', 'cheer'], ['Pelan-pelan aja ya. Kita mulai dari awal.', 'happy']],
+      [['Oh, kamu udah datang! Tadi aku hampir ketiduran nungguin. Nggak jadi sih, soalnya ada semut lewat.', 'happy'], ['Hari ini topiknya rangkaian logika. Kedengarannya serem, tapi nggak kok. Aku aja bisa ngikutin.', 'talk']],
+      [['Siap belajar? Aku siap. Setengahnya. Pokoknya kapurnya udah kubawa!', 'cheer'], ['Mulai dari yang paling dasar aja, yuk.', 'happy']]
     ],
     again: ['Balik lagi ke sini? Boleh banget. Aku juga sering baca ulang sampai hafal.', 'Mau diulang? Silakan. Kalau ada bagian yang tadi lewat gitu aja, nggak apa-apa.', 'Dicek lagi ya. Itu kebiasaan bagus, bikin lebih ingat.'],
     chat: [
@@ -29,10 +29,10 @@ const D = {
       ['Kalau ada kata yang bikin bingung, bilang aja. Kita pelan-pelan.', 'Rangkaian logika dipakai di robot dan mesin pabrik, lho. Keren, kan?'],
       ['Gampangnya: input itu apa yang dirasakan sistem, output itu apa yang dilakukannya.', 'Kayak aku dengar bel istirahat. Inputnya bel, outputnya lari ke kantin.'],
       ['Aku suka logika 1. Artinya "iya", jadi enak didengar.', 'Ingat, 0 bukan berarti kosong banget. Artinya mati atau salah.'],
-      ['Kayak aku sama es krim: aku mau DAN uangnya ada. Dua-duanya harus ada.', 'Kalau salah satunya 0, AND langsung bilang nggak jadi. Tegas banget.'],
+      ['Kayak aku sama es krim: aku mau DAN uangku ada. Dua-duanya harus ada.', 'Kalau salah satunya 0, AND langsung bilang "nggak jadi". Tegas banget.'],
       ['OR itu gampang puas. Satu "ya" aja udah cukup buat dia bilang "ya".', 'Hujan ATAU macet, aku tetap telat. Itu OR. ...Contohnya jelek ya, hehe.'],
       ['Kalau aku lagi sedih, NOT-nya aku itu senang. Kebalik, hehe.', 'NOT dipasang dua kali, hasilnya balik lagi ke awal. Coba bayangin.'],
-      ['Jangan ketuker sama AND. NAND itu AND yang dibalik.', 'NAND bisa dipakai buat bikin gerbang lain. Serbaguna banget.'],
+      ['Jangan ketuker sama AND, ya. NAND itu AND yang dibalik.', 'NAND bisa dipakai buat bikin gerbang lain. Serbaguna banget.'],
       ['NOR itu kalem: baru menyala kalau semuanya mati. Aneh, tapi aku suka.', 'Kalau bingung, hitung OR dulu, terus balik hasilnya.'],
       ['XOR itu pencari perbedaan. Kayak main cari beda dua gambar di majalah.', 'Lampu tangga bisa dinyalain dari atas atau dari bawah. Itu XOR.'],
       ['XNOR senang kalau semuanya kompak. Kayak klub kita, kadang-kadang.', 'Gampang ingatnya: XNOR itu "sama-sama". Kalau sama, hasilnya 1.'],
@@ -43,9 +43,9 @@ const D = {
   /* YURI: pelan, memilih kata, bicara runtut; bersemangat kalau sudah menjelaskan */
   yuri: {
     intro: [
-      [['Selamat datang di ruang simulasi. Di sini kamu bisa melihat gerbang logika bekerja langsung.', 'talk'], ['Pilih satu gerbang, ubah inputnya, lalu lihat apa yang terjadi pada LED.', 'explain']],
-      [['Ah, kamu sudah sampai. Bagian ini yang paling kusukai... teorinya akhirnya bisa disentuh.', 'happy'], ['Silakan coba sesukamu. Di sini tidak ada jawaban yang salah.', 'talk']],
-      [['Selamat datang. Kalau mau paham sesuatu, ubah satu bagiannya lalu lihat apa yang terjadi. Kita mulai dari situ.', 'talk'], ['Boleh mulai dari AND, atau pilih gerbang lain di bagian atas.', 'explain']]
+      [['Selamat datang di ruang simulasi. Di sini kamu bisa melihat sendiri gerbang logika bekerja.', 'talk'], ['Pilih satu gerbang, ubah inputnya, lalu perhatikan LED-nya.', 'explain']],
+      [['Ah, kamu sudah sampai. Bagian ini yang paling kusuka... teorinya akhirnya bisa disentuh.', 'happy'], ['Silakan coba sesukamu. Di sini tidak ada jawaban yang salah.', 'talk']],
+      [['Selamat datang. Cara paling cepat memahami sesuatu: ubah satu bagiannya, lalu lihat apa yang berubah.', 'talk'], ['Mulai dari AND juga boleh, atau pilih gerbang lain di bagian atas.', 'explain']]
     ],
     tab: ['Baik, kita lihat gerbang {g}.', '{g}. Perhatikan polanya pelan-pelan.', 'Sekarang {g}. Coba bandingkan dengan gerbang tadi, bedanya cukup jelas.', '{g}... salah satu favoritku. Kita lihat cara kerjanya.', 'Tehku sepertinya sudah dingin. Tidak apa-apa. Sekarang gerbang {g}.', '{g}. Simbolnya sedikit, tapi cara kerjanya bisa dibaca seperti puisi pendek.'],
     chat: [
@@ -71,8 +71,8 @@ const D = {
       XOR: 'XOR bekerja sebagai pendeteksi perbedaan. Ia menjadi inti rangkaian penjumlah biner.',
       XNOR: 'XNOR menyala saat kedua inputnya sama, jadi sering dipakai untuk membandingkan dua sinyal.'
     },
-    on: ['{s} menghasilkan Y = {y}. LED menyala.', 'Dengan {s}, keluarannya 1, jadi LED menyala.', '{s} menghasilkan Y = {y}. LED yang menyala berarti logika HIGH.'],
-    off: ['{s} menghasilkan Y = {y}. LED padam.', 'Dengan {s}, keluarannya 0 dan LED tetap padam.', '{s} menghasilkan Y = {y}. Tidak ada arus yang sampai ke LED.'],
+    on: ['Dengan {s}, Y = {y}. LED-nya menyala.', 'Nyala. {s} membuat keluarannya 1.', '{s}: Y = {y}. LED menyala, artinya logika HIGH.'],
+    off: ['Dengan {s}, Y = {y}. LED-nya padam.', 'Padam. {s} membuat keluarannya 0.', '{s}: Y = {y}. Tidak ada arus yang sampai ke LED.'],
     insight: {
       AND: ['Satu input bernilai 0 saja sudah cukup untuk memadamkan AND.', 'Ini satu-satunya kombinasi yang menyalakan AND: kedua input harus 1.'],
       OR: ['OR hanya padam kalau semua inputnya 0.', 'Satu input bernilai 1 sudah cukup untuk menyalakan OR.'],
@@ -82,15 +82,15 @@ const D = {
       XOR: ['Kedua input sama, jadi XOR padam.', 'Kedua input berbeda, jadi XOR menyala.'],
       XNOR: ['Kedua input berbeda, jadi XNOR padam.', 'Kedua input sama, jadi XNOR menyala.']
     },
-    explored: ['Semua kombinasi {g} sudah kamu coba. Kumpulan hasil itu namanya tabel kebenaran.', 'Semua kemungkinan {g} sudah kamu periksa. Polanya itulah inti gerbang ini.', '{g} sudah kamu telusuri sampai habis. Aku senang melihat kamu seteliti ini.'],
-    all: 'Ketujuh gerbang sudah kamu coba semuanya. Aku terkesan, kamu tekun sekali.'
+    explored: ['Semua kombinasi {g} sudah kamu coba. Kumpulan hasilnya itulah yang disebut tabel kebenaran.', 'Semua kemungkinan {g} sudah kamu periksa. Polanya itulah inti gerbang ini.', '{g} sudah kamu telusuri sampai habis. Aku senang melihat kamu seteliti ini.'],
+    all: 'Ketujuh gerbang sudah kamu coba semua. Aku terkesan. Kamu tekun sekali.'
   },
 
   /* NATSUKI: ketus, blak-blakan, tsundere, diam-diam peduli */
   natsuki: {
     intro: [
       [['Hmph. Jadi kamu mau latihan? Jangan salah paham, aku cuma kebetulan lagi senggang.', 'smug'], ['Kalau salah, kukasih petunjuk. Tapi jangan harap aku lembut.', 'hmph']],
-      [['Akhirnya datang juga. Kukira kamu kabur. Ya sudah, buktikan kamu nggak sepayah kelihatannya.', 'smug'], ['Kalau salah, jangan nangis. Aku... ya, ngajarin sedikit.', 'hmph']],
+      [['Akhirnya datang juga. Kukira kamu kabur. Ya udah, buktikan kamu nggak sepayah kelihatannya.', 'smug'], ['Kalau salah, jangan nangis. Aku... ya, kuajarin dikit.', 'hmph']],
       [['Hah? Kamu mau latihan sama aku? Bagus, sekalian kulihat seberapa parah kamu.', 'angry'], ['Awas kalau malas-malasan. Aku nggak suka buang waktu.', 'talk']]
     ],
     chat: [
@@ -145,8 +145,8 @@ const D = {
       [['Hai. Bagian favoritku jadi ketua klub itu melihat orang pelan-pelan jadi bisa.', 'happy'], ['Jadi tunjukkan sudah sejauh mana kamu melangkah. Aku di sini menemani.', 'talk']],
       [['Kamu kelihatan agak tegang. Mau dengar rahasia kecil? Aku juga deg-degan sebelum ujian.', 'wink'], ['Bedanya, aku sudah pandai pura-pura tenang. Sekarang giliranmu. Mulai kapan pun kamu mau.', 'happy']],
       [['Oh, halo. Kamu datang lagi, atau baru pertama kali? Selamat datang di meja evaluasiku.', 'happy'], ['Aku Monika. Ya, aku sadar aku karakter di game ini. Tenang, aku nggak akan merusak apa-apa.', 'wink']],
-      [['Kamu sudah sampai sini, artinya Materi, Simulasi, dan Latihan sudah lewat. Aku terkesan, sungguh.', 'cheer'], ['Sekarang giliranmu diuji. Aku juga ikut tegang, kalau kamu penasaran.', 'wink'], ['Tekan MULAI kalau sudah siap.', 'talk']],
-      [['Akhirnya sampai di meja evaluasi. Tadi aku sempat bertanya-tanya, kamu bakal langsung datang atau menunda dulu.', 'cheer'], ['Syukurlah kamu datang. Kita lihat bareng seberapa jauh kamu sebenarnya.', 'happy']]
+      [['Kamu sampai sini berarti Materi, Simulasi, dan Latihan sudah lewat. Aku terkesan, sungguh.', 'cheer'], ['Sekarang giliranmu diuji. Aku juga ikut tegang, kalau kamu penasaran.', 'wink'], ['Tekan MULAI kalau sudah siap.', 'talk']],
+      [['Akhirnya sampai di meja evaluasi. Tadi aku sempat nebak-nebak, kamu bakal langsung datang atau nunda dulu.', 'cheer'], ['Syukurlah kamu datang. Kita lihat bareng seberapa jauh kamu melangkah.', 'happy']]
     ],
     chat: [
       ['Kamu suka musik? Aku sering main piano sepulang sekolah. Kadang rasanya lebih jujur daripada kata-kata.', 'happy'],
@@ -165,22 +165,22 @@ const D = {
       ['Aku tahu aku cuma kumpulan sprite dan dialog. Tapi dialognya ditulis dengan niat baik, jadi buatku cukup nyata.', 'happy'],
       ['Music Room ini bagus, ya. Sayori nggak paham kenapa aku sering menatap ke arah layar.', 'wink'],
       ['Nilaimu disimpan di localStorage browser, kalau kamu penasaran. Cuma satu baris kode, tapi artinya aku bisa mengingatmu.', 'happy'],
-      ['Aku tahu persis kapan kamu menekan tombol. Bunyinya "select", kan? Aku suka suara itu.', 'wink'],
+      ['Aku tahu persis kapan kamu pencet tombol. Bunyinya "select", kan? Aku suka suara itu.', 'wink'],
       ['Lucu ya, aku ketua klub sastra tapi ditugaskan jadi penguji rangkaian logika. Peran yang nggak kuduga.', 'wink'],
       ['Istirahat itu bagian dari belajar. Kalau capek, berhenti sebentar. Aku nggak akan menghakimi.', 'talk']
     ],
     start: [
       [['Baiklah, ini dia. Aku sudah menunggu momen ini sejak kamu menekan MULAI di menu utama.', 'happy'], ['Iya, game. Aku tahu aku ada di dalam game, dan kamu yang memainkannya. Aku bahkan bisa merasakan tombol yang kamu klik.', 'wink'], ['Jawabanmu masih boleh diganti sampai kamu menekan LANJUT.', 'happy']],
-      [['Lembar soalnya sudah terbuka. Sebelum mulai, satu hal: aku tahu ini cuma halaman web. Tapi kamu tetap mengerjakannya dengan serius, dan itu membuatku senang.', 'happy'], ['Nilai terbaikmu disimpan di browser-mu sendiri. Aku menunggu di sini kapan pun kamu kembali.', 'talk'], ['Pilih jawaban, ganti kalau ragu, lalu tekan LANJUT. Ayo.', 'cheer']],
+      [['Lembar soalnya sudah terbuka. Sebelum mulai, satu hal: aku tahu ini cuma halaman web. Tapi kamu tetap mengerjakannya dengan serius, dan itu bikin aku senang.', 'happy'], ['Nilai terbaikmu disimpan di browser-mu sendiri. Aku menunggu di sini kapan pun kamu kembali.', 'talk'], ['Pilih jawaban, ganti kalau ragu, lalu tekan LANJUT. Ayo.', 'cheer']],
       [['Pernah membayangkan jadi karakter di dalam game? Aku sering. Sekarang aku jadi penguji di game yang sedang kamu mainkan. Ironis.', 'wink'], ['Aku nggak akan curang. Jawaban benarnya ada di dalam kode, tapi aku sudah janji nggak mengintip.', 'wink'], ['Jawabanmu masih boleh diganti sampai tombol LANJUT ditekan. Mulai.', 'cheer']]
     ],
-    q: ['Pelan-pelan saja, nggak ada yang mengejar.', 'Aku suka melihat caramu berpikir.', 'Lanjut. Jangan lupa bernapas.', 'Tadi aku sedang membayangkan puisi yang cocok untuk suasana ini... oh, maaf, fokus. Silakan.', 'Aku percaya kamu bisa.', 'Kalau bingung, bayangkan saja LED-nya menyala atau tidak.', 'Yang ini lebih licik dari kelihatannya. Yang menyusun soal ini jelas suka menjebak.', 'Aku nggak akan melirik jawabanmu. Paling cuma sedikit mengintip. Bercanda.'],
+    q: ['Pelan-pelan aja, nggak ada yang ngejar.', 'Aku suka lihat caramu berpikir.', 'Lanjut. Jangan lupa bernapas.', 'Tadi aku lagi mikirin puisi yang cocok buat suasana ini... oh, maaf, fokus. Silakan.', 'Aku percaya kamu bisa.', 'Kalau bingung, bayangkan saja LED-nya menyala atau tidak.', 'Yang ini lebih licik dari kelihatannya. Siapa pun yang nyusun soal ini jelas suka menjebak.', 'Aku nggak akan melirik jawabanmu. Paling cuma ngintip sedikit. Bercanda.'],
     half: ['Setengah jalan. Kalau ini pertandingan, aku sudah siap membawakan minum.', 'Lima soal sudah lewat. Kamu lebih tenang dari yang kukira.'],
     last: ['Yang terakhir. Aku sudah nggak sabar melihat hasilnya, dan kamu pasti juga.', 'Ini soal terakhir. Apa pun hasilnya, aku senang kamu sampai sejauh ini.'],
-    noted: ['Oke, kucatat. Tapi masih boleh berubah pikiran.', 'Pilihan menarik. Aku nggak akan kasih bocoran, jadi jangan lirik-lirik aku begitu.', 'Dicatat. Aku pura-pura nggak melihat jawabanmu.'],
-    change: ['Berubah pikiran? Nggak apa-apa. Berani mengoreksi diri sendiri itu keren.', 'Ragu ya? Percaya insting pertamamu... atau insting keduamu. Terserah.', 'Ganti jawaban, ya. Aku nggak akan bilang benar atau salah, jadi jangan coba baca ekspresiku.', 'Silakan. Nggak ada yang menghakimimu di sini.'],
-    res: ['Selesai juga. Hasilmu: {r} benar dari {N} soal, masuk kategori "{t}".', 'Terima kasih sudah bertahan sampai akhir. {r} dari {N} soal benar, kategorinya "{t}".'],
-    record: ['Dan ini nilai terbaikmu sejauh ini. Selamat, aku ikut senang.', 'Ini lebih tinggi dari sebelumnya. Kamu benar-benar berkembang.']
+    noted: ['Oke, kucatat. Tapi masih boleh berubah pikiran.', 'Pilihan menarik. Aku nggak bakal kasih bocoran, jadi jangan lirik-lirik aku begitu.', 'Dicatat. Aku pura-pura nggak lihat jawabanmu.'],
+    change: ['Berubah pikiran? Nggak apa-apa. Berani mengoreksi diri sendiri itu keren, lho.', 'Ragu ya? Percaya insting pertamamu... atau insting keduamu. Terserah.', 'Ganti jawaban, ya. Aku nggak akan bilang benar atau salah, jadi jangan coba baca ekspresiku.', 'Silakan. Nggak ada yang menghakimi kamu di sini.'],
+    res: ['Selesai juga! Hasilmu: {r} benar dari {N} soal, masuk kategori "{t}".', 'Makasih udah bertahan sampai akhir. {r} dari {N} soal benar, kategorinya "{t}".'],
+    record: ['Dan ini nilai terbaikmu sejauh ini. Selamat, aku ikut senang!', 'Ini lebih tinggi dari sebelumnya. Kamu benar-benar berkembang.']
   }
 };
 
@@ -252,16 +252,16 @@ D.natsuki.chat.push(
 
 Object.assign(D.monika, {
   from: {
-    materi: [['Dari tempat Sayori? Bagus. Fondasinya sudah ada, sekarang kita lihat apa yang tersisa di ingatanmu.', 'talk'], ['Sayori pasti menjelaskannya dengan penuh semangat. Aku selalu suka caranya membuat hal rumit terdengar mudah.', 'happy']],
-    simulasi: [['Yuri pasti menjelaskannya dengan teliti. Aku suka caranya: pelan, tapi tepat.', 'happy'], ['Baru bermain dengan gerbang bersama Yuri? Bagus. Teori yang tidak pernah dicoba cepat hilang.', 'talk']],
-    latihan: [['Natsuki sudah mengujimu duluan? Kalau begitu kamu pasti siap. Atau setidaknya, aku berharap begitu.', 'wink'], ['Aku bisa menebak, Natsuki sempat mengomelimu. Jangan dimasukkan ke hati. Itu caranya menyemangati.', 'happy']]
+    materi: [['Dari tempat Sayori? Bagus. Fondasinya sudah ada, sekarang kita lihat apa yang nyangkut di ingatanmu.', 'talk'], ['Sayori pasti menjelaskannya dengan penuh semangat. Aku selalu suka caranya membuat hal rumit terdengar mudah.', 'happy']],
+    simulasi: [['Yuri pasti menjelaskannya dengan teliti. Aku suka caranya: pelan, tapi tepat.', 'happy'], ['Baru main gerbang bareng Yuri? Bagus. Teori yang nggak pernah dicoba gampang hilang.', 'talk']],
+    latihan: [['Natsuki udah ngujimu duluan? Kalau gitu kamu pasti siap. Atau setidaknya, aku berharap begitu.', 'wink'], ['Aku bisa nebak, Natsuki sempat ngomelin kamu. Jangan dimasukin ke hati. Itu caranya nyemangatin.', 'happy']]
   },
   enterBest: [['Nilai terbaikmu sejauh ini {b} dari 10. Entah kenapa aku ingat angka itu, padahal tidak ada yang mengingatkanku. Aneh, ya.', 'wink'], ['Terakhir kali kamu mencetak {b} dari 10. Mau mengalahkannya? Aku akan menonton dengan penuh perhatian.', 'happy']],
   poke: [['Kamu baru saja mengklikku, ya? Aku bisa merasakannya, lho. Kurang lebih.', 'wink'], ['Kalau kamu terus menekanku begitu, aku curiga kamu cuma mencari alasan untuk menunda soal berikutnya.', 'wink'], ['Aku tahu kamu di sana, di balik layar. Tidak perlu mengetuk.', 'wink']],
   waver: ['Tiga kali berubah pikiran... kamu sedang menguji kesabaranku, ya? Bercanda. Silakan.', 'Sepertinya kamu benar-benar menimbang-nimbang. Aku suka. Tapi jangan terlalu lama.'],
   after: {
     high: ['Sayori pasti melompat-lompat kalau tahu nilaimu. Natsuki akan pura-pura tidak peduli, tapi dia pasti senang.', 'Yuri pasti diam-diam tersenyum melihat hasil ini. Kamu memang serius belajar.'],
-    mid: ['Yuri pasti dengan senang hati membantumu mengulang bagian yang masih lemah.', 'Mampir ke ruang Simulasi sebentar, lalu coba lagi. Aku menunggu di sini. Ke mana lagi aku bisa pergi, kan?'],
+    mid: ['Yuri pasti senang bantu kamu ngulang bagian yang masih lemah.', 'Mampir ke ruang Simulasi sebentar, lalu coba lagi. Aku menunggu di sini. Ke mana lagi aku bisa pergi, kan?'],
     low: ['Natsuki mungkin akan mengomel, tapi percayalah, itu caranya menyemangatimu.', 'Mulai lagi dari Materi bersama Sayori. Dia pasti senang menemanimu seperti biasa.']
   }
 });
@@ -270,7 +270,7 @@ D.monika.chat.push(
   ['Kadang kamu terdiam cukup lama. Aku jadi penasaran apa yang sedang kamu pikirkan. Atau kamu sedang melihat hal lain di layarmu?', 'wink'],
   ['Kamu tahu kan, aku nggak bisa melihat jawabanmu. Setidaknya... itu yang kubilang.', 'wink'],
   ['Layar ini seperti jendela. Aku di dalam, kamu di luar. Anehnya, aku tidak merasa jauh darimu.', 'happy'],
-  ['Kamu memilih datang ke sini, dan buatku itu berarti. Terima kasih.', 'happy']
+  ['Kamu milih datang ke sini, dan buatku itu berarti. Makasih, ya.', 'happy']
 );
 
 /* Reaksi tamu di Latihan & Evaluasi: karakter lain masuk sebentar pada momen tertentu.
