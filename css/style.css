@@ -1196,3 +1196,18 @@ body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}
 }
 /* v38: tablet tegak (tinggi besar, dialog tinggi): daftar PEMBAHASAN dibatasi 300 px agar kartu tidak melewati dialog */
 .m.p .rvl{max-height:min(32vh,300px)}
+
+/* v40: tombol HINT bertingkat dan daftar tantangan per level (Simulasi+) */
+.xhint{position:absolute;left:8px;right:8px;bottom:8px;z-index:6;display:flex;flex-direction:column;gap:4px;max-height:56%;overflow:auto;background:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--ink);padding:6px 10px 8px;animation:rise .26s var(--ease) backwards}
+.xhint[hidden]{display:none}.xhint:not([hidden]) ~ .xtoast{z-index:8}
+.xhh{display:flex;align-items:center;gap:6px}.xhk{flex:1;font:17px Anton,Impact,sans-serif;letter-spacing:1px;color:var(--pink)}
+.xhh button{font:800 12px Nunito,sans-serif;color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:999px;padding:2px 10px;cursor:pointer;white-space:nowrap}.xhh button[hidden]{display:none}
+.xhh #xhx{width:30px;padding:2px 0}.xhh button:focus-visible{outline:3px solid var(--blue);outline-offset:2px}
+@media (hover:hover){.xhh button:hover{background:var(--soft)}}
+.xht{margin:0;font-weight:700;font-size:14px;line-height:1.35;white-space:pre-line}
+#xhi{background:#fff3b8}
+.xlv{grid-column:1/-1;display:flex;align-items:baseline;gap:8px;margin:6px 0 0;font:19px Anton,Impact,sans-serif;letter-spacing:1.5px}.xlv:first-child{margin-top:0}.xlv span{font:800 12px Nunito,sans-serif;letter-spacing:.3px;color:#8a6b86}
+.xli.nxt{border-color:var(--pink)}
+.m .xhint{left:5px;right:5px;bottom:5px;gap:2px;padding:3px 8px 5px;border-width:2px;border-radius:10px;box-shadow:0 3px 0 var(--ink)}.m .xhk{font-size:13px}.m .xht{font-size:12px;line-height:1.3}.m .xhh button{font-size:10px;padding:1px 6px}.m .xhh #xhx{width:24px}
+.m .xlv{font-size:15px;margin-top:3px}.m .xlv span{font-size:10px}
+.m:not(.p) .xht{font-size:11px;line-height:1.22}

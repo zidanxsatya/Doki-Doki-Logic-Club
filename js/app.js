@@ -96,7 +96,7 @@ function scrollHint(sel) {
   fadeHint(c);
 }
 function buildPeta() {
-  const el = $('#peta'), seen = store.get('tkm_seen', {}), sp = Story.prog(), done = new Set(store.get('tkm_ch', [])), nS = sp.done ? STEPS.length : sp.step,
+  const el = $('#peta'), seen = store.get('tkm_seen', {}), sp = Story.prog(), done = new Set(store.get('tkm_ch', [])), nCh = CH.filter(c => done.has(c.id)).length, nS = sp.done ? STEPS.length : sp.step,
     bs = store.get('tkm_latihan_best', 0), bw = store.get('tkm_latihan_best_w', 0), bc = store.get('tkm_chain_best', null), ev = store.get('tkm_eval_best', null),
     st = (a, b) => `<span class="pst ${a ? 'on' : ''}">${a ? '✓ ' : ''}${b}</span>`, lat = (n, v) => `<span class="pst ${v ? 'on' : ''}">${n}: ${v ? v + ' / ' + N8 : 'belum dicoba'}</span>`, N8 = 8,
     dd = Daily.data(), dday = Daily.day(), dstr = Daily.streak(dd.h, dday), kOpen = sp.done || sp.step >= STEPS.indexOf('k_alarm'), kDone = sp.done ? 3 : sp.kasus || 0,
@@ -105,7 +105,7 @@ function buildPeta() {
   <div class="setcard pcard">
     ${row('story', 'CERITA', `<span>${nS ? (sp.done ? 'Selesai' : `Langkah ${nS} dari ${STEPS.length}`) : 'Belum dimulai'}</span><span class="pseg" aria-hidden="true">${STEPS.map((_, k) => `<i class="${k < nS ? 'on' : ''}"></i>`).join('')}</span>`)}
     ${row('materi', 'MATERI', st(seen.materi, seen.materi ? 'Sudah dibuka' : 'Belum dibuka'))}
-    ${row('simpick', 'SIMULASI', `<span>${st(seen.simulasi, 'Dasar ' + (seen.simulasi ? 'dicoba' : 'belum dicoba'))}${st(seen.simplus, 'Simulasi+ ' + done.size + ' / ' + CH.length)}</span><span class="pgrid" role="img" aria-label="${done.size} dari ${CH.length} tantangan Simulasi+ selesai">${CH.map((c, k) => `<i class="pc${done.has(k) ? ' on' : ''}" title="${c.t}"></i>`).join('')}</span>`)}
+    ${row('simpick', 'SIMULASI', `<span>${st(seen.simulasi, 'Dasar ' + (seen.simulasi ? 'dicoba' : 'belum dicoba'))}${st(seen.simplus, 'Simulasi+ ' + nCh + ' / ' + CH.length)}</span><span class="pgrid" role="img" aria-label="${nCh} dari ${CH.length} tantangan Simulasi+ selesai">${CH.map((c, k) => `<i class="pc${done.has(c.id) ? ' on' : ''}" title="${c.t}"></i>`).join('')}</span>`)}
     ${row('latihan', 'LATIHAN', `<span>${lat('Santai', bs)}${lat('Waktu', bw)}<span class="pst ${bc ? 'on' : ''}">Berantai: ${bc ? bc.n + ' benar · Level ' + bc.lv : 'belum dicoba'}</span></span>`)}
     <div class="prow pkz"><b class="prn">KASUS NYATA</b><span class="pb"><span>${st(kDone >= 3, kOpen ? `${kDone} / 3 selesai` : 'Terbuka setelah Cerita sampai Kasus Nyata')}</span><span class="pkb">${Object.keys(KASUS).map(id => `<button class="btn sm" data-k="${id}"${kOpen ? '' : ' disabled'}>${KASUS[id].no <= kDone ? '✓ ' : ''}${KASUS[id].no}. ${{ k_alarm: 'Alarm', k_tangga: 'Lampu tangga', k_brankas: 'Brankas' }[id]}</button>`).join('')}</span></span></div>
     ${row('harian', 'HARIAN', `<span>${st(dd.h[dday] != null, dd.h[dday] != null ? 'Hari ini selesai' : 'Hari ini belum')}<span class="pst ${dstr ? 'on' : ''}">${dstr} hari beruntun${dd.best > dstr ? ' · terbaik ' + dd.best : ''}</span></span>${dayDots(Daily.week(dd.h, dday))}`)}

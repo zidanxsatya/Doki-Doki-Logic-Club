@@ -32,26 +32,38 @@ const Sfx = (() => {
   return k => { const c = Snd.ac; if (Snd.muted || Snd.sv <= 0 || !c || c.state !== 'running') return; S[k](c, c.currentTime, clamp01(Snd.sv)) };
 })();
 
-/* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi) */
+/* mode tantangan: susun rangkaian sampai tabel X sama dengan target. y = kolom X per baris (A = bit tertinggi).
+   id = nomor tetap untuk simpanan tkm_ch (jangan diubah atau dipakai ulang); urutan tampil = urutan array. l = level (indeks LVN).
+   h = [konsep, rancangan] untuk tombol HINT; s = kunci jawaban 'g1=GERBANG kaki kaki;...>keluaran' (langkah 3 petunjuk dibuat dari s, dan s diperiksa oleh tes terhadap y dan ok) */
+const LVN = ['Pemanasan', 'Dua gerbang', 'Gerbang universal', 'Merakit gerbang baru', 'Tantangan akhir'], LVD = ['Mudah', 'Mudah', 'Sedang', 'Sedang', 'Sulit'];
 const CH = [
-  { t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'], lv: 'Mudah' },
-  { t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'], lv: 'Mudah' },
-  { t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'], lv: 'Sedang' },
-  { t: 'AND dari NOR saja', n: 2, y: '0001', ok: ['NOR'], lv: 'Sedang' },
-  { t: 'OR dari NOR saja', n: 2, y: '0111', ok: ['NOR'], lv: 'Sedang' },
-  { t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
-  { t: 'XNOR dari AND, OR, dan NOT', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT'], lv: 'Sedang' },
-  { t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'], lv: 'Sulit' },
-  { t: 'Sama atau beda: X = 1 bila A = B, tanpa XOR dan XNOR', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT', 'NAND', 'NOR'], lv: 'Sedang' },
-  { t: 'Brankas: X = 1 hanya untuk kode A = 1, B = 0, C = 1', n: 3, y: '00000100', ok: null, lv: 'Mudah' },
-  { t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null, lv: 'Sedang' },
-  { t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null, lv: 'Sedang' },
-  { t: 'Tombol kuis: X = 1 bila tepat satu input = 1', n: 3, y: '01101000', ok: null, lv: 'Sedang' },
-  { t: 'Pemilih (MUX): A = 0 pilih B, A = 1 pilih C', n: 3, y: '00110101', ok: null, lv: 'Sulit' },
-  { t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null, lv: 'Sulit' },
-  { t: 'Paritas genap: X = 1 bila jumlah input 1 genap', n: 3, y: '10010110', ok: null, lv: 'Sulit' },
-  { t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, lv: 'Sulit' }
+  { id: 17, l: 0, t: 'Tarik kabel dari A langsung ke X', n: 1, y: '01', ok: null, h: ['Lihat kolom TARGET: nilainya sama persis dengan kolom A. Jadi X cukup meniru A.', 'Tidak butuh gerbang. Tarik kabel dari titik di ujung kanan A ke titik X di sisi kanan kanvas.'], s: '>A' },
+  { id: 18, l: 0, t: 'Balik sinyal: X = NOT A', n: 1, y: '10', ok: ['NOT'], h: ['TARGET selalu kebalikan dari A: A = 0 menghasilkan 1, A = 1 menghasilkan 0.', 'Gerbang yang membalik sinyal adalah NOT. Pasang satu NOT di antara A dan X.'], s: 'g1=NOT A>g1' },
+  { id: 19, l: 0, t: 'Dua saklar seri: X = 1 bila A dan B sama-sama 1', n: 2, y: '0001', ok: ['AND'], h: ['X hanya 1 kalau A dan B sama-sama 1. Itu aturan gerbang AND.', 'Pasang satu AND. Sambungkan A dan B ke dua kakinya, lalu keluarannya ke X.'], s: 'g1=AND A B>g1' },
+  { id: 20, l: 0, t: 'Alarm: X = 1 bila A atau B menyala', n: 2, y: '0111', ok: ['OR'], h: ['X menyala kalau salah satu atau kedua input menyala. Itu aturan gerbang OR.', 'Pasang satu OR. Sambungkan A dan B ke dua kakinya, lalu keluarannya ke X.'], s: 'g1=OR A B>g1' },
+  { id: 21, l: 0, t: 'Lampu tangga: X = 1 bila A dan B berbeda', n: 2, y: '0110', ok: ['XOR'], h: ['X = 1 hanya kalau A dan B berbeda. Gerbang mana yang menilai "beda atau sama"?', 'Pasang satu XOR. Sambungkan A dan B ke dua kakinya, lalu keluarannya ke X.'], s: 'g1=XOR A B>g1' },
+  { id: 22, l: 1, t: 'NAND dari AND dan NOT', n: 2, y: '1110', ok: ['AND', 'NOT'], h: ['NAND adalah AND yang dibalik. Susun dua gerbang berurutan.', 'AND dulu untuk A dan B, lalu balik hasilnya dengan NOT sebelum masuk ke X.'], s: 'g1=AND A B;g2=NOT g1>g2' },
+  { id: 23, l: 1, t: 'NOR dari OR dan NOT', n: 2, y: '1000', ok: ['OR', 'NOT'], h: ['NOR adalah OR yang dibalik. Susun dua gerbang berurutan.', 'OR dulu untuk A dan B, lalu balik hasilnya dengan NOT sebelum masuk ke X.'], s: 'g1=OR A B;g2=NOT g1>g2' },
+  { id: 11, l: 1, t: 'X = A · (B + C)', n: 3, y: '00000111', ok: null, h: ['Yang dalam kurung dikerjakan dulu: B + C adalah OR. Hasilnya dikalikan (AND) dengan A.', 'Dua gerbang: OR untuk B dan C, lalu AND yang menerima A dan hasil OR.'], s: 'g1=OR B C;g2=AND A g1>g2' },
+  { id: 9, l: 1, t: 'Brankas: X = 1 hanya untuk kode A = 1, B = 0, C = 1', n: 3, y: '00000100', ok: null, h: ['X hanya 1 saat A = 1, B = 0, C = 1. Supaya B = 0 terhitung "cocok", B harus dibalik dulu.', 'NOT untuk B. Lalu A, hasil NOT, dan C harus sama-sama 1. AND hanya punya dua kaki, jadi pakai dua AND berurutan.'], s: 'g1=NOT B;g2=AND A g1;g3=AND g2 C>g3' },
+  { id: 0, l: 2, t: 'NOT dari NAND saja', n: 2, y: '1100', ok: ['NAND'], h: ['Kalau kedua kaki NAND diberi sinyal yang sama, hasilnya selalu kebalikan sinyal itu.', 'Sambungkan A ke kedua kaki satu gerbang NAND, lalu keluarannya ke X. B tidak dipakai.'], s: 'g1=NAND A A>g1' },
+  { id: 1, l: 2, t: 'AND dari NAND saja', n: 2, y: '0001', ok: ['NAND'], h: ['NAND adalah AND yang dibalik. Balik sekali lagi dan hasilnya kembali menjadi AND.', 'NAND pertama menerima A dan B. NAND kedua menerima hasil pertama di kedua kakinya (jadi berfungsi sebagai NOT).'], s: 'g1=NAND A B;g2=NAND g1 g1>g2' },
+  { id: 2, l: 2, t: 'OR dari NAND saja', n: 2, y: '0111', ok: ['NAND'], h: ['Balik dulu tiap input, lalu NAND-kan hasilnya. Itu sama dengan OR (hukum De Morgan).', 'Satu NAND dengan kedua kaki disatukan membalik sinyal. Pakai dua untuk A dan B, lalu NAND ketiga menerima keduanya.'], s: 'g1=NAND A A;g2=NAND B B;g3=NAND g1 g2>g3' },
+  { id: 3, l: 2, t: 'AND dari NOR saja', n: 2, y: '0001', ok: ['NOR'], h: ['Balik dulu A dan B, lalu NOR-kan hasilnya. (NOT A) NOR (NOT B) sama dengan A AND B.', 'NOR dengan kedua kaki disatukan berfungsi sebagai NOT. Pakai dua untuk A dan B, lalu NOR ketiga menerima keduanya.'], s: 'g1=NOR A A;g2=NOR B B;g3=NOR g1 g2>g3' },
+  { id: 4, l: 2, t: 'OR dari NOR saja', n: 2, y: '0111', ok: ['NOR'], h: ['NOR adalah OR yang dibalik. Balik sekali lagi dan hasilnya kembali menjadi OR.', 'NOR pertama menerima A dan B. NOR kedua menerima hasil pertama di kedua kakinya.'], s: 'g1=NOR A B;g2=NOR g1 g1>g2' },
+  { id: 5, l: 3, t: 'XOR dari AND, OR, dan NOT', n: 2, y: '0110', ok: ['AND', 'OR', 'NOT'], h: ['XOR bernilai 1 kalau minimal satu input 1, tetapi tidak kalau keduanya 1.', 'Gabungkan OR (minimal satu) dengan NOT dari AND (bukan keduanya), lalu AND-kan kedua hasil itu.'], s: 'g1=OR A B;g2=AND A B;g3=NOT g2;g4=AND g1 g3>g4' },
+  { id: 6, l: 3, t: 'XNOR dari AND, OR, dan NOT', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT'], h: ['XNOR bernilai 1 kalau kedua input sama: sama-sama 1, atau sama-sama 0.', 'AND mendeteksi sama-sama 1. NOT dari OR mendeteksi sama-sama 0. Gabungkan keduanya dengan OR.'], s: 'g1=AND A B;g2=OR A B;g3=NOT g2;g4=OR g1 g3>g4' },
+  { id: 8, l: 3, t: 'Sama atau beda: X = 1 bila A = B, tanpa XOR dan XNOR', n: 2, y: '1001', ok: ['AND', 'OR', 'NOT', 'NAND', 'NOR'], h: ['X = 1 saat A dan B sama: sama-sama 1, atau sama-sama 0.', 'AND untuk sama-sama 1, NOR untuk sama-sama 0, lalu gabungkan keduanya dengan OR.'], s: 'g1=AND A B;g2=NOR A B;g3=OR g1 g2>g3' },
+  { id: 10, l: 3, t: 'Mayoritas: X = 1 bila minimal 2 input = 1', n: 3, y: '00010111', ok: null, h: ['Minimal 2 dari 3 input bernilai 1 berarti ada satu pasangan yang sama-sama 1: A dan B, A dan C, atau B dan C.', 'Tiga AND untuk ketiga pasangan itu, lalu gabungkan semuanya dengan OR (dua OR berurutan).'], s: 'g1=AND A B;g2=AND A C;g3=AND B C;g4=OR g1 g2;g5=OR g4 g3>g5' },
+  { id: 12, l: 3, t: 'Tombol kuis: X = 1 bila tepat satu input = 1', n: 3, y: '01101000', ok: null, h: ['Tepat satu input 1 berarti jumlah angka 1 ganjil, tetapi bukan ketiganya sekaligus.', 'Dua XOR berurutan memberi "jumlah 1 ganjil". Lalu keluarkan kasus A, B, C semuanya 1 dengan AND dan NOT.'], s: 'g1=XOR A B;g2=XOR g1 C;g3=AND A B;g4=AND g3 C;g5=NOT g4;g6=AND g2 g5>g6' },
+  { id: 13, l: 4, t: 'Pemilih (MUX): A = 0 pilih B, A = 1 pilih C', n: 3, y: '00110101', ok: null, h: ['Saat A = 0 hanya B yang boleh lewat, saat A = 1 hanya C. A bertugas sebagai pemilih.', 'AND-kan B dengan NOT A, AND-kan C dengan A, lalu gabungkan keduanya dengan OR.'], s: 'g1=NOT A;g2=AND g1 B;g3=AND A C;g4=OR g2 g3>g4' },
+  { id: 14, l: 4, t: 'Paritas ganjil: X = 1 bila jumlah input 1 ganjil', n: 3, y: '01101001', ok: null, h: ['XOR bernilai 1 kalau jumlah angka 1 pada inputnya ganjil. Dengan tiga input, rantai dua XOR.', 'XOR pertama untuk A dan B. XOR kedua untuk hasilnya dan C.'], s: 'g1=XOR A B;g2=XOR g1 C>g2' },
+  { id: 15, l: 4, t: 'Paritas genap: X = 1 bila jumlah input 1 genap', n: 3, y: '10010110', ok: null, h: ['Paritas genap adalah kebalikan paritas ganjil.', 'Sama seperti paritas ganjil, tetapi gerbang terakhir diganti XNOR.'], s: 'g1=XOR A B;g2=XNOR g1 C>g2' },
+  { id: 7, l: 4, t: 'XOR dari NAND saja', n: 2, y: '0110', ok: ['NAND'], h: ['Mulai dari NAND(A, B). Hasilnya dipakai ulang di dua tempat.', 'NAND kedua menerima A dan hasil pertama. NAND ketiga menerima B dan hasil pertama. NAND keempat menggabungkan hasil kedua dan ketiga.'], s: 'g1=NAND A B;g2=NAND A g1;g3=NAND B g1;g4=NAND g2 g3>g4' },
+  { id: 16, l: 4, t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, h: ['Minimal 3 dari 4 berarti A dan B menyala bersama salah satu dari C atau D, atau C dan D menyala bersama salah satu dari A atau B.', 'Bagian pertama: (A · B) · (C + D). Bagian kedua: (C · D) · (A + B). Gabungkan keduanya dengan OR.'], s: 'g1=AND A B;g2=OR C D;g3=AND g1 g2;g4=AND C D;g5=OR A B;g6=AND g4 g5;g7=OR g3 g6>g7' }
 ];
+/* kunci jawaban s -> daftar langkah untuk petunjuk ke-3 */
+const solText = s => { const [st, o] = s.split('>'), src = x => /^g\d+$/.test(x) ? 'hasil langkah ' + x.slice(1) : 'input ' + x, steps = st ? st.split(';').map(p => { const [g, e] = p.split('='), [t, ...a] = e.split(' '); return `Langkah ${g.slice(1)}: pasang ${t}. ${a.length === 1 ? `Kakinya dari ${src(a[0])}.` : `Kaki atas dari ${src(a[0])}, kaki bawah dari ${src(a[1])}.`}` }) : []; return [...steps, `Sambungkan ${o[0] === 'g' ? 'output langkah ' + o.slice(1) : 'input ' + o} ke X.`].join('\n') };
 
 /* pemilih mode: SIMULASI DASAR / SIMULASI+ */
 SC.simpick = () => {
@@ -77,7 +89,7 @@ SC.simplus = () => {
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ <span class="lg">PILIH </span>MODE</button><b>SIMULASI+</b><i class="hintc">Susun rangkaian dari input dan gerbang</i><button class="btn sm" id="xch">TANTANGAN</button></div>
   <div class="xp">
     <div class="xpal" aria-label="Palet gerbang dan input">${GL.map(g => `<button class="xpi" data-g="${g}" aria-label="Tambah gerbang ${g}" title="Seret ke kanvas, atau ketuk untuk menambah"><svg viewBox="0 0 130 70" aria-hidden="true">${gGfx(g, 10, 36, .8)}</svg><b>${g}</b></button>`).join('')}${inCard(0)}${inCard(1)}</div>
-    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xlist" hidden></div><div class="xundo"><button class="btn sm" id="xun" aria-label="Urungkan (Ctrl+Z)" title="Urungkan (Ctrl+Z)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button><button class="btn sm xre" id="xre" aria-label="Ulangi (Ctrl+Y)" title="Ulangi (Ctrl+Y)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>
+    <div class="xcv"><svg class="xsvg" id="xsvg" role="application" aria-label="Kanvas rangkaian"></svg><p class="xempty">Seret kartu INPUT dan gerbang dari palet ke sini.<br>Lalu tarik kabel dari titik output input atau gerbang ke kaki input gerbang, dan dari output gerbang ke X.</p><div class="xgoal" hidden><span class="xgt"></span><button id="xgn" hidden>LANJUT ▶</button><button id="xhi" aria-expanded="false">HINT</button><button id="xgl">DAFTAR</button><button id="xgx">KELUAR</button></div><div class="xtip" hidden></div><div class="xhint" role="region" aria-label="Petunjuk tantangan" hidden><div class="xhh"><b class="xhk"></b><button id="xhm">LAGI ▶</button><button id="xhx" aria-label="Tutup petunjuk">✕</button></div><p class="xht" aria-live="polite"></p></div><div class="xlist" hidden></div><div class="xundo"><button class="btn sm" id="xun" aria-label="Urungkan (Ctrl+Z)" title="Urungkan (Ctrl+Z)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button><button class="btn sm xre" id="xre" aria-label="Ulangi (Ctrl+Y)" title="Ulangi (Ctrl+Y)" disabled><svg viewBox="0 0 20 20" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4L3 8l4 4"/><path d="M3 8h8a5 5 0 010 10H8"/></svg></button></div><button class="btn sm xstb" id="xst" hidden>▶ LANGKAH</button><div class="xstp" hidden><p class="xstt" id="xstt" aria-live="polite"></p><div class="xsb"><button class="btn sm" id="xsp">◀</button><button class="btn sm" id="xsx">LANJUT ▶</button><button class="btn sm" id="xse">SELESAI</button></div></div><div class="xtoast" role="status" aria-live="polite"></div></div>
     <div class="xside">
       <div class="xcard xio"><div class="xlab">INPUT<span class="xcnt" id="xcnt"></span></div><div class="xrow"><span class="xtgs" id="xtgs"></span><span class="xy" id="xy"></span></div></div>
       <div class="xcard xttc"><div class="xlab">TABEL KEBENARAN X</div><div class="xtw"><table class="tt xtt" id="xtt"></table></div><p class="xmsg" id="xmsg"></p><p class="xex" id="xex" hidden></p></div>
@@ -86,7 +98,7 @@ SC.simplus = () => {
   </div>`;
   const svg = $('#xsvg', el), cv = $('.xcv', el), pal = $('.xpal', el), toast = $('.xtoast', el), stg = $('#stage');
   const MAXIN = 6, LET = 'ABCDEF';   // input bebas: A..F (maks. 6 -> tabel 64 baris)
-  const G = [], W = [], I = []; let stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set(store.get('tkm_ch', []))   // tantangan selesai tersimpan (Peta Kemajuan membacanya);
+  const G = [], W = [], I = []; let hn = 0, stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set(store.get('tkm_ch', [])), nDone = () => CH.filter(c => done.has(c.id)).length   // tantangan selesai tersimpan (Peta Kemajuan membacanya);
   const gate = id => G.find(n => n.id === id), inp = id => I.find(n => n.id === id), into = (id, pin) => W.find(w => w.to.t === 'g' && w.to.id === id && w.to.pin === pin), yw = () => W.find(w => w.to.t === 'y');
   const SI = () => I.slice().sort((a, b) => a.name < b.name ? -1 : 1), curV = () => { const o = {}; I.forEach(n => o[n.id] = n.v); return o };   // urutan kolom tabel = urutan nama (A paling kiri / bit tertinggi)
 
@@ -157,19 +169,28 @@ SC.simplus = () => {
   const allowed = t => chi < 0 || (t[0] !== 'i' && (!CH[chi].ok || CH[chi].ok.includes(t)));
   const deny = t => { Sfx('bad'); say(t[0] === 'i' ? 'Input tantangan sudah disediakan. Pakai A, B, ... yang ada di kanvas.' : `Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad') };
   const list = $('.xlist', el);
+  const hintBox = $('.xhint', el), hiBtn = $('#xhi', el);
+  const showHint = k => {   // k = 1..3: tingkat petunjuk; makin tinggi makin spesifik
+    const c = CH[chi]; hn = Math.max(hn, k); const t = hn === 3 ? solText(c.s) : c.h[hn - 1];
+    $('.xhk', hintBox).textContent = `PETUNJUK ${hn} / 3`; $('.xht', hintBox).textContent = t; $('#xhm', hintBox).hidden = hn >= 3; clearTimeout(tT); toast.classList.remove('show'); hintBox.hidden = false; hiBtn.setAttribute('aria-expanded', 'true'); hiBtn.textContent = hn > 1 ? `HINT ${hn}/3` : 'HINT';
+  };
+  const closeHint = () => { hintBox.hidden = true; hiBtn.setAttribute('aria-expanded', 'false') };
+  const resetHint = () => { hn = 0; closeHint(); hiBtn.textContent = 'HINT' };
   const openList = () => {
-    list.innerHTML = `<div class="xlh"><b>PILIH TANTANGAN<small>${done.size} / ${CH.length} selesai</small></b><button class="xlx" aria-label="Tutup daftar">✕</button></div><div class="xlg">${CH.map((c, i) => `<button class="xli${i === chi ? ' cur' : ''}" data-i="${i}"><b>${i + 1}</b><span>${c.t}</span><i>${c.n} input · ${c.lv}${done.has(i) ? ' · ✓ selesai' : ''}</i></button>`).join('')}</div>`;
+    const nx = CH.findIndex(c => !done.has(c.id));
+    list.innerHTML = `<div class="xlh"><b>PILIH TANTANGAN<small>${nDone()} / ${CH.length} selesai</small></b><button class="xlx" aria-label="Tutup daftar">✕</button></div><div class="xlg">${CH.map((c, i) => `${i === 0 || CH[i - 1].l !== c.l ? `<h3 class="xlv">LEVEL ${c.l + 1}<span>${LVN[c.l]}</span></h3>` : ''}<button class="xli${i === chi ? ' cur' : ''}${i === nx ? ' nxt' : ''}" data-i="${i}"><b>${i + 1}</b><span>${c.t}</span><i>${c.n} input · ${LVD[c.l]}${done.has(c.id) ? ' · ✓ selesai' : i === nx ? ' · berikutnya' : ''}</i></button>`).join('')}</div>`;
     list.hidden = false; $('.xlx', list).onclick = () => { list.hidden = true };
     $$('.xli', list).forEach(b => b.onclick = () => startCh(+b.dataset.i)); Sfx('tick');
+    const cur = $('.xli.cur', list) || $('.xli.nxt', list); cur && requestAnimationFrame(() => cur.scrollIntoView({ block: 'nearest' }));
   };
   const startCh = i => {
-    const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
+    const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; resetHint(); G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
     const yIn = j => c.n >= 4 ? (mob() ? 58 : 70) + j * (ch - 40 - (mob() ? 58 : 70)) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
     for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: yIn(j) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
     if (c.n >= 4) requestAnimationFrame(() => requestAnimationFrame(() => { if (chi === i) { I.forEach((n, j) => { n.y = yIn(j); clampI(n) }); render() } }));   // tinggi kanvas berubah setelah bilah tujuan muncul
     Sfx('tick'); say(`Tantangan ${i + 1}: ${c.t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
   };
-  const exitCh = () => { chi = -1; solved = false; I.forEach(n => { delete n.lock }); Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
+  const exitCh = () => { chi = -1; solved = false; resetHint(); I.forEach(n => { delete n.lock }); Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
 
   /* ekspresi Boolean: NOT = garis di atas (overline). p = tingkat (4 atom/garis atas, 3 AND, 2 XOR, 1 OR); d = kedalaman garis atas.
      h = HTML untuk ditampilkan, t = teks polos (¬) untuk pembaca layar */
@@ -295,12 +316,12 @@ SC.simplus = () => {
       if (tr && w.scrollHeight > w.clientHeight + 1) { const k = stg.getBoundingClientRect().width / stg.offsetWidth, wr = w.getBoundingClientRect(), tb = tr.getBoundingClientRect(), hh = $('#xtt th', el).getBoundingClientRect().height; if (tb.top < wr.top + hh) w.scrollTop += (tb.top - wr.top - hh) / k; else if (tb.bottom > wr.bottom) w.scrollTop += (tb.bottom - wr.bottom) / k }
     }
     const msg = $('#xmsg', el), has = yw(), now = !!C && !!has && !nul && okN === rows && n === C.n;
-    if (now && !solved) { solved = true; done.add(chi); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
+    if (now && !solved) { solved = true; closeHint(); done.add(C.id); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
     msg.textContent = C && has && !nul ? (now ? `✓ Benar! Semua ${rows} baris cocok dengan target (${G.length} gerbang).` : `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`)
       : !n ? 'Belum ada input. Seret kartu INPUT 0 atau INPUT 1 dari palet ke kanvas.' : !G.length && !has ? 'Belum ada gerbang. Tambahkan gerbang lalu sambungkan ke X.' : !has ? 'Hasil belum tersedia: X belum tersambung ke output gerbang atau input.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${SIn.map(x => `${x.name} = ${x.v}`).join(', ')}, maka X = ${yv}.`;
     const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E);
     if (has) { if (E) { ex.innerHTML = `X = ${E.h}`; ex.setAttribute('aria-label', `X = ${E.t}`) } else { ex.textContent = 'X = … (rangkaian belum lengkap)'; ex.removeAttribute('aria-label') } }
-    const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1 }
+    const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1; hiBtn.hidden = solved }
     $$('.xpi', el).forEach(b => b.classList.toggle('dis', !allowed(b.dataset.g)));
     msg.classList.toggle('warn', yv == null && !!(G.length || has));
     $('.xempty', el).hidden = G.length + I.length > 0;
@@ -358,7 +379,7 @@ SC.simplus = () => {
   $('#xun').onclick = undo; $('#xre').onclick = redo;
   $('#xcl').onclick = () => { G.length = 0; W.length = 0; if (chi < 0) I.length = 0; sel = null; Sfx('del'); say('Rangkaian dikosongkan.', 'info'); render() };
   $('#xch').onclick = () => { if (list.hidden) openList(); else list.hidden = true };
-  $('#xgl').onclick = openList; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);
+  $('#xgl').onclick = openList; hiBtn.onclick = () => { if (chi < 0) return; Sfx('tick'); if (!hintBox.hidden) closeHint(); else showHint(Math.max(hn, 1)) }; $('#xhm').onclick = () => { Sfx('tick'); showHint(hn + 1) }; $('#xhx').onclick = () => { Sfx('tick'); closeHint() }; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);
   const back = () => { Sfx('tick'); go('simpick') };
   $('#back').onclick = back;
   document.onkeydown = e => { const z = (e.ctrlKey || e.metaKey) && !e.altKey && e.key.toLowerCase(); if (z === 'z') { e.preventDefault(); e.shiftKey ? redo() : undo() } else if (z === 'y') { e.preventDefault(); redo() } else if (e.key === 'Escape') { if (!list.hidden) list.hidden = true; else back() } else if ((e.key === 'Delete' || e.key === 'Backspace') && sel) { e.preventDefault(); delSel() } };
