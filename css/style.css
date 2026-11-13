@@ -1240,8 +1240,6 @@ body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}
 
 /* v42: poles anti-slop (identitas DDLC: satu rona merah muda, kontur tinta, bayangan keras) */
 #start,.mbg{background:linear-gradient(160deg,#ffdcec,#ffbad9)}
-.sp{width:14px;height:14px;margin:-7px 0 0 -7px;border:3px solid var(--ink);border-radius:50%;background:none;animation:spr .45s ease-out forwards}
-@keyframes spr{to{transform:scale(2.6);opacity:0}}
 .tag{background:none;border:0;border-radius:0;padding:0;margin-top:6px;font-size:14px;font-weight:800;color:var(--ink);opacity:.72}
 .m .tag{border:0;padding:0}
 .hintc{background:none;padding:0;border-radius:0;color:#fff;text-shadow:1px 1px 0 var(--ink),-1px 1px 0 var(--ink),1px -1px 0 var(--ink),-1px -1px 0 var(--ink)}
