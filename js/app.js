@@ -65,8 +65,8 @@ function buildMenu() {
   const el = $('#menu');
   const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? STEPS.length : 0, nowI = CHAPI.find(x => x >= cur);
   const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = CHAPI[k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
-  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `${GL.length} gerbang interaktif`, latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
-  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>★ Rangkaian Logika ★</h2></div>
+  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `Simulasi+ ${CH.filter(c => store.get('tkm_ch', []).includes(c.id)).length} / ${CH.length}`, latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
+  el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1><h2>Rangkaian Logika</h2></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${CHARS[m.key].name} · ${m.sub}</span><span class="tag">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
   <div class="mtools setbtn"><button class="btn" id="hrb">HARIAN${Daily.data().h[Daily.day()] == null ? '<i class="hnew" aria-label="belum dikerjakan hari ini"></i>' : ''}</button><button class="btn" id="setb">PENGATURAN</button><button class="btn" id="petab">PETA</button></div><div class="mkeys"><kbd>↑↓</kbd> pilih menu <kbd>Enter</kbd> buka</div>`;
@@ -74,7 +74,7 @@ function buildMenu() {
   $('#setb').onclick = () => { Snd.sfx('select'); go('settings') }; $('#petab').onclick = () => { Snd.sfx('select'); go('peta') }; $('#hrb').onclick = () => { Snd.sfx('select'); Story.on = false; go('harian') };
   const btns = $$('.mbtn', el); let sel = -1;
   const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu') }; // snd=false untuk mouse (suara hover ditangani global)
-  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
+  btns.forEach((b, i) => { b.onmouseenter = () => set(i, false); b.onclick = () => { Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
   const re = $('#sre', el); if (re) re.onclick = e => { e.stopPropagation(); Snd.sfx('select'); Story.start(true) };
   document.onkeydown = e => {
     if (!el.classList.contains('on')) return;

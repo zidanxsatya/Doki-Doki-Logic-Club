@@ -245,9 +245,7 @@ const tt = (g, hl = -1) => g === 'NOT'
 /* Efek sparkle */
 function spark(e, n = 6) {
   const st = $('#stage'), r = st.getBoundingClientRect(), k = r.width / st.offsetWidth, x = (e.clientX - r.left) / k, y = (e.clientY - r.top) / k;
-  for (let i = 0; i < n; i++) {
-    const s = document.createElement('i'); s.className = 'sp'; s.textContent = '✦';
-    s.style.cssText = `left:${x}px;top:${y}px;--dx:${(Math.random() - .5) * 130}px;--dy:${(Math.random() - .85) * 130}px;color:${pick(['#ffd54a', '#ff7eb6', '#8cd4ff', '#fff'])}`;
-    st.appendChild(s); setTimeout(() => s.remove(), 700);
-  }
+  const s = document.createElement('i'); s.className = 'sp';   // cincin tap: umpan balik klik, satu warna
+  s.style.cssText = `left:${x}px;top:${y}px`;
+  st.appendChild(s); setTimeout(() => s.remove(), 450);
 }

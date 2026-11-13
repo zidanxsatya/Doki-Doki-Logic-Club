@@ -70,8 +70,8 @@ SC.simpick = () => {
   const el = $('#scene');
   const plus = `<svg class="pkic" viewBox="0 0 200 90" aria-hidden="true">${gGfx('AND', 6, 26, .5)}${gGfx('XOR', 6, 64, .5)}${gGfx('OR', 118, 45, .55)}<path d="M66 26C92 26 92 35 118 35M67 64C92 64 92 55 118 55" stroke="#ff7eb6" stroke-width="3.5" fill="none" stroke-linecap="round"/></svg>`;
   el.innerHTML = `<div class="bg" data-b="DDLCbg" style="background-image:url(assets/img/DDLCbg.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>SIMULASI</b><i class="hintc">Pilih jenis simulasi</i></div>
-  <div class="pick"><button class="pickc" data-go="simulasi"><svg class="pkic" viewBox="0 0 160 80" aria-hidden="true">${gGfx('AND', 14, 40, .9)}</svg><b>SIMULASI DASAR</b><span>Satu gerbang pada satu waktu. Ubah input, lihat LED dan tabel kebenarannya bersama Yuri.</span><em>BUKA ▶</em></button>
-  <button class="pickc" data-go="simplus">${plus}<b>SIMULASI+</b><span>Susun rangkaian dari beberapa gerbang dengan kabel, lalu lihat hasil gabungannya.</span><em>BUKA ▶</em></button></div>`;
+  <div class="pick"><button class="pickc" data-go="simulasi"><svg class="pkic" viewBox="0 0 160 80" aria-hidden="true">${gGfx('AND', 14, 40, .9)}</svg><b>SIMULASI DASAR</b><span>Satu gerbang pada satu waktu. Ubah input, lihat LED dan tabel kebenarannya bersama Yuri.</span><em>BUKA</em></button>
+  <button class="pickc" data-go="simplus">${plus}<b>SIMULASI+</b><span>Susun rangkaian dari beberapa gerbang dengan kabel, lalu lihat hasil gabungannya.</span><em>BUKA</em></button></div>`;
   $$('.pickc', el).forEach(b => b.onclick = () => { Snd.sfx('select'); go(b.dataset.go) });
   const back = () => { Snd.sfx('cancelMenu'); go('menu') };
   $('#back').onclick = back; document.onkeydown = e => { if (e.key === 'Escape') back() };
