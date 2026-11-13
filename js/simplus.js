@@ -114,8 +114,9 @@ SC.simplus = () => {
   const term = () => ({ Y: { x: cw - 78, y: ch / 2 } });
   const gp = n => { const o = gGeo(n.type), w = (o.xo - o.xi) * K, tx = n.x - w / 2; return { o, w, tx, ins: o.ys.map(y => ({ x: tx, y: n.y + (y - 50) * K })), out: { x: tx + w, y: n.y } } };
   const mob = () => document.body.classList.contains('m');
-  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(112 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 88 : 102) : 58, Math.min(ch - 40, n.y)) };
-  const clampI = n => { n.x = Math.max(84, Math.min(Math.max(84, cw - 190), n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 58 : 70) : 30, Math.min(ch - 40, n.y)) };
+  const goal2 = () => { const g = $('.xgoal', el); return g && !g.hidden ? Math.max(0, g.offsetHeight - 36) : 0 };   // bilah tujuan dua baris di ponsel tegak
+  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(112 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 88 + goal2() : 102) : 58, Math.min(ch - 40, n.y)) };
+  const clampI = n => { n.x = Math.max(84, Math.min(Math.max(84, cw - 190), n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 58 + goal2() : 70) : 30, Math.min(ch - 40, n.y)) };
   const pinMap = () => {
     const t = term(), m = { Y: { kind: 'dst', ...t.Y, d: { t: 'y' } } };
     I.forEach(n => m[n.name] = { kind: 'src', x: n.x, y: n.y, d: { t: 'in', id: n.id } });
@@ -147,7 +148,7 @@ SC.simplus = () => {
 
   /* edit */
   const freeSpot = () => { for (const fy of [.3, .55, .8]) for (const fx of [.32, .5, .68]) { const x = cw * fx, y = ch * fy; if (!G.some(n => Math.abs(n.x - x) < 100 && Math.abs(n.y - y) < 60)) return { x, y } } return { x: cw / 2 + Math.random() * 40, y: ch / 2 + Math.random() * 40 } };
-  const inSpot = () => { const top = chi >= 0 ? 70 : 30, hit = (x, y) => I.some(n => Math.abs(n.x - x) < 80 && Math.abs(n.y - y) < 62) || G.some(g => Math.abs(g.x - 20 - x) < 110 && Math.abs(g.y - y) < 56); for (const x of [84, 170, 256, 342]) { if (x > Math.max(84, cw - 190)) break; for (const fy of [.3, .7, .5, .12, .9, .2, .8, .4, .6]) { const y = ch * fy; if (y >= top && y <= ch - 40 && !hit(x, y)) return { x, y } } } return { x: 84, y: ch / 2 } };   // slot kosong terdekat (tidak menimpa input/gerbang lain)
+  const inSpot = () => { const top = chi >= 0 ? (mob() ? 58 + goal2() : 70) : 30, hit = (x, y) => I.some(n => Math.abs(n.x - x) < 80 && Math.abs(n.y - y) < 62) || G.some(g => Math.abs(g.x - 20 - x) < 110 && Math.abs(g.y - y) < 56); for (const x of [84, 170, 256, 342]) { if (x > Math.max(84, cw - 190)) break; for (const fy of [.3, .7, .5, .12, .9, .2, .8, .4, .6]) { const y = ch * fy; if (y >= top && y <= ch - 40 && !hit(x, y)) return { x, y } } } return { x: 84, y: ch / 2 } };   // slot kosong terdekat (tidak menimpa input/gerbang lain)
   const place = (type, x, y) => { if (!allowed(type)) return deny(type); const n = { id: ++nid, type, x, y }; clampG(n); G.push(n); sel = { k: 'g', id: n.id }; Sfx('place'); render() };
   const placeIn = (v, x, y) => {
     if (!allowed('in' + v)) return deny('in' + v);
@@ -170,9 +171,10 @@ SC.simplus = () => {
   const deny = t => { Sfx('bad'); say(t[0] === 'i' ? 'Input tantangan sudah disediakan. Pakai A, B, ... yang ada di kanvas.' : `Tantangan ini hanya boleh memakai: ${CH[chi].ok.join(', ')}.`, 'bad') };
   const list = $('.xlist', el);
   const hintBox = $('.xhint', el), hiBtn = $('#xhi', el);
+  const hfade = () => { const t = $('.xht', hintBox); if (t) hintBox.classList.toggle('more', t.scrollTop + t.clientHeight < t.scrollHeight - 2) };
   const showHint = k => {   // k = 1..3: tingkat petunjuk; makin tinggi makin spesifik
     const c = CH[chi]; hn = Math.max(hn, k); const t = hn === 3 ? solText(c.s) : c.h[hn - 1];
-    $('.xhk', hintBox).textContent = `PETUNJUK ${hn} / 3`; $('.xht', hintBox).textContent = t; $('#xhm', hintBox).hidden = hn >= 3; clearTimeout(tT); toast.classList.remove('show'); hintBox.hidden = false; hiBtn.setAttribute('aria-expanded', 'true'); hiBtn.textContent = hn > 1 ? `HINT ${hn}/3` : 'HINT';
+    $('.xhk', hintBox).textContent = `PETUNJUK ${hn} / 3`; $('.xht', hintBox).textContent = t; $('#xhm', hintBox).hidden = hn >= 3; clearTimeout(tT); toast.classList.remove('show'); hintBox.hidden = false; hiBtn.setAttribute('aria-expanded', 'true'); hiBtn.textContent = hn > 1 ? `HINT ${hn}/3` : 'HINT'; $('.xht', hintBox).scrollTop = 0; requestAnimationFrame(hfade);
   };
   const closeHint = () => { hintBox.hidden = true; hiBtn.setAttribute('aria-expanded', 'false') };
   const resetHint = () => { hn = 0; closeHint(); hiBtn.textContent = 'HINT' };
@@ -185,7 +187,7 @@ SC.simplus = () => {
   };
   const startCh = i => {
     const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; resetHint(); G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
-    const yIn = j => c.n >= 4 ? (mob() ? 58 : 70) + j * (ch - 40 - (mob() ? 58 : 70)) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
+    const top = (mob() ? 58 + goal2() : 70), yIn = j => c.n >= 4 ? top + j * (ch - 40 - top) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
     for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: yIn(j) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
     if (c.n >= 4) requestAnimationFrame(() => requestAnimationFrame(() => { if (chi === i) { I.forEach((n, j) => { n.y = yIn(j); clampI(n) }); render() } }));   // tinggi kanvas berubah setelah bilah tujuan muncul
     Sfx('tick'); say(`Tantangan ${i + 1}: ${c.t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
@@ -292,6 +294,9 @@ SC.simplus = () => {
     clearTimeout(cT); cT = setTimeout(commit, 400);
     btns();
   };
+  // bayangan di dasar tabel panjang: tanda masih ada baris di bawah
+  const tfade = () => { const w = $('.xtw', el); if (w) w.classList.toggle('more', w.scrollTop + w.clientHeight < w.scrollHeight - 2) };
+  $('.xtw', el).addEventListener('scroll', tfade, { passive: true }); new ResizeObserver(tfade).observe($('.xtw', el));
   const sync = yv => {
     const SIn = SI(), n = SIn.length, rows = 1 << n, bit = (r, i) => (r >> (n - 1 - i)) & 1, C = chi >= 0 ? CH[chi] : null;   // baris r: input pertama (A) = bit tertinggi
     $('.xp', el).classList.toggle('n3', n >= 3);
@@ -319,6 +324,7 @@ SC.simplus = () => {
     if (now && !solved) { solved = true; closeHint(); done.add(C.id); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
     msg.textContent = C && has && !nul ? (now ? `✓ Benar! Semua ${rows} baris cocok dengan target (${G.length} gerbang).` : `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`)
       : !n ? 'Belum ada input. Seret kartu INPUT 0 atau INPUT 1 dari palet ke kanvas.' : !G.length && !has ? 'Belum ada gerbang. Tambahkan gerbang lalu sambungkan ke X.' : !has ? 'Hasil belum tersedia: X belum tersambung ke output gerbang atau input.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${SIn.map(x => `${x.name} = ${x.v}`).join(', ')}, maka X = ${yv}.`;
+    requestAnimationFrame(tfade);
     const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E);
     if (has) { if (E) { ex.innerHTML = `X = ${E.h}`; ex.setAttribute('aria-label', `X = ${E.t}`) } else { ex.textContent = 'X = … (rangkaian belum lengkap)'; ex.removeAttribute('aria-label') } }
     const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1; hiBtn.hidden = solved }
@@ -379,6 +385,7 @@ SC.simplus = () => {
   $('#xun').onclick = undo; $('#xre').onclick = redo;
   $('#xcl').onclick = () => { G.length = 0; W.length = 0; if (chi < 0) I.length = 0; sel = null; Sfx('del'); say('Rangkaian dikosongkan.', 'info'); render() };
   $('#xch').onclick = () => { if (list.hidden) openList(); else list.hidden = true };
+  $('.xht', hintBox).addEventListener('scroll', hfade, { passive: true }); new ResizeObserver(hfade).observe(hintBox);
   $('#xgl').onclick = openList; hiBtn.onclick = () => { if (chi < 0) return; Sfx('tick'); if (!hintBox.hidden) closeHint(); else showHint(Math.max(hn, 1)) }; $('#xhm').onclick = () => { Sfx('tick'); showHint(hn + 1) }; $('#xhx').onclick = () => { Sfx('tick'); closeHint() }; $('#xgx').onclick = exitCh; $('#xgn').onclick = () => startCh(chi + 1);
   const back = () => { Sfx('tick'); go('simpick') };
   $('#back').onclick = back;
