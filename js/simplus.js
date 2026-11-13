@@ -63,7 +63,7 @@ const CH = [
   { id: 16, l: 4, t: 'Juri 4 orang: X = 1 bila minimal 3 dari 4 input = 1', n: 4, y: '0000000100010111', ok: null, h: ['Minimal 3 dari 4 berarti A dan B menyala bersama salah satu dari C atau D, atau C dan D menyala bersama salah satu dari A atau B.', 'Bagian pertama: (A · B) · (C + D). Bagian kedua: (C · D) · (A + B). Gabungkan keduanya dengan OR.'], s: 'g1=AND A B;g2=OR C D;g3=AND g1 g2;g4=AND C D;g5=OR A B;g6=AND g4 g5;g7=OR g3 g6>g7' }
 ];
 /* kunci jawaban s -> daftar langkah untuk petunjuk ke-3 */
-const solText = s => { const [st, o] = s.split('>'), src = x => /^g\d+$/.test(x) ? 'hasil langkah ' + x.slice(1) : 'input ' + x, steps = st ? st.split(';').map(p => { const [g, e] = p.split('='), [t, ...a] = e.split(' '); return `Langkah ${g.slice(1)}: pasang ${t}. ${a.length === 1 ? `Kakinya dari ${src(a[0])}.` : `Kaki atas dari ${src(a[0])}, kaki bawah dari ${src(a[1])}.`}` }) : []; return [...steps, `Sambungkan ${o[0] === 'g' ? 'output langkah ' + o.slice(1) : 'input ' + o} ke X.`].join('\n') };
+const solText = s => { const [st, o] = s.split('>'), src = x => /^g\d+$/.test(x) ? 'hasil langkah ' + x.slice(1) : 'input ' + x, steps = st ? st.split(';').map(p => { const [g, e] = p.split('='), [t, ...a] = e.split(' '); return `Langkah ${g.slice(1)}: pasang ${t}. ${a.length === 1 ? `Kakinya dari ${src(a[0])}.` : `Kaki atas dari ${src(a[0])}, kaki bawah dari ${src(a[1])}.`}` }) : []; return [...steps, `Sambungkan ${o[0] === 'g' ? 'output langkah ' + o.slice(1) : 'input ' + o} ke X.`, 'Lalu uji: ubah saklar input ke baris yang ditandai di tabel sampai semua baris target teruji.'].join('\n') };
 
 /* pemilih mode: SIMULASI DASAR / SIMULASI+ */
 SC.simpick = () => {
@@ -98,7 +98,7 @@ SC.simplus = () => {
   </div>`;
   const svg = $('#xsvg', el), cv = $('.xcv', el), pal = $('.xpal', el), toast = $('.xtoast', el), stg = $('#stage');
   const MAXIN = 6, LET = 'ABCDEF';   // input bebas: A..F (maks. 6 -> tabel 64 baris)
-  const G = [], W = [], I = []; let hn = 0, stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set(store.get('tkm_ch', [])), nDone = () => CH.filter(c => done.has(c.id)).length   // tantangan selesai tersimpan (Peta Kemajuan membacanya);
+  const G = [], W = [], I = []; let tested = new Set(), req = [], wasB = false, lastNR = -1, hn = 0, stp = -1, nid = 0, wid = 0, iid = 0, sel = null, drag = null, flash = null, cw = 0, ch = 0, K = .8, tT = 0, fT = 0, tblK = '', ioK = '', curR = -1, chi = -1, solved = false; const done = new Set(store.get('tkm_ch', [])), nDone = () => CH.filter(c => done.has(c.id)).length   // tantangan selesai tersimpan (Peta Kemajuan membacanya);
   const gate = id => G.find(n => n.id === id), inp = id => I.find(n => n.id === id), into = (id, pin) => W.find(w => w.to.t === 'g' && w.to.id === id && w.to.pin === pin), yw = () => W.find(w => w.to.t === 'y');
   const SI = () => I.slice().sort((a, b) => a.name < b.name ? -1 : 1), curV = () => { const o = {}; I.forEach(n => o[n.id] = n.v); return o };   // urutan kolom tabel = urutan nama (A paling kiri / bit tertinggi)
 
@@ -186,13 +186,13 @@ SC.simplus = () => {
     const cur = $('.xli.cur', list) || $('.xli.nxt', list); cur && requestAnimationFrame(() => cur.scrollIntoView({ block: 'nearest' }));
   };
   const startCh = i => {
-    const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; resetHint(); G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
+    const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; tested.clear(); req = []; wasB = false; resetHint(); G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
     const top = (mob() ? 58 + goal2() : 70), yIn = j => c.n >= 4 ? top + j * (ch - 40 - top) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
     for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: yIn(j) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
     if (c.n >= 4) requestAnimationFrame(() => requestAnimationFrame(() => { if (chi === i) { I.forEach((n, j) => { n.y = yIn(j); clampI(n) }); render() } }));   // tinggi kanvas berubah setelah bilah tujuan muncul
     Sfx('tick'); say(`Tantangan ${i + 1}: ${c.t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
   };
-  const exitCh = () => { chi = -1; solved = false; resetHint(); I.forEach(n => { delete n.lock }); Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
+  const exitCh = () => { chi = -1; solved = false; tested.clear(); req = []; wasB = false; resetHint(); I.forEach(n => { delete n.lock }); Sfx('tick'); say('Kembali ke mode bebas. Rangkaianmu tetap ada.', 'info'); render() };
 
   /* ekspresi Boolean: NOT = garis di atas (overline). p = tingkat (4 atom/garis atas, 3 AND, 2 XOR, 1 OR); d = kedalaman garis atas.
      h = HTML untuk ditampilkan, t = teks polos (¬) untuk pembaca layar */
@@ -316,18 +316,31 @@ SC.simplus = () => {
       if (y == null) nul++; else if (C && y === tg) okN++;
       if (C) { tr.querySelector('.xtgt').textContent = tg; c.classList.toggle('ok', y != null && y === tg); c.classList.toggle('bad', y != null && y !== tg) }
     });
-    if (curR !== cur) {   // tabel panjang (banyak input): baris aktif selalu terlihat
-      curR = cur; const w = $('.xtw', el), tr = $(`#xtt tr[data-r="${cur}"]`, el);
+    const showRow = r => {   // tabel panjang (banyak input): baris yang dibutuhkan selalu terlihat
+      const w = $('.xtw', el), tr = $(`#xtt tr[data-r="${r}"]`, el);
       if (tr && w.scrollHeight > w.clientHeight + 1) { const k = stg.getBoundingClientRect().width / stg.offsetWidth, wr = w.getBoundingClientRect(), tb = tr.getBoundingClientRect(), hh = $('#xtt th', el).getBoundingClientRect().height; if (tb.top < wr.top + hh) w.scrollTop += (tb.top - wr.top - hh) / k; else if (tb.bottom > wr.bottom) w.scrollTop += (tb.bottom - wr.bottom) / k }
+    };
+    if (curR !== cur) { curR = cur; showRow(cur) }
+    const msg = $('#xmsg', el), has = yw(), built = !!C && !!has && !nul && okN === rows && n === C.n;
+    // fase uji: rangkaian benar belum cukup, pemain harus menyetel input ke baris-baris target dan melihat X cocok
+    if (!built) { tested.clear(); req = []; wasB = false }
+    else {
+      if (!wasB) { wasB = true; const all = Array.from({ length: rows }, (_, r) => r).sort(() => Math.random() - .5); req = all.slice(0, Math.min(rows, 8)) }
+      if (req.includes(cur)) tested.add(cur);
     }
-    const msg = $('#xmsg', el), has = yw(), now = !!C && !!has && !nul && okN === rows && n === C.n;
-    if (now && !solved) { solved = true; closeHint(); done.add(C.id); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
-    msg.textContent = C && has && !nul ? (now ? `✓ Benar! Semua ${rows} baris cocok dengan target (${G.length} gerbang).` : `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`)
+    const left = req.filter(r => !tested.has(r)), nextR = left.length ? left[0] : -1, now = built && (solved || !left.length);
+    $$('#xtt tr[data-r]', el).forEach(tr => { const r = +tr.dataset.r, t = built && tested.has(r); tr.classList.toggle('tv', t); tr.classList.toggle('tp', built && r === nextR && !solved); if (C) tr.querySelector('.xtgt').textContent = C.y[r] + (t ? ' ✓' : '') });
+    $$('.xtg', el).forEach(b => { const i = SIn.findIndex(x => x.id === +b.dataset.id), x = SIn[i]; b.classList.toggle('need', built && nextR >= 0 && !solved && !!x && x.v !== bit(nextR, i)) });
+    if (now && !solved) { solved = true; closeHint(); done.add(C.id); store.set('tkm_ch', [...done]); Sfx('win'); say(`Benar! Semua baris teruji. Tantangan selesai dengan ${G.length} gerbang.`, 'ok') } else if (!now) solved = false;
+    if (built && !solved && nextR >= 0 && lastNR !== nextR) { lastNR = nextR; showRow(nextR) } else if (!built) lastNR = -1;
+    const tc = req.length - left.length, nm1 = nextR >= 0 ? SIn.map((x, i) => `${x.name} = ${bit(nextR, i)}`).join(', ') : '';
+    msg.textContent = C && built ? (now ? `✓ Selesai! Rangkaian benar dan ${req.length} baris target sudah kamu uji (${G.length} gerbang).` : `Rangkaian sudah benar. Sekarang uji (${tc} / ${req.length}): atur ${nm1}, lalu pastikan X = ${C.y[nextR]}.`)
+      : C && has && !nul ? `Cocok ${okN} dari ${rows} baris. Baris merah belum sesuai target.`
       : !n ? 'Belum ada input. Seret kartu INPUT 0 atau INPUT 1 dari palet ke kanvas.' : !G.length && !has ? 'Belum ada gerbang. Tambahkan gerbang lalu sambungkan ke X.' : !has ? 'Hasil belum tersedia: X belum tersambung ke output gerbang atau input.' : yv == null ? 'Hasil belum tersedia: rangkaian belum lengkap, masih ada kaki input gerbang yang kosong.' : `Saat ini ${SIn.map(x => `${x.name} = ${x.v}`).join(', ')}, maka X = ${yv}.`;
     requestAnimationFrame(tfade);
     const E = has ? expr(has.from) : null, ex = $('#xex', el); ex.hidden = !has; ex.classList.toggle('na', !E);
     if (has) { if (E) { ex.innerHTML = `X = ${E.h}`; ex.setAttribute('aria-label', `X = ${E.t}`) } else { ex.textContent = 'X = … (rangkaian belum lengkap)'; ex.removeAttribute('aria-label') } }
-    const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1; hiBtn.hidden = solved }
+    const gl = $('.xgoal', el); gl.hidden = !C; if (C) { $('.xgt', gl).innerHTML = `<b><span class="xgw">TANTANGAN </span>${chi + 1}/${CH.length}</b> ${C.t}${built && !solved ? ` <em class="xtq">UJI ${tc}/${req.length}</em>` : ''}`; gl.title = C.t; $('#xgn', el).hidden = !solved || chi >= CH.length - 1; hiBtn.hidden = solved }
     $$('.xpi', el).forEach(b => b.classList.toggle('dis', !allowed(b.dataset.g)));
     msg.classList.toggle('warn', yv == null && !!(G.length || has));
     $('.xempty', el).hidden = G.length + I.length > 0;
