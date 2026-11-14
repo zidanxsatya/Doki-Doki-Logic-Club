@@ -29,7 +29,7 @@ h1,h2{margin:0;font-family:Anton,Impact,"Arial Black",sans-serif;letter-spacing:
 .mbtn i{position:absolute;left:18px;font-size:26px;font-style:normal;color:var(--pink);opacity:0}
 .mbtn.sel,.mbtn:hover{background:var(--soft)}.mbtn.sel i{opacity:1;animation:bob .5s 6 alternate}
 @keyframes bob{to{transform:translateX(6px)}}
-.mchar{position:absolute;bottom:0}.mchar canvas{width:auto}
+.mchar{position:absolute;bottom:0}
 #mute{position:absolute;z-index:30;font-size:22px;border-radius:50%;cursor:pointer}
 /* scene */
 .bg{position:absolute;inset:0;background:url(../assets/img/DDLCbg.webp) center/cover}
@@ -109,11 +109,9 @@ body.m.p{--pz:.8;--cs:.4}
 
 
 .m .mchar{right:0;top:0;bottom:0;width:calc(100% - 470px)}
-.m .mchar canvas{width:100%;height:100%;object-fit:contain;object-position:right bottom}
 
 .m.p .mlist{left:14px;right:14px;width:auto}
 
-.m.p .mchar canvas{object-position:center bottom}
 .m.p .setbtn{text-align:center}
 /* kerangka scene: bar atas, karakter, panel, dialog */
 .m .top{left:8px;top:5px;gap:8px}.m .top b{-webkit-text-stroke:1.5px var(--ink);text-shadow:2px 2px 0 var(--ink)}.m .hintc{display:none}
@@ -389,43 +387,31 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .mstory .mbtn{height:179px;padding:22px 28px}
 .mstory .mbtn b{font-size:38px}.mstory .mbtn .sub{margin-top:2px}
 .pbtn{position:absolute;right:26px;top:24px;font-weight:800;font-size:20px;color:var(--ink);border:4px solid var(--ink);border-radius:14px;padding:10px 24px;box-shadow:0 4px 0 var(--ink)}
-.steps{position:absolute;left:28px;right:28px;bottom:16px;display:flex;align-items:flex-start}
-.st{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:800;min-width:56px}.st em{font-style:normal}
-.st i{position:static;opacity:1;width:32px;height:32px;border-radius:50%;border:3px solid var(--ink);background:#fff;display:grid;place-items:center;font:800 15px Nunito,sans-serif;font-style:normal}
-.st.cur i{background:#ffd54a}.st.done i{background:var(--pink);color:#fff}
-.ln{flex:1;height:3px;background:#b6c8e4;margin:15px 6px 0;border-radius:2px}
 .mre{right:30px;top:28px;bottom:auto;translate:none;z-index:3;font:800 20px Nunito,sans-serif;height:50px;padding:0 24px;border-width:4px;border-radius:14px;box-shadow:0 4px 0 var(--ink)}
 .mstory.cont .pbtn{right:154px}
 .mgrid{display:grid;grid-template-columns:1fr 1fr;gap:21px 20px}
 .mgrid .mbtn{height:136px;padding:15px 16px 12px 102px}
 .mgrid .mbtn b{font-size:32px}
 .av{position:absolute;left:16px;top:22px;width:72px;height:72px;border-radius:50%;border:3px solid var(--ink);background:#fff}
-.tag{display:inline-block;white-space:nowrap;margin-top:7px;background:#ffffffd0;border:2.5px solid var(--ink);border-radius:999px;padding:2px 12px;font-size:13px;font-weight:800}
 .mbtn[data-k=sayori]{--c0:#cdeaff;--c1:#cdeaff4d}.mbtn[data-k=yuri]{--c0:#e8def6;--c1:#e8def64d}.mbtn[data-k=natsuki]{--c0:#ffd6e8;--c1:#ffd6e84d}.mbtn[data-k=monika]{--c0:#d4f3dd;--c1:#d4f3dd4d}
 .mbtn[data-k]:not([data-k=story]),.mbtn[data-k]:not([data-k=story]).sel,.mbtn[data-k]:not([data-k=story]):hover{background:linear-gradient(90deg,var(--c0) 0,var(--c0) 40%,var(--c1) 100%),var(--tp) center/cover,var(--c0)}
 .mbtn[data-k=story].sel,.mbtn[data-k=story]:hover{background:linear-gradient(90deg,var(--c0) 0,var(--c0) 50%,var(--c1) 100%),linear-gradient(120deg,#ff9fcb,#a9dcff)}
 .mbtn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
-.mchar{right:23px}.mchar canvas{height:640px}
+.mchar{right:23px}
 .setbtn{right:74px;top:22px}
-.mkeys{position:absolute;left:57px;top:672px;font:700 12px Nunito,sans-serif}
-.mkeys kbd{font:inherit;background:#fff;border:2px solid var(--ink);border-radius:6px;padding:1px 7px;margin:0 4px 0 8px}
-.mkeys kbd:first-child{margin-left:0}
 /* menu mobile: kartu ringkas satu kolom, grup karakter di tengah bawah */
-.m .mkeys{display:none}
 .m .mtitle,.m.p .mtitle{left:16px;top:52px}.m .mtitle h1{font-size:26px;margin-top:6px;-webkit-text-stroke:1.5px var(--ink);text-shadow:2px 2px 0 var(--ink)}.m .mtitle h2{font-size:13px;margin-top:6px}
 .m .setbtn{left:12px;right:auto;top:8px;font-size:13px}.m.p .setbtn{top:8px;left:12px;right:auto}
 .m .mlist,.m.p .mlist{left:14px;right:14px;width:auto;top:118px}
 .m .mstory{margin-bottom:8px}.m .mstory .mbtn{height:112px;padding:10px 14px}.m .mstory .mbtn b{font-size:22px}.m .mstory .mbtn .sub{font-size:11px}
 .m .pbtn{right:12px;top:10px;font-size:12px;padding:6px 12px;border-width:3px;box-shadow:0 3px 0 var(--ink)}.m .mstory.cont .pbtn{right:100px}
 .m .mre{right:16px;bottom:auto;top:13px;font-size:12px;height:36px;padding:0 10px;min-height:0;border-width:3px;box-shadow:0 3px 0 var(--ink)}
-.m .steps{left:14px;right:14px;bottom:6px}.m .st{font-size:9px;min-width:44px}.m .st i{width:22px;height:22px;font-size:11px;border-width:2px}.m .ln{margin-top:10px}
 .m .mgrid{grid-template-columns:1fr;gap:6px}.m .mgrid .mbtn{height:auto;min-height:66px;padding:6px 12px 6px 62px}
 .m .mgrid .mbtn b{font-size:20px;letter-spacing:1.5px}.m .mbtn .sub{font-size:11px}.m .av{left:10px;top:7px;width:42px;height:42px;border-width:2px}
-.m .tag{margin:2px 0 0;font-size:10px;padding:0 8px;border-width:2px}
 .m .mbtn{border-width:3px;box-shadow:0 4px 0 var(--ink)}
 .m .mbtn.sel,.m .mbtn:hover{transform:translateY(-2px)}
 .m.p .mchar{left:0;right:0;top:auto;bottom:0;width:auto;height:calc(100% - 590px)}
-.m:not(.p) .mgrid{grid-template-columns:1fr}.m:not(.p) .mstory .mbtn{height:56px}.m:not(.p) .steps,.m:not(.p) .mbtn .sub,.m:not(.p) .tag{display:none}
+.m:not(.p) .mgrid{grid-template-columns:1fr}.m:not(.p) .mstory .mbtn{height:56px}.m:not(.p) .mbtn .sub{display:none}
 .m:not(.p) .mgrid .mbtn{height:38px;padding:3px 10px 3px 52px}.m:not(.p) .av{width:30px;height:30px;top:3px}.m:not(.p) .mlist{top:62px;width:min(420px,calc(100% - 380px));right:auto}
 .m:not(.p) .mtitle{top:8px}.m:not(.p) .setbtn{left:auto;right:46px}
 /* kerangka scene */
@@ -1099,7 +1085,6 @@ body:not(.m) .qv{margin-bottom:4px}
 
 /* v34: Tantangan Harian, tombol HARIAN di menu, baris Peta (Harian, Kasus Nyata) */
 .mtools .btn{position:relative}
-.hnew{position:absolute;top:-5px;right:-5px;width:13px;height:13px;border:3px solid var(--ink);border-radius:50%;background:var(--pink)}
 .dqs{display:flex;align-items:baseline;justify-content:center;gap:10px;margin:6px 0 4px;font-weight:800}
 .dqn{font:48px/1 Anton,Impact,sans-serif;color:var(--pink);-webkit-text-stroke:2px var(--ink);paint-order:stroke fill}
 .dqd{display:inline-grid;grid-template-columns:repeat(7,26px);gap:6px;margin:4px 0 8px}
@@ -1140,7 +1125,6 @@ body:not(.m) .qv{margin-bottom:4px}
 .m.p .mstory.cont .mbtn .sub{max-width:calc(100% - 196px);line-height:1.15}
 
 /* v36: kartu hasil Harian: status berupa pil dengan ikon, penjelasan dalam kotak */
-.m.p .mstory.cont .steps{margin-top:4px}
 .dq .dqr{display:inline-flex;align-items:center;justify-content:center;gap:8px;max-width:100%;padding:3px 16px;border:3px solid var(--ink);border-radius:18px;background:#fff;font-size:17px;line-height:1.25;margin:2px 0 4px;box-shadow:0 3px 0 var(--ink)}
 .dq .dqr.ok{background:#b9f0c4;color:var(--ink)}.dq .dqr.bad{background:#ffd3dc;color:var(--ink)}
 .dq .dqr::before{flex:none;font-weight:800;font-size:18px}.dq .dqr.ok::before{content:"\2713"}.dq .dqr.bad::before{content:"\2717"}
@@ -1240,8 +1224,6 @@ body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}
 
 /* v42: poles anti-slop (identitas DDLC: satu rona merah muda, kontur tinta, bayangan keras) */
 #start,.mbg{background:linear-gradient(160deg,#ffdcec,#ffbad9)}
-.tag{background:none;border:0;border-radius:0;padding:0;margin-top:6px;font-size:14px;font-weight:800;color:var(--ink);opacity:.72}
-.m .tag{border:0;padding:0}
 .hintc{background:none;padding:0;border-radius:0;color:#fff;text-shadow:1px 1px 0 var(--ink),-1px 1px 0 var(--ink),1px -1px 0 var(--ink),-1px -1px 0 var(--ink)}
 .chip{border-radius:8px;border-width:2.5px}
 .bestp{border-radius:10px}
@@ -1256,20 +1238,75 @@ body:not(.m) .story .lres .rside .srule{margin:2px 0 6px}
 
 /* v45: menu utama desktop. Karakter di kiri, menu di kanan dimiringkan ke dalam
    (kanan besar dan dekat, kiri kecil dan jauh) sehingga terbaca sebagai papan menu bertingkat di depan karakter. Hanya desktop. */
-body:not(.m) .mchar{left:0;right:auto;width:640px;text-align:center}
-body:not(.m) .mchar canvas{height:595px;display:inline-block}
 body:not(.m) .mlist{left:560px;top:146px;width:680px;transform-origin:100% 50%;transform:perspective(1000px) rotateY(-10deg);transform-style:preserve-3d}
 body:not(.m) .mgrid .mbtn{padding-left:102px}
 body:not(.m) .mbtn.sel,body:not(.m) .mbtn:hover{transform:translate3d(0,-4px,30px);box-shadow:0 10px 0 var(--ink)}
 body:not(.m) .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translate3d(0,-4px,30px)}
-body:not(.m) .mkeys{left:auto;right:40px;top:680px}
 body:not(.m) .mtitle{left:57px}
 body:not(.m) .mtitle h1{margin-top:-2px}
-body:not(.m) .mchar canvas{height:615px;display:block;margin:0 auto}
 body:not(.m) .mgrid .mbtn{justify-content:center}
 
 /* v46b: rapikan menu utama di HP */
 .m:not(.p) .av{top:50%;translate:0 -50%}
+
+
+/* v47: menu utama. Karakter terpisah yang maju saat kartu disorot, header satu garis kanan, kartu dua tingkat teks */
+.mchar{pointer-events:none}
+.mcast{position:absolute;left:50%;bottom:0;width:640px;height:640px;margin-left:-320px;transform:scale(var(--cs,1));transform-origin:50% 100%}
+.cc{position:absolute;left:var(--x);bottom:var(--b,0);height:var(--h);translate:-50% 0;transform-origin:50% 100%;opacity:0;transition:opacity .45s ease,transform .3s var(--ease),filter .3s ease}
+.cc.in{opacity:1}
+.cc canvas{display:block;height:100%;width:auto}
+.cc[data-k=yuri]{--x:222px;--h:540px;--b:50px}
+.cc[data-k=natsuki]{--x:345px;--h:400px;--b:70px}
+.cc[data-k=sayori]{--x:122px;--h:420px;--b:0px}
+.cc[data-k=monika]{--x:462px;--h:540px;--b:-6px}
+.mcast[data-f] .cc{filter:brightness(.93) saturate(.72)}
+.mcast[data-f=""] .cc{filter:none}
+.mcast[data-f=yuri] .cc[data-k=yuri],.mcast[data-f=natsuki] .cc[data-k=natsuki],.mcast[data-f=sayori] .cc[data-k=sayori],.mcast[data-f=monika] .cc[data-k=monika]{filter:none;z-index:5;transform:scale(1.07) translateY(-6px)}
+@media (prefers-reduced-motion:reduce){.cc{transition:opacity .2s,filter .2s}.mcast[data-f] .cc{transform:none!important}}
+
+/* status satu baris di kartu: centang = pernah dibuka */
+.mbtn .sub{display:flex;align-items:center;gap:7px;font-size:16px;font-weight:800;opacity:.85;margin-top:3px}
+.sub .ck{flex:none;width:20px;height:20px;padding:1px;box-sizing:border-box;border:2.5px solid var(--ink);border-radius:50%;background:var(--pink);fill:none;stroke:var(--ink);stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* tombol atas: Harian beraksen dengan 7 hari terakhir, Pengaturan dan Peta berupa ikon */
+.mtools{align-items:center}
+.hbtn{display:flex;align-items:center;gap:12px;height:50px;padding:0 16px;font-size:20px;background:var(--pink)}
+.hbtn b{font-weight:800;letter-spacing:.5px}
+.hbtn.ok{background:#fff}
+.hdots{display:inline-flex;gap:4px}
+.hdots i{width:10px;height:10px;box-sizing:border-box;border-radius:50%;background:#ffffff80}
+.hbtn.ok .hdots i{background:#4a204026}
+.hdots i.ok{background:var(--ink)}.hdots i.bad{background:#4a204080}.hdots i.now{background:#fff;border:2.5px solid var(--ink)}
+.ibtn{display:grid;place-items:center;width:46px;height:46px;padding:0;border-radius:50%;box-shadow:0 3px 0 var(--ink)}
+.ibtn svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+@media (hover:hover){.hbtn:hover:not(:disabled){background:#ff95c4}.hbtn.ok:hover:not(:disabled){background:var(--soft)}}
+
+/* desktop: satu garis kanan (x=1240) untuk tombol suara, ikon, dan kartu; judul lebih besar */
+body:not(.m) .mchar{left:0;right:auto;width:640px;height:720px}
+body:not(.m) .mtitle{left:57px;top:20px}
+body:not(.m) .mtitle h1{font-size:56px;margin:0;-webkit-text-stroke:3px var(--ink)}
+body:not(.m) .setbtn{right:96px;top:23px}
+body:not(.m) #stage:has(#menu.on) #mute{right:40px;top:25px}
+#mute{transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s,color .16s,opacity .16s,right .3s var(--ease),top .3s var(--ease)}
+body:not(.m) .mlist{top:148px}
+body:not(.m) .mstory .mbtn{height:124px;justify-content:center;padding:0 28px}
+body:not(.m) .pbtn{top:35px}body:not(.m) .mre{top:37px}
+body:not(.m) .mgrid .mbtn{height:158px;justify-content:center;padding:0 14px 0 122px}
+body:not(.m) .mgrid .mbtn b{font-size:36px}
+body:not(.m) .av{left:20px;top:50%;translate:0 -50%;width:84px;height:84px}
+
+/* v47: menu HP. Ikon, kartu lebih ringkas tanpa stepper, formasi karakter diskalakan ke ruang yang ada */
+.m .mtools{gap:8px}
+.m .hbtn{height:36px;padding:0 10px;gap:8px;font-size:13px;border-width:3px;box-shadow:0 3px 0 var(--ink)}
+.m .hdots{gap:3px}.m .hdots i{width:8px;height:8px}.m .hdots i.now{border-width:2px}
+.m .ibtn{width:36px;height:36px;border-width:3px}.m .ibtn svg{width:19px;height:19px}
+.m .setbtn{top:8px}
+.m.p #stage:has(#menu.on) #mute{right:14px;top:7px}
+.m .mbtn .sub{font-size:12px;margin-top:1px;gap:5px}.m .sub .ck{width:15px;height:15px;border-width:2px}
+.m .av{top:50%;translate:0 -50%}
+.m.p .mstory .mbtn{height:84px;justify-content:center}
+.m.p .mgrid .mbtn{min-height:58px;justify-content:center}
+.m.p .mchar{height:calc(100% - 478px)}
 .m:not(.p) .mchar{top:48px}
-.m.p .mstory.cont .mbtn{height:124px}
-.m.p .mchar{height:calc(100% - 602px)}
+.m:not(.p) .mcast{left:auto;right:0;margin-left:0;transform-origin:100% 100%}
