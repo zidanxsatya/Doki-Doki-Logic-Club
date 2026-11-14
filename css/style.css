@@ -1264,4 +1264,12 @@ body:not(.m) .mbtn.sel,body:not(.m) .mbtn:hover{transform:translate3d(0,-4px,30p
 body:not(.m) .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translate3d(0,-4px,30px)}
 body:not(.m) .mkeys{left:auto;right:40px;top:680px}
 body:not(.m) .mtitle{left:57px}
-body:not(.m) .mtitle h1{margin-top:4px}body:not(.m) .mtitle h2{margin-top:4px}
+body:not(.m) .mtitle h1{margin-top:-2px}
+body:not(.m) .mchar canvas{height:615px;display:block;margin:0 auto}
+body:not(.m) .mgrid .mbtn{justify-content:center}
+
+/* v46b: rapikan menu utama di HP */
+.m:not(.p) .av{top:50%;translate:0 -50%}
+.m:not(.p) .mchar{top:48px}
+.m.p .mstory.cont .mbtn{height:124px}
+.m.p .mchar{height:calc(100% - 602px)}
