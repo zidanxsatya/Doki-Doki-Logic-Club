@@ -1280,8 +1280,8 @@ body:not(.m) .mgrid .mbtn{justify-content:center}
 .mtools .ibtn{display:grid;place-items:center;width:46px;height:46px;padding:0;border-radius:50%;box-shadow:0 3px 0 var(--ink)}
 .ibtn svg{width:25px;height:25px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
 @media (hover:hover){.hbtn:hover:not(:disabled){background:#ff95c4}.hbtn.ok:hover:not(:disabled){background:var(--soft)}}
-body:not(.m) .mtitle{left:57px;top:20px}
-body:not(.m) .mtitle h1{font-size:56px;margin:0;-webkit-text-stroke:3px var(--ink)}
+body:not(.m) .mtitle{left:57px;top:12px}
+body:not(.m) .mtitle h1{font-size:72px;margin:0;-webkit-text-stroke:4px var(--ink);text-shadow:3px 3px 0 var(--ink),6px 6px 0 var(--pink),9px 9px 0 var(--ink)}
 body:not(.m) .setbtn{right:96px;top:23px}
 body:not(.m) #stage:has(#menu.on) #mute{right:40px;top:25px}
 #mute{transition:transform .14s var(--ease),box-shadow .14s var(--ease),background-color .16s,color .16s,opacity .16s,right .3s var(--ease),top .3s var(--ease)}
@@ -1293,3 +1293,6 @@ body:not(.m) #stage:has(#menu.on) #mute{right:40px;top:25px}
 .m.p #stage:has(#menu.on) #mute{right:14px;top:7px}
 .m:not(.p) #stage:has(#menu.on) #mute{top:9px}
 .m:not(.p) .setbtn{right:48px}
+
+/* v49: karakter menu desktop digeser sekitar 2% ke kanan (26 px) dan 1% ke atas (7 px) dari panggung 1280x720 */
+body:not(.m) .mchar{left:26px;bottom:7px}
