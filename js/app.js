@@ -2,7 +2,7 @@
 const stage = $('#stage'), chars = {}, SC = {};
 let warm = Promise.resolve();
 const charP = {}, loadChar = k => charP[k] ??= Character.load(k).then(c => chars[k] = c);   // sprite tiap karakter dimuat saat dibutuhkan, bukan semuanya di awal
-let scene = null, busy = false;
+let scene = null, together = null, busy = false;
 const M = {
   materi: { id: 'materi', label: 'MATERI', key: 'sayori', music: 'sayoc', bg: 'DDLCbg', sub: 'Belajar dasar bersama kelas' },
   simulasi: { id: 'simulasi', label: 'SIMULASI', key: 'yuri', music: 'yuric', bg: 'DDLCbg', sub: 'Coba gerbang logika' },
@@ -60,50 +60,33 @@ async function go(id) {
   if (pend && pend !== id) go(pend)
 }
 
-/* menu utama */
 const ICO = {   // ikon tombol menu (garis, sama gaya dengan ikon suara)
-  gear: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.8v2.6M12 18.6v2.6M2.8 12h2.6M18.6 12h2.6M5.5 5.5l1.9 1.9M16.6 16.6l1.9 1.9M18.5 5.5l-1.9 1.9M7.4 16.6l-1.9 1.9"/></svg>',
-  map: '<svg viewBox="0 0 24 24"><path d="M3.5 6.5l5.5-2 6 2 5.5-2v13l-5.5 2-6-2-5.5 2z"/><path d="M9 4.5v13M15 6.5v13"/></svg>',
-  ck: '<svg class="ck" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.2 8.6l3 3 6.6-7.2"/></svg>'
+  gear: '<svg viewBox="0 0 24 24"><path d="M10.6 4.5L11.1 1.9H12.9L13.4 4.5L16.3 5.7L18.5 4.3L19.7 5.5L18.3 7.7L19.5 10.6L22.1 11.1V12.9L19.5 13.4L18.3 16.3L19.7 18.5L18.5 19.7L16.3 18.3L13.4 19.5L12.9 22.1H11.1L10.6 19.5L7.7 18.3L5.5 19.7L4.3 18.5L5.7 16.3L4.5 13.4L1.9 12.9V11.1L4.5 10.6L5.7 7.7L4.3 5.5L5.5 4.3L7.7 5.7Z"/><circle cx="12" cy="12" r="3"/></svg>',   // roda gigi 8 gigi
+  map: '<svg viewBox="0 0 24 24"><path d="M3.5 6.5l5.5-2 6 2 5.5-2v13l-5.5 2-6-2-5.5 2z"/><path d="M9 4.5v13M15 6.5v13"/></svg>'
 };
-const CAST = ['yuri', 'natsuki', 'sayori', 'monika'];   // urutan gambar: baris belakang dulu, lalu baris depan
-const CAST_REACT = { sayori: 'cheer', yuri: 'happy', natsuki: 'happy', monika: 'happy' };   // gerakan singkat saat karakter "maju"
+
+/* menu utama */
 function buildMenu() {
   const el = $('#menu');
-  const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? STEPS.length : 0, fi = CHAPI.indexOf(CHAPI.find(x => x >= cur));
-  const front = fi >= 0 ? MODES[fi].key : '';   // karakter bab yang sedang dikerjakan di Cerita; kosong bila Cerita sudah selesai
-  const seen = store.get('tkm_seen', {}), nCh = CH.filter(c => store.get('tkm_ch', []).includes(c.id)).length, bs = store.get('tkm_latihan_best', 0), ev = store.get('tkm_eval_best', null);
+  const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? STEPS.length : 0, nowI = CHAPI.find(x => x >= cur);
+  const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = CHAPI[k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
   const dd = Daily.data(), dday = Daily.day(), dOk = dd.h[dday] != null, dstr = Daily.streak(dd.h, dday);
-  const ST = {   // [sudah dibuka?, satu baris status]; centang = pernah dibuka, sama dengan Peta
-    materi: [seen.materi, `${MATERI.length} halaman`],
-    simulasi: [seen.simulasi || seen.simplus || nCh > 0, `Simulasi+ ${nCh} / ${CH.length}`],
-    latihan: [seen.latihan || bs > 0, bs ? `Terbaik ${bs} / 8` : '3 mode latihan'],
-    evaluasi: [seen.evaluasi || ev != null, ev != null ? `Nilai terbaik ${ev * 10}` : '10 soal akhir']
-  };
+  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: `Simulasi+ ${CH.filter(c => store.get('tkm_ch', []).includes(c.id)).length} / ${CH.length}`, latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1></div>
-  <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn${ST[m.id][0] ? ' ok' : ''}" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${ST[m.id][0] ? ICO.ck : ''}${ST[m.id][1]}</span></button>`).join('')}</div></div>
-  <div class="mchar"><div class="mcast" data-f="${front}">${CAST.map(k => `<div class="cc" data-k="${k}"></div>`).join('')}</div></div>
+  <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${TAG[m.id]}</span></button>`).join('')}</div></div>
+  <div class="mchar"></div>
   <div class="mtools setbtn"><button class="btn hbtn${dOk ? ' ok' : ''}" id="hrb" aria-label="Tantangan harian, ${dstr} hari beruntun, hari ini ${dOk ? 'sudah' : 'belum'} dikerjakan"><b>HARIAN</b><span class="hdots" aria-hidden="true">${Daily.week(dd.h, dday).map(x => `<i class="${x}"></i>`).join('')}</span></button><button class="btn ibtn" id="setb" title="Pengaturan" aria-label="Pengaturan">${ICO.gear}</button><button class="btn ibtn" id="petab" title="Peta kemajuan" aria-label="Peta kemajuan">${ICO.map}</button></div>`;
-  // karakter: sprite dialog yang sama, satu per satu, supaya bisa maju/meredup sendiri-sendiri
-  const mounted = []; let gone = false; const cast = $('.mcast', el);
-  CAST.forEach(k => loadChar(k).then(c => {
-    if (gone) return; const w = $(`.cc[data-k=${k}]`, el), cv = c.actor.canvas; mounted.push([c, cv, cv.style.height]);
-    cv.style.height = '100%'; c.mount(w); requestAnimationFrame(() => w.classList.add('in'));
-  }).catch(() => { }));
-  const mc = $('.mchar', el), fit = () => cast.style.setProperty('--cs', Math.min(1, mc.clientWidth / 640, mc.clientHeight / 640)), ro = window.ResizeObserver ? new ResizeObserver(fit) : null;   // formasi 640 px diskalakan ke ruang yang tersedia (HP)
-  fit(); ro && ro.observe(mc);
-  let focus = front;
-  const setFocus = k => { if (k === focus) return; focus = k; cast.dataset.f = k; const c = k && chars[k]; if (c && c.actor.cur === c.actor.anims.idle) c.setExpression(CAST_REACT[k]) };
+  $('.mchar', el).appendChild(together.canvas); together.start(); together.play('t', { loop: true });
   $('#setb').onclick = () => { Snd.sfx('select'); go('settings') }; $('#petab').onclick = () => { Snd.sfx('select'); go('peta') }; $('#hrb').onclick = () => { Snd.sfx('select'); Story.on = false; go('harian') };
   const btns = $$('.mbtn', el); let sel = -1;
-  const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu'); const k = i < 0 ? 'story' : btns[i].dataset.k; setFocus(k === 'story' ? front : k) }; // snd=false untuk mouse (suara hover ditangani global); tanpa kartu terpilih / kartu Cerita: karakter bab sekarang di depan
-  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onmouseleave = () => { if (sel === i) set(-1, false) }; b.onfocus = () => { if (b.matches(':focus-visible')) set(i, false) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
+  const set = (i, snd = true) => { if (i === sel) return; sel = i; btns.forEach((b, k) => b.classList.toggle('sel', k === i)); if (snd) Snd.sfx('scrollMenu') }; // snd=false untuk mouse (suara hover ditangani global)
+  btns.forEach((b, i) => { b.onmouseenter = e => { set(i, false); spark(e, 5) }; b.onclick = e => { spark(e, 14); Snd.sfx('select'); if (b.dataset.i === 's') Story.start(false); else { Story.on = false; const mid = MODES[+b.dataset.i].id; go(mid === 'simulasi' ? 'simpick' : mid) } } });
   const re = $('#sre', el); if (re) re.onclick = e => { e.stopPropagation(); Snd.sfx('select'); Story.start(true) };
   document.onkeydown = e => {
     if (!el.classList.contains('on')) return;
-    if (e.key === 'ArrowDown') set((sel + 1) % btns.length); else if (e.key === 'ArrowUp') set(sel < 0 ? btns.length - 1 : (sel + btns.length - 1) % btns.length); else if (e.key === 'Enter' && sel >= 0) btns[sel].click();
+    if (e.key === 'ArrowDown') set((sel + 1) % btns.length); else if (e.key === 'ArrowUp') set((sel + btns.length - 1) % btns.length); else if (e.key === 'Enter' && sel >= 0) btns[sel].click();
   };
-  scene = { cleanup() { gone = true; ro && ro.disconnect(); mounted.forEach(([c, cv, h]) => { c.unmount(); cv.style.height = h }); document.onkeydown = null } };   // tinggi kanvas dikembalikan: sprite yang sama dipakai di layar dialog
+  scene = { cleanup() { together.stop(); together.canvas.remove(); document.onkeydown = null } };
   el.classList.add('on');
 }
 
@@ -639,6 +622,7 @@ document.addEventListener('pointermove', e => {
   $('#mute').onclick = e => { e.currentTarget.innerHTML = ico(Snd.mute()) };
   const btn = $('#startBtn'), msg = $('#loadmsg');
   try {
+    together = new Actor(await loadAtlas('assets/img/dokitogether'), { t: { name: 'Doki together club monika', fps: 12, loop: true } });
     await Snd.preload();   // SFX didecode sebelum tombol MULAI aktif
     const keys = Object.keys(CHARS);
     warm = Promise.all([loadAtlas('assets/img/Text_Boxes'), loadImg('assets/img/DDLCbg.webp'), loadImg('assets/img/Music_Room.webp')]);
