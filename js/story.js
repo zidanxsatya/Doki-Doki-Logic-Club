@@ -40,12 +40,70 @@ Story.prog = () => { const p = store.get(Story.key, null); if (!p) return { step
 Story.save = p => store.set(Story.key, p);
 Story.start = fresh => { const p = Story.prog(); if (fresh) { p.step = 0; Story.save(p) } Story.on = true; preloadPortraits(); preloadExpr(); go(STEPS[p.step]) };
 Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, STEPS.length - 1); Story.save(p); Story.on = true; go(STEPS[p.step]) };
-/* kartu judul bab: muncul sebentar saat masuk bagian belajar lewat Mode Cerita; tidak menghalangi sentuhan */
-Story.chap = id => {
-  const n = CHAPI.indexOf(STEPS.indexOf(id)) + 1; if (!Story.on || !n) return;
-  $('.chap')?.remove(); const c = document.createElement('div'); c.className = 'chap'; c.setAttribute('role', 'status'); c.setAttribute('aria-label', `Bab ${n}: ${STEP_NAME[id]}`);
-  c.innerHTML = `<b class="cn">${n}</b><span class="ct">${STEP_NAME[id]}</span><span class="cd" aria-hidden="true">${[1, 2, 3, 4].map(k => `<i class="${k <= n ? 'on' : ''}"></i>`).join('')}</span>`;
-  $('#stage').append(c); setTimeout(() => c.remove(), 2000);
+/* v50: kartu bab layar penuh, satu rancangan per bab (gaya: bagian "v50" di style.css).
+   Kartu tampil SEBELUM adegan bab dibuat: go() menyerahkan run() ke sini, dan run() dipanggil tepat saat kartu mulai menutup,
+   jadi dialog tidak mengetik di balik kartu. Lewati: klik, ketuk, Enter, Spasi atau Esc (setelah 0,5 dtk). */
+const chapImg = f => `<img class="c_cp" src="assets/img/portraits/${f}.webp" alt="" draggable="false">`;
+const chapSch = v => {   // rangkaian AND: saklar A dan B -> gerbang -> lampu. v = tegak (layar potret): alur arus turun, bukan ke kanan
+  const P = (x, y) => v ? `x="${y}" y="${x}"` : `x="${x}" y="${y}"`, W = { A: 'M20 14H58V23H73', B: 'M20 46H58V37H73', Y: 'M103 30H136' };
+  const rays = [0, 1, 2, 3, 5, 6, 7].map(k => { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a); return `<path d="M${146 + c * 11.5} ${30 + s * 11.5}L${146 + c * 15} ${30 + s * 15}"/>` }).join('');
+  return `<svg class="c_sch ${v ? 'c_v' : 'c_h'}" viewBox="${v ? '0 0 60 174' : '0 0 160 60'}" aria-hidden="true"><g${v ? ' transform="matrix(0 1 1 0 0 0)"' : ''}>
+    ${Object.values(W).map((d, k) => `<path class="c_wd" style="--k:${k}" pathLength="1" d="${d}"/>`).join('')}
+    <path class="c_gt" d="M73 15H88A15 15 0 0 1 88 45H73Z"/>
+    ${[['a', 10, 14], ['b', 42, 46]].map(([k, y, cy]) => `<rect class="c_sw c_${k}" x="6" y="${y}" width="14" height="8" rx="4"/><circle class="c_kn c_${k}" cx="16" cy="${cy}" r="2.6"/>`).join('')}
+    ${Object.entries(W).map(([k, d]) => `<path class="c_wl c_${k}" pathLength="1" d="${d}"/>`).join('')}
+    <g class="c_ry">${rays}</g><circle class="c_lp" cx="146" cy="30" r="8"/></g>
+    <text ${P(13, 7.6)}>A</text><text ${P(13, 39.6)}>B</text><text ${v ? P(165, 30) : P(146, 49)}>Bab 2 dari 4</text></svg>`;
+};
+const CHAPS = {
+  materi: {
+    hold: 2700, out: 620,
+    html: () => `<div class="c_bk"><section class="c_pg c_l"><h2 class="c_ct">Materi</h2><p class="c_cs">Sayori mengajakmu membaca ${MATERI.length} halaman, dari rangkaian logika sampai tabel kebenaran.</p>${chapImg('sayori_happ')}</section>
+      <section class="c_pg c_r"><h3>Daftar halaman</h3><ol class="c_toc">${MATERI.map((m, i) => `<li style="--i:${i}"><span>${m.t}</span><i></i><b>${i + 1}</b></li>`).join('')}</ol></section>
+      <i class="c_rb"><small>Bab</small><b>1</b><small>dari 4</small></i></div>`
+  },
+  simulasi: {
+    hold: 2700, out: 650,
+    html: () => `${chapSch(0)}${chapSch(1)}<div class="c_tx"><h2 class="c_ct">Simulasi</h2><p class="c_cs">Yuri menyiapkan papan rangkaian. Ubah masukannya, lihat keluarannya.</p></div>${chapImg('yuri_smile')}`,
+    pre(c) {   // titik lampu: kartu menutup seperti diafragma ke arah lampu yang menyala
+      const l = $$('.c_lp', c).find(e => e.getBoundingClientRect().width), r = l.getBoundingClientRect(), s = c.getBoundingClientRect();
+      c.style.setProperty('--lx', ((r.left + r.width / 2 - s.left) / s.width * 100).toFixed(1) + '%'); c.style.setProperty('--ly', ((r.top + r.height / 2 - s.top) / s.height * 100).toFixed(1) + '%');
+    }
+  },
+  latihan: {
+    hold: 2500, out: 520,
+    html: () => `${chapImg('natsuki_wah')}<div class="c_sl"><h2 class="c_ct">Latihan</h2><p class="c_cs">Soal acak dari semua materi. Jawaban salah mengurangi satu nyawa.</p>
+      <div class="c_hr">${[0, 1, 2].map(k => `<svg style="--i:${k}" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 14S1.6 9.7 1.6 5.5A3.5 3.5 0 0 1 8 3.8a3.5 3.5 0 0 1 6.4 1.7C14.4 9.7 8 14 8 14Z"/></svg>`).join('')}<b>3 nyawa</b></div></div><p class="c_bn">Bab 3 dari 4</p>`
+  },
+  evaluasi: {
+    hold: 2800, out: 600,
+    html: () => `${chapImg('monika_neutral')}<p class="c_cs c_cr">Monika menutup bab terakhir. Kerjakan semua soal, lalu lihat nilaimu.</p>
+      <article class="c_sh"><header><h2 class="c_ct">Evaluasi</h2><span>Bab 4 dari 4</span></header>
+      <dl><div class="c_rw"><dt>Jumlah soal</dt><dd>10</dd></div><div class="c_rw"><dt>Waktu tiap soal</dt><dd>60 detik</dd></div><div class="c_rw"><dt>Hasil akhir</dt><dd>Nilai dan kategori</dd></div></dl>
+      <svg class="c_rg" viewBox="0 0 40 40" aria-hidden="true"><circle class="c_r0" cx="20" cy="20" r="16"/><circle class="c_r1" cx="20" cy="20" r="16" pathLength="100" transform="rotate(-90 20 20)"/><text class="c_n" x="20" y="24.4">60</text><text class="c_u" x="20" y="31">detik</text></svg>
+      <div class="c_st" aria-hidden="true">SIAP</div></article>`
+  }
+};
+Story.chap = async (id, run, fade) => {   // selalu memanggil run() tepat sekali; kartu hanya untuk 4 bab di Mode Cerita
+  const n = CHAPI.indexOf(STEPS.indexOf(id)) + 1, K = CHAPS[id]; let ran = false, c; const go1 = () => { if (!ran) { ran = true; run() } };
+  if (!Story.on || !n || !K) return go1();
+  try {
+    const rm = matchMedia('(prefers-reduced-motion:reduce)').matches;
+    c = document.createElement('div'); c.className = 'chap'; c.dataset.s = id; c.setAttribute('role', 'status'); c.setAttribute('aria-label', `Bab ${n} dari 4: ${STEP_NAME[id]}`);
+    c.innerHTML = `${K.html()}<p class="chint" aria-hidden="true">${document.body.classList.contains('m') ? 'Ketuk untuk lanjut' : 'Klik atau tekan Enter untuk lanjut'}</p>`;
+    await Promise.race([Promise.all($$('img', c).map(i => i.decode ? i.decode().catch(() => { }) : 0)), wait(400)]);   // potret sudah di cache; jangan sampai muncul belakangan
+    $('#stage').append(c); void c.offsetWidth; fade.classList.remove('on');   // kartu menutup layar lebih dulu, baru layar hitam diangkat
+    const t0 = performance.now();
+    await new Promise(done => {
+      const end = () => { clearTimeout(tm); removeEventListener('keydown', key, true); c.removeEventListener('click', skip); done() },
+        skip = () => { if (performance.now() - t0 > 500) end() },
+        key = e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); skip() } },
+        tm = setTimeout(end, rm ? 1500 : K.hold);
+      c.addEventListener('click', skip); addEventListener('keydown', key, true);
+    });
+    K.pre?.(c); go1(); await wait(16); c.classList.add('out'); await wait(rm ? 200 : K.out);
+  } catch (e) { console.warn('kartu bab', e) }
+  finally { c?.remove(); go1() }
 };
 Story.menuSub = () => { const p = Story.prog(); return p.step > 0 ? `Lanjutkan: ${STEP_NAME[STEPS[p.step]]}` : p.done ? `Selesai · nilai ${p.ev * 10} · main lagi` : 'Belajar bareng semua karakter' };
 

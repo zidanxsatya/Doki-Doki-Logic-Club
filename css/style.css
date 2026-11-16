@@ -780,12 +780,6 @@ body.m{--cs:.6}
 .m:not(.p) .xside :where(.btn,.credlink):not(#startBtn)::after{content:none}
 
 /* v16: kartu bab, combo Latihan, hasil meriah, mode LANGKAH Simulasi+ */
-.chap{position:absolute;left:50%;top:26%;translate:-50% 0;z-index:35;display:flex;align-items:center;gap:14px;padding:10px 26px 10px 12px;background:#fff;border:5px solid var(--ink);border-radius:999px;box-shadow:0 8px 0 var(--ink);pointer-events:none;animation:chap 2s linear both;max-width:calc(100% - 24px);box-sizing:border-box}
-.chap .cn{display:grid;place-items:center;flex:none;width:58px;height:58px;border-radius:50%;background:var(--pink);border:4px solid var(--ink);color:#fff;font:36px/1 Anton,Impact,sans-serif;-webkit-text-stroke:1.5px var(--ink);paint-order:stroke fill}
-.chap .ct{font:40px/1 Anton,Impact,sans-serif;letter-spacing:2px;color:var(--ink);text-transform:uppercase;white-space:nowrap}
-.chap .cd{display:flex;gap:5px}.chap .cd i{width:12px;height:12px;border-radius:50%;border:3px solid var(--ink);background:#fff}.chap .cd i.on{background:#ffd54a}
-@keyframes chap{0%{opacity:0;transform:translateY(-18px) scale(.94);animation-timing-function:cubic-bezier(.23,1,.32,1)}14%{opacity:1;transform:none}84%{opacity:1;transform:none;animation-timing-function:ease-out}100%{opacity:0;transform:translateY(-8px)}}
-.m .chap{padding:6px 16px 6px 8px;gap:9px;border-width:3px;box-shadow:0 5px 0 var(--ink);top:20%}.m .chap .cn{width:38px;height:38px;border-width:3px;font-size:24px}.m .chap .ct{font-size:24px;letter-spacing:1px}.m .chap .cd i{width:9px;height:9px;border-width:2px}
 .combo{margin-left:auto;padding:2px 12px;border-radius:999px;background:var(--pink);color:#fff;border:3px solid var(--ink);font:800 14px/1.3 Nunito,sans-serif;letter-spacing:.5px;text-shadow:0 1px 0 var(--ink);box-shadow:0 3px 0 var(--ink);white-space:nowrap}
 .combo.hot{background:#ffd54a;color:var(--ink);text-shadow:none}.combo.lost{background:#e6dcf5;color:var(--ink);text-shadow:none;animation:badshake .32s}
 .combo.pop{animation:okpop .36s var(--ease)}
@@ -800,7 +794,7 @@ body.m{--cs:.6}
 .xstt{margin:0 0 6px;font:800 14px/1.35 Nunito,sans-serif;color:var(--ink)}.xsb{display:flex;gap:6px;justify-content:flex-end}
 .xdim{opacity:.22}.xhl{animation:xhlp 1s ease-in-out 6 alternate}@keyframes xhlp{to{stroke-width:2;fill:#ffd54a14}}
 .m .xstp{left:5px;right:5px;bottom:5px;padding:4px 8px 6px;border-width:2px;border-radius:10px}.m .xstt{font-size:12px;margin-bottom:4px}.m:not(.p) .xstt{font-size:11px;line-height:1.25}
-@media (prefers-reduced-motion:reduce){.chap{animation:chapr 2s linear both}@keyframes chapr{0%{opacity:0}14%,84%{opacity:1}100%{opacity:0}}.cf{display:none}.res .stars i.on{animation:none}.xhl,.xstb,.xstp,.combo.pop{animation:none}}
+@media (prefers-reduced-motion:reduce){.cf{display:none}.res .stars i.on{animation:none}.xhl,.xstb,.xstp,.combo.pop{animation:none}}
 .xstp:not([hidden]) ~ .xtoast{opacity:0!important}
 
 /* v17: pilihan cerita, undo/redo Simulasi+, timer Evaluasi */
@@ -1296,3 +1290,148 @@ body:not(.m) #stage:has(#menu.on) #mute{right:40px;top:25px}
 
 /* v49: karakter menu desktop digeser sekitar 2% ke kanan (26 px) dan 1% ke atas (7 px) dari panggung 1280x720 */
 body:not(.m) .mchar{left:26px;bottom:7px}
+
+/* ===== v50: kartu bab Mode Cerita, layar penuh, satu rancangan per bab =====
+   Ukuran memakai cqmin (1 = 1% sisi pendek layar) supaya sama di desktop, HP potret, dan HP lanskap.
+   Gaya dasar = keadaan akhir kartu. Animasi hanya menulis keadaan awal (from + backwards), jadi reduced-motion cukup mematikan animasi. */
+.chap{position:absolute;inset:0;z-index:45;container:chap/size;overflow:hidden;cursor:pointer;background:var(--bg);color:#fff;font-family:Nunito,"Trebuchet MS","Segoe UI",sans-serif;-webkit-tap-highlight-color:transparent;transition:background-color .3s linear;animation:chin .2s linear backwards}
+@keyframes chin{from{opacity:0}}
+.chap *{box-sizing:border-box;margin:0}
+.chap.out{pointer-events:none}
+.chap img{display:block;position:absolute;pointer-events:none;-webkit-user-drag:none}
+.chap .c_ct{font:400 17cqmin/1 Anton,Impact,"Arial Black",sans-serif;letter-spacing:.02em}
+.chap .c_cs{font-weight:700;font-size:3cqmin;line-height:1.45}
+.chint{position:absolute;bottom:2.2cqmin;left:0;right:0;text-align:center;font-weight:800;font-size:max(12px,2.2cqmin);opacity:.82;pointer-events:none;animation:chh .4s linear 1s backwards}
+@keyframes chh{from{opacity:0}}
+
+/* Bab 1, Materi: buku terbuka. Halaman membuka dari punggung buku; daftar isi berisi 11 judul halaman yang sebenarnya; pita merah = penanda bab */
+[data-s=materi]{--bg:#164a6e;--pp:#f3faff;--ik:#16384f;--ac:#d3303a}
+[data-s=materi] .chint{color:#d4e9f7}
+.c_bk{position:absolute;inset:5cqh 4cqw 8cqh}
+.c_pg{position:absolute;top:0;bottom:0;width:50%;color:var(--ik);padding:7cqmin 6cqmin 6cqmin;transition:translate .5s cubic-bezier(.6,.05,.9,.5)}
+.c_pg.c_l{left:0;border-radius:2.4cqmin 0 0 2.4cqmin;background:linear-gradient(90deg,var(--pp) 90%,#d3e6f0);box-shadow:0 .8cqmin 0 #c9dde9,0 1.6cqmin 0 #a5c3d6;animation:pgl .62s var(--ease) .12s backwards}
+.c_pg.c_r{right:0;border-radius:0 2.4cqmin 2.4cqmin 0;background:linear-gradient(270deg,var(--pp) 90%,#d3e6f0);box-shadow:0 .8cqmin 0 #c9dde9,0 1.6cqmin 0 #a5c3d6;padding-left:9cqmin;animation:pgr .62s var(--ease) .12s backwards}
+@keyframes pgl{from{clip-path:inset(0 0 0 100%)}}@keyframes pgr{from{clip-path:inset(0 100% 0 0)}}
+@keyframes pglp{from{clip-path:inset(100% 0 0 0)}}@keyframes pgrp{from{clip-path:inset(0 0 100% 0)}}
+.c_pg .c_ct{color:var(--ik)}
+.c_pg .c_cs{margin-top:2.6cqmin;max-width:31cqmin;color:#27506c}
+.c_pg .c_cp{right:2cqmin;bottom:0;height:54cqmin;animation:chpop .5s var(--ease) .65s backwards}
+@keyframes chpop{from{translate:0 40%}}
+.c_pg h3{font-weight:800;font-size:2.5cqmin;color:#2f6a91;margin-bottom:1.6cqmin}
+.c_toc{list-style:none;padding:0}
+.c_toc li{display:flex;align-items:baseline;gap:1.2cqmin;font-weight:700;font-size:3.2cqmin;line-height:1;padding:1.2cqmin 0;animation:chw .34s var(--ease) calc(.55s + var(--i) * .06s) backwards}
+@keyframes chw{from{clip-path:inset(0 100% 0 0)}}
+.c_toc i{flex:1;border-bottom:.28cqmin dotted #7aa3bd;translate:0 -.45ex}
+.c_toc b{font-weight:800;min-width:2.2ch;text-align:right;font-variant-numeric:tabular-nums}
+.c_rb{position:absolute;left:50%;top:-1.2cqmin;translate:-50% 0;width:10cqmin;height:25cqmin;padding-top:3cqmin;display:flex;flex-direction:column;align-items:center;background:var(--ac);color:#fff;clip-path:polygon(0 0,100% 0,100% 100%,50% 88%,0 100%);font-style:normal;font-weight:800;font-size:max(11px,2.2cqmin);line-height:1.25;transition:translate .4s cubic-bezier(.6,.05,.9,.5);animation:chrb .5s cubic-bezier(.3,1.3,.5,1) 1.5s backwards}
+.c_rb b{font:400 8.4cqmin/1 Anton,Impact,sans-serif}
+@keyframes chrb{from{translate:-50% -110%}}@keyframes chrbp{from{translate:0 -110%}}
+
+/* Bab 2, Simulasi: rangkaian AND menyala. Saklar A, saklar B, gerbang, lampu: satu-satunya warna hangat di kartu */
+[data-s=simulasi]{--bg:#170f2e}
+[data-s=simulasi] .chint{color:#cbbfe6}
+.c_sch{position:absolute;overflow:visible}
+.c_sch.c_h{left:0;right:0;margin-inline:auto;top:7cqh;width:min(85cqw,139cqh);height:auto}
+.c_sch.c_v{display:none}
+.c_sch :where(path,rect,circle){fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.4}
+.c_sch text{font:800 4.2px Nunito,sans-serif;fill:#cbbfe6;text-anchor:middle}
+.c_wd{stroke:#4e3d86;stroke-dasharray:1 2;animation:chd .7s var(--ease) calc(.1s + var(--k) * .08s) backwards}
+@keyframes chd{from{stroke-dashoffset:1.01}}
+.c_gt{fill:#241748;stroke:#b394e0;animation:chfo .4s linear .5s backwards}
+@keyframes chfo{from{opacity:0}}
+.c_sw{fill:#e6d9ff;stroke:none}.c_kn{fill:#170f2e;stroke:none}
+.c_sw.c_a{animation:chsw .25s linear .75s backwards}.c_sw.c_b{animation:chsw .25s linear 1s backwards}
+.c_kn.c_a{animation:chkn .25s var(--ease) .75s backwards}.c_kn.c_b{animation:chkn .25s var(--ease) 1s backwards}
+@keyframes chsw{from{fill:#3a2c6b}}@keyframes chkn{from{translate:-6px 0}}
+.c_wl{stroke:#e6d9ff;stroke-dasharray:1 2}
+.c_wl.c_A{animation:chd .35s linear .85s backwards}.c_wl.c_B{animation:chd .35s linear 1.1s backwards}.c_wl.c_Y{animation:chd .3s linear 1.45s backwards}
+.c_lp{fill:#ffd54a;stroke:#fff4c2;filter:drop-shadow(0 0 2.2px #ffd54a);animation:chl .3s linear 1.75s backwards}
+@keyframes chl{from{fill:#2b1b55;stroke:#6e5cb0;filter:none}}
+.c_ry path{stroke:#ffd54a;stroke-width:1.2}
+.c_ry{transform-origin:146px 30px;animation:chry .4s var(--ease) 1.75s backwards}
+@keyframes chry{from{scale:.5;opacity:0}}
+[data-s=simulasi] .c_tx{position:absolute;left:7.5cqw;bottom:7cqh;width:56cqw}
+[data-s=simulasi] .c_ct{color:#d7c4ff}
+[data-s=simulasi] .c_cs{margin-top:2cqmin;max-width:44cqmin;color:#cbbfe6}
+[data-s=simulasi] .c_cp{right:5cqw;bottom:0;height:36cqh}
+@keyframes chir{from{clip-path:circle(150% at var(--lx) var(--ly))}to{clip-path:circle(0 at var(--lx) var(--ly))}}
+
+/* Bab 3, Latihan: papan skor miring. Lempengan gelap menghantam dari kiri; tiga nyawa muncul satu per satu */
+[data-s=latihan]{--bg:#fc95d3}
+.c_sl{position:absolute;left:-6cqw;top:0;bottom:0;width:72cqw;padding:0 0 0 13cqw;display:flex;flex-direction:column;justify-content:center;background:#2a0b25;clip-path:polygon(0 0,100% 0,81% 100%,0 100%);animation:chsl .5s cubic-bezier(.2,1.2,.4,1) backwards}
+@keyframes chsl{from{translate:-105% 0}}@keyframes chslp{from{translate:0 105%}}
+[data-s=latihan] .c_ct{display:block;font-size:25cqmin;color:#fc95d3;text-shadow:.9cqmin .9cqmin 0 #8c1c63;transform:skewX(-8deg);transform-origin:left bottom;animation:chtl .3s var(--ease) .3s backwards}
+@keyframes chtl{from{scale:1.3;opacity:0}}
+[data-s=latihan] .c_cs{margin-top:3.4cqmin;max-width:42cqmin;color:#ffe3f3;animation:chh .3s linear .55s backwards}
+.c_hr{display:flex;align-items:center;gap:1.6cqmin;margin-top:4.2cqmin}
+.c_hr svg{width:9.5cqmin;height:9.5cqmin;fill:#ff4d7a;stroke:#fff;stroke-width:1;stroke-linejoin:round;animation:chhp .34s cubic-bezier(.3,1.6,.5,1) calc(.75s + var(--i) * .14s) backwards}
+@keyframes chhp{from{scale:0}}
+.c_hr b{margin-left:1.4cqmin;font-weight:800;font-size:4cqmin;color:#fff;animation:chh .3s linear 1.2s backwards}
+[data-s=latihan] .c_cp{right:1cqw;bottom:0;height:98cqh;animation:chnp .5s var(--ease) .3s backwards}
+@keyframes chnp{from{translate:10cqw 6cqh;rotate:5deg;opacity:0}}
+.c_bn{position:absolute;top:4cqmin;right:5cqw;font-weight:800;font-size:max(12px,2.6cqmin);color:#2a0b25}
+[data-s=latihan] .chint{left:7cqw;right:auto;text-align:left;color:#fc95d3}
+@keyframes chdw{from{clip-path:polygon(0 0,100% 0,100% 100%,-30% 100%)}to{clip-path:polygon(130% 0,100% 0,100% 100%,100% 100%)}}
+
+/* Bab 4, Evaluasi: lembar ujian jatuh ke meja, lalu distempel SIAP. Stempel merah = satu-satunya aksen */
+[data-s=evaluasi]{--bg:#12472a;--pa:#f6fbf3;--ik:#173f25;--rd:#d3303a}
+[data-s=evaluasi] .chint{left:58cqw;right:auto;bottom:auto;top:calc(13cqh + 14cqmin);text-align:left;color:#cfe8c6}
+.c_sh{position:absolute;left:calc(30cqw - 15.5em);top:50%;translate:0 -50%;rotate:-2.5deg;width:31em;height:45em;font-size:2cqmin;padding:2.4em 2.6em;background:var(--pa);color:var(--ik);box-shadow:.5em .6em 0 #0b2c18;transition:translate .55s cubic-bezier(.5,0,.9,.5),rotate .55s cubic-bezier(.5,0,.9,.5);animation:chdrop .7s cubic-bezier(.3,1.25,.5,1) .1s backwards,chsk .24s linear 1.8s}
+@keyframes chdrop{from{translate:0 -120cqh;rotate:-9deg}}
+@keyframes chsk{20%{translate:.35em -50%}45%{translate:-.3em -50%}70%{translate:.15em -50%}}@keyframes chskp{20%{translate:.35em 0}45%{translate:-.3em 0}70%{translate:.15em 0}}
+.c_sh header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:.7em;border-bottom:.25em solid var(--ik)}
+.c_sh .c_ct{font-size:4.6em;color:var(--ik)}
+.c_sh header span{font-weight:800;font-size:1.3em;padding-bottom:.35em}
+.c_rw{display:flex;justify-content:space-between;align-items:baseline;padding:.9em 0;border-bottom:.12em solid #cfe3c8}
+.c_rw dt{font-weight:700;font-size:1.4em;color:#3d6a49}.c_rw dd{font-weight:800;font-size:1.9em}
+.c_rg{display:block;width:12em;height:12em;margin:1.7em 0 0 1.2em;fill:none;stroke-width:3}
+.c_rg .c_r0{stroke:#dcebd5}.c_rg .c_r1{stroke:var(--ik);stroke-dasharray:100 100;stroke-linecap:round;animation:chrg .8s var(--ease) .6s backwards}
+@keyframes chrg{from{stroke-dashoffset:100}}
+.c_rg text{text-anchor:middle;fill:var(--ik);stroke:none}.c_rg .c_n{font:400 13px Anton,Impact,sans-serif}.c_rg .c_u{font:800 3.4px Nunito,sans-serif}
+.c_st{position:absolute;right:.27em;bottom:1.4em;rotate:-11deg;color:var(--rd);font:400 4.4em/1.1 Anton,Impact,sans-serif;letter-spacing:.06em;padding:.02em .14em;border:.09em solid var(--rd);outline:.035em solid var(--rd);outline-offset:.09em;border-radius:.12em;animation:chst .22s cubic-bezier(.5,0,1,.6) 1.58s backwards}
+@keyframes chst{from{scale:2.4;opacity:0}}
+[data-s=evaluasi] .c_cp{right:3cqw;bottom:0;height:66cqh}
+[data-s=evaluasi] .c_cr{position:absolute;left:58cqw;right:5cqw;top:13cqh;color:#e9f6e3;font-size:3.3cqmin;transition:opacity .3s linear}
+
+/* potret: kartu lebih tinggi daripada lebar. Buku jadi dua halaman bertumpuk, rangkaian berdiri tegak, papan skor memotong layar dari bawah, lembar ujian memenuhi lebar */
+@container chap (max-aspect-ratio:1/1){
+  .c_bk{inset:4cqh 4cqw 6cqh}
+  .c_pg{left:0;right:0;width:auto;padding:4cqmin 6cqmin}
+  .c_pg.c_l{top:0;bottom:auto;height:40%;border-radius:2.4cqmin 2.4cqmin 0 0;background:linear-gradient(180deg,var(--pp) 90%,#d3e6f0);animation-name:pglp}
+  .c_pg.c_r{top:auto;bottom:0;height:60%;border-radius:0 0 2.4cqmin 2.4cqmin;background:linear-gradient(0deg,var(--pp) 90%,#d3e6f0);padding-left:6cqmin;animation-name:pgrp}
+  .c_pg .c_cs{font-size:3.5cqmin;max-width:54%}.c_pg .c_ct{font-size:19cqmin}
+  .c_pg .c_cp{height:52cqmin;right:1cqmin}
+  .c_toc li{font-size:min(4.1cqmin,2.55cqh);padding:min(1.8cqmin,.8cqh) 0}.c_pg h3{font-size:3.6cqmin;margin-bottom:2.4cqmin}
+  .c_rb{left:auto;right:7cqmin;translate:0 0;top:-1cqmin}
+  .c_rb{animation-name:chrbp}
+  .c_sch.c_h{display:none}.c_sch.c_v{display:block;left:8cqw;top:25cqh;width:min(46cqw,18cqh);height:auto;margin:0}
+  [data-s=simulasi] .c_tx{top:4cqh;bottom:auto;width:84cqw}[data-s=simulasi] .c_ct{font-size:17cqmin}[data-s=simulasi] .c_cs{font-size:3.5cqmin;max-width:none}
+  [data-s=simulasi] .c_cp{right:-5cqw;height:34cqh}
+  .c_sl{left:0;right:0;top:auto;bottom:0;width:auto;height:56%;padding:9cqh 8cqw 0;justify-content:center;clip-path:polygon(0 16%,100% 0,100% 100%,0 100%);animation-name:chslp}
+  [data-s=latihan] .c_ct{font-size:25cqmin}[data-s=latihan] .c_cs{font-size:3.7cqmin;max-width:none;margin-top:2.4cqmin}
+  .c_hr{margin-top:3cqmin}.c_hr svg{width:11cqmin;height:11cqmin}.c_hr b{font-size:4.6cqmin}
+  [data-s=latihan] .c_cp{right:-4cqw;bottom:42cqh;height:50cqh}
+  [data-s=latihan] .chint{left:0;right:0;text-align:center}
+  .c_bn{top:3cqmin;right:5cqw}
+  .c_sh{left:calc(50% - 15.5em);top:4cqh;translate:0 0;font-size:min(2.58cqw,1.3cqh)}
+  .c_sh{animation-name:chdrop,chskp}
+  [data-s=evaluasi] .c_cp{right:-3cqw;height:30cqh}
+  [data-s=evaluasi] .c_cr{left:7cqw;right:44cqw;top:calc(4cqh + 45 * min(2.58cqw,1.3cqh) + 5cqmin);bottom:auto;font-size:3.7cqmin}
+  [data-s=evaluasi] .chint{left:7cqw;right:auto;top:auto;bottom:2.2cqmin;text-align:left}
+  [data-s=simulasi] .chint{left:8cqw;right:auto;text-align:left}
+}
+/* keluar: tiap bab punya cara sendiri, semuanya membuka adegan di baliknya */
+@media (prefers-reduced-motion:no-preference){
+  [data-s=materi].out{background-color:transparent}
+  [data-s=materi].out .c_pg.c_l{translate:-115% 0}[data-s=materi].out .c_pg.c_r{translate:115% 0}[data-s=materi].out .c_rb{translate:-50% -130%}
+  [data-s=simulasi].out{animation:chir .65s cubic-bezier(.6,0,.9,.4) forwards}
+  [data-s=latihan].out{animation:chdw .52s cubic-bezier(.6,0,.9,.4) forwards}
+  [data-s=evaluasi].out{background-color:transparent}
+  [data-s=evaluasi].out .c_sh{translate:30cqw -140cqh;rotate:14deg}[data-s=evaluasi].out .c_cp,[data-s=evaluasi].out .c_cr,[data-s=evaluasi].out .chint{opacity:0;transition:opacity .25s linear}
+}
+@media (prefers-reduced-motion:no-preference) and (max-aspect-ratio:1/1){
+  [data-s=materi].out .c_pg.c_l{translate:0 -115%}[data-s=materi].out .c_pg.c_r{translate:0 115%}[data-s=materi].out .c_rb{translate:0 -130%}
+  [data-s=evaluasi].out .c_sh{translate:30cqw -140cqh}
+}
+@media (prefers-reduced-motion:reduce){.chap *{animation:none!important;transition:none!important}.chap{animation:chin .15s linear backwards}.chap.out{animation:chfx .2s linear forwards!important}}
+@keyframes chfx{to{opacity:0}}

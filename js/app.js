@@ -55,8 +55,8 @@ async function go(id) {
   if (id === 'menu') { Story.on = false; buildMenu(); Snd.music('freakyMenu') }
   else if (id === 'settings') { buildSettings(); scrollHint('#settings') }   // musik menu tetap berjalan
   else if (id === 'peta') { buildPeta(); scrollHint('#peta') }
-  else { markSeen(id); if (id !== 'simpick' && id !== 'tutor' && id !== 'harian') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }
-  curId = id; await wait(40); f.classList.remove('on'); busy = false; Story.chap?.(id);
+  else { markSeen(id); if (id !== 'simpick' && id !== 'tutor' && id !== 'harian') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } const run = () => { SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }; await Story.chap(id, run, f) }
+  curId = id; await wait(40); f.classList.remove('on'); busy = false;
   if (pend && pend !== id) go(pend)
 }
 
