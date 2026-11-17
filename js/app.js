@@ -227,7 +227,7 @@ IC.chain = '<svg viewBox="0 0 16 16"><path d="M6.6 9.4l2.8-2.8M5.2 8L4 9.2a2.5 2
 const chipRow = a => `<div class="chips">${a.map(([i, t]) => `<span class="chip">${i ? IC[i] : ''}${t}</span>`).join('')}</div>`;
 const startCard = (S, title, desc, onGo, alt) => {   // alt = [label, keterangan, fn, ikon?] atau daftar beberapa: tombol tambahan (Mode Waktu, Berantai)
   const alts = !alt ? [] : Array.isArray(alt[0]) ? alt : [alt];
-  const two = alts.length && `<div class="goes${alts.length > 1 ? ' g3' : ''}"><button class="btn big" id="go"><b>SANTAI</b><small>3 nyawa · waktu bebas</small></button>${alts.map((x, k) => `<button class="btn big tw${k ? ' ch' : ''}" id="go${k + 2}"><b>${x[3] || IC.clock}${x[0]}</b><small>${x[1]}</small></button>`).join('')}</div>`;
+  const two = alts.length && `<div class="goes${alts.length > 1 ? ' g3' : ''}"><button class="btn big" id="go"><b>SANTAI</b></button>${alts.map((x, k) => `<button class="btn big tw${k ? ' ch' : ''}" id="go${k + 2}"><b>${x[3] || IC.clock}${x[0]}</b></button>`).join('')}</div>`;
   S.panel.innerHTML = `<div class="startcard sc" data-k="${S.ch.key}"><h2>${title}</h2><div class="scb">${desc}</div>${two || '<button class="btn big" id="go">MULAI</button>'}</div>`;
   $('#go').onclick = () => { Snd.sfx('select'); onGo() };
   alts.forEach((x, k) => $('#go' + (k + 2)).onclick = () => { Snd.sfx('select'); x[2]() });
@@ -525,7 +525,7 @@ SC.latihan = () => {
     const tier = sc === N ? 'perfect' : sc >= 6 ? 'good' : sc >= 4 ? 'mid' : 'low', e = { perfect: 'happy', good: 'happy', mid: 'smug', low: 'angry' }[tier];
     S.d.say([...(out ? [[pick(LIFE_SAY.out), 'hmph'], ...cameo('natsuki', 'out')] : []), [pick(DN.res[tier]), e], ...(rec ? [[pick(DN.record), 'smug']] : []), ...SL.lat('end', sc)]);
   };
-  startCard(S, 'LATIHAN', `${chipRow([['out', 'Tentukan output'], ['gate', 'Kenali gerbang'], ['tab', 'Tabel kebenaran'], ['wire', 'Baca rangkaian']])}<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b>${Story.on || !store.get('tkm_latihan_best_w', 0) ? '' : ` · Waktu: <b>${store.get('tkm_latihan_best_w', 0)}/${N}</b>`}${Story.on || !store.get('tkm_chain_best', null) ? '' : ` · Berantai: <b>${store.get('tkm_chain_best').n}</b>`}</p>`, () => begin('santai'), Story.on ? null : [['MODE WAKTU', 'timer + 3 nyawa', () => begin('waktu')], ['BERANTAI', 'soal tanpa henti', () => begin('berantai'), IC.chain]]);
+  startCard(S, 'LATIHAN', `<p class="bestp">${IC.best}Skor terbaik: <b>${best()}/${N}</b>${Story.on || !store.get('tkm_latihan_best_w', 0) ? '' : ` · Waktu: <b>${store.get('tkm_latihan_best_w', 0)}/${N}</b>`}${Story.on || !store.get('tkm_chain_best', null) ? '' : ` · Berantai: <b>${store.get('tkm_chain_best').n}</b>`}</p>`, () => begin('santai'), Story.on ? null : [['MODE WAKTU', '', () => begin('waktu')], ['BERANTAI', '', () => begin('berantai'), IC.chain]]);
   S.d.say([...entryExtra('natsuki'), ...pick(DN.intro), ...SL.enter('lat')]);
 };
 
@@ -565,7 +565,7 @@ SC.evaluasi = () => {
     show(true);
     S.d.say([[pick(DM.res).replace('{r}', right).replace('{N}', N).replace('{t}', gr.t), gr.e], [pick(gr.s), gr.e], ...(rec ? [[pick(DM.record), 'happy']] : []), ...(Math.random() < .6 ? [[pick(DM.after[right >= 7 ? 'high' : right >= 5 ? 'mid' : 'low']), 'wink']] : []), ...SL.eval('end', right)]);
   };
-  startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['gate', 'Tanpa petunjuk'], ['tab', 'Jawaban bisa diganti'], ['clock', `${EVAL_TIME} detik / soal`]])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
+  startCard(S, 'EVALUASI AKHIR', `${chipRow([['out', `${N} soal`], ['clock', `${EVAL_TIME} detik / soal`]])}<p class="bestp">${IC.best}Nilai terbaik: <b>${bestTxt()}</b></p>`, begin);
   S.d.say([...entryExtra('monika'), ...pick(DM.intro), ...SL.enter('eval')]);
 };
 
