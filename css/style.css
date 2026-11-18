@@ -271,7 +271,7 @@ html{scrollbar-color:var(--pink) transparent}
 .pt::after{content:'';position:absolute;inset:0;border-radius:15px;box-shadow:inset 0 0 0 3px #ffffffb0;pointer-events:none}
 .pn{position:absolute;left:12px;top:12px;z-index:2;font:24px Anton,Impact,sans-serif;letter-spacing:2px;color:#fff;background:var(--pd,var(--ink));padding:3px 14px 2px;border-radius:10px;box-shadow:0 3px 0 rgba(0,0,0,.25)}
 .pt img{position:absolute;left:50%;bottom:0;width:472px;height:472px;max-width:none;translate:-50% 0;display:block;filter:drop-shadow(0 4px 6px rgba(40,10,40,.3))}
-.pt[data-k=sayori] img{width:560px;height:560px;translate:-50% 0}.pt[data-k=yuri] img{width:560px;height:560px;translate:-49% 0}.pt[data-k=natsuki] img{width:555px;height:555px;translate:-53% 0}.pt[data-k=monika] img{width:490px;height:490px;translate:-49% -5%}   /* v51: ukuran tampak sama. Sayori & Yuri acuan; Natsuki (gambar pendek) diperbesar, Monika (gambar tinggi dan lebar) diperkecil */
+.pt[data-k=sayori] img{width:560px;height:560px;translate:-50% 0}.pt[data-k=yuri] img{width:560px;height:560px;translate:-49% 0}.pt[data-k=natsuki] img{width:555px;height:555px;translate:-53% 0}.pt[data-k=monika] img{width:350px;height:auto;translate:-50% -7.5%}   /* v51: ukuran tampak sama. Sayori & Yuri acuan; Natsuki (gambar pendek) diperbesar, Monika (gambar tinggi dan lebar) diperkecil */
 .pt img.in{animation:pin .14s var(--ease)}
 @keyframes pin{from{opacity:.35;transform:translateX(-10px)}}
 .story .panel{left:424px;top:58px;width:836px;height:432px}
@@ -296,10 +296,10 @@ html{scrollbar-color:var(--pink) transparent}
 .m .pt{left:3px;top:auto;bottom:4px;width:182px;height:240px;border-width:3px;border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
 .m .pt::after{border-radius:11px;box-shadow:inset 0 0 0 2px #ffffffb0}.m .pn{font-size:16px;left:6px;top:6px;padding:2px 9px 1px}
 .m .pt img{width:206px;height:206px}
-.m .pt[data-k=natsuki] img{width:222px;height:222px;translate:-53% 0}.m .pt[data-k=monika] img{width:190px;height:190px;translate:-48% -5%}   /* v51: Natsuki x1.08, Monika x0.92 dari kotak Sayori/Yuri */
+.m .pt[data-k=natsuki] img{width:222px;height:222px;translate:-53% 0}.m .pt[data-k=monika] img{width:auto;height:212px;translate:-50% -7.5%}   /* v51: Natsuki x1.08, Monika x0.92 dari kotak Sayori/Yuri */
 .m .story .dlg{left:auto;width:580px}
 .m.p .pt{bottom:134px;width:170px;height:214px}.m.p .pt img{width:180px;height:180px}
-.m.p .pt[data-k=natsuki] img{width:194px;height:194px}.m.p .pt[data-k=monika] img{width:166px;height:166px}
+.m.p .pt[data-k=natsuki] img{width:194px;height:194px}.m.p .pt[data-k=monika] img{width:auto;height:188px}
 .m.p .story .dlg{left:6px;width:auto}
 .m .nar{--ks:.38;--by:92px}.m.p .nar{--ks:.34;--by:150px}
 .m .narr .dlg{left:50%;right:auto;translate:-50% 0;width:580px}.m.p .narr .dlg{left:50%;width:calc(100% - 12px)}

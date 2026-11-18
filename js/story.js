@@ -29,10 +29,12 @@ const POOL = {
   monika: { talk: ['neutral', 'ahaha'], happy: ['ahaha', 'ahh'], cheer: ['ahh', 'ahaha'], calm: ['neutral', 'ahaha'], wink: ['ahh'], down: ['upset', 'eeh'], shy: ['eeh', 'ahaha'] }
 };
 const CYC = {}, nextOf = (pool, key) => pool[CYC[key] = ((CYC[key] ?? -1) + 1) % pool.length];
-const portSrc = (k, e) => { const pl = POOL[k][e] || PORT[k][e] && [PORT[k][e]]; return `assets/img/portraits/${k}_${pl ? nextOf(pl, k + e) : 'neutral'}.webp` };
+const MFULL = { neutral: 'smile', ahaha: 'happy', ahh: 'wink', eeh: 'shock', upset: 'down' };   // v56: potret Monika memakai sprite badan penuh (kaki dan tangan tidak terpotong); nama potret dipetakan ke ekspresi sprite
+const pfile = (k, n) => k === 'monika' ? `assets/img/expr/monika_${MFULL[n] || 'smile'}.webp` : `assets/img/portraits/${k}_${n}.webp`;
+const portSrc = (k, e) => { const pl = POOL[k][e] || PORT[k][e] && [PORT[k][e]]; return pfile(k, pl ? nextOf(pl, k + e) : 'neutral') };
 const PCACHE = {};   // satu objek Image per potret, dibuat sekali & didecode di awal (dulu: new Image() tiap ganti ekspresi + fade 160ms)
 const getPort = src => PCACHE[src] ??= (() => { const i = new Image(); i.src = src; i.decode && i.decode().catch(() => { }); return i })();
-const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set([...Object.values(PORT[k]), ...Object.values(POOL[k]).flat()]).forEach(n => getPort(`assets/img/portraits/${k}_${n}.webp`))); Object.keys(CHARS).forEach(k => getPort(`assets/img/sprites/${k}.webp`)) };
+const preloadPortraits = () => { Object.keys(PORT).forEach(k => new Set([...Object.values(PORT[k]), ...Object.values(POOL[k]).flat()]).forEach(n => getPort(pfile(k, n)))); Object.keys(CHARS).forEach(k => getPort(`assets/img/sprites/${k}.webp`)) };
 
 /* kemajuan cerita (localStorage: tkm_story) */
 /* v33 menyisipkan 4 langkah (3 kasus + jembatan) sebelum Evaluasi: simpanan lama (tanpa v) digeser sekali */
