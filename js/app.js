@@ -48,7 +48,7 @@ let pend = null, curId = null;
 async function go(id) {
   if (busy) { if (id !== curId) pend = id; return }   // klik saat transisi: yang terakhir diantre, bukan dibuang
   busy = true; pend = null; if (!/^k_/.test(id)) Story.replay = false;   // ulang kasus dari Peta hanya berlaku di layar kasus
-  const f = $('#fade'); f.classList.add('on'); await wait(240);
+  const f = $('#fade'), soft = Story.on && id !== 'menu' && id !== 'settings' && id !== 'peta'; clearTimeout(f._st); f.classList.toggle('soft', soft); f.classList.add('on'); await wait(soft ? 400 : 240);   // v55: di Mode Cerita layar memudar lembut (tanpa iris), bukan menyapu
   if (id !== 'menu' && id !== 'settings' && id !== 'peta') await Promise.all([warm, !Story.on && M[id] && loadChar(M[id].key)]);   // hanya sprite karakter layar ini yang ditunggu
   if (scene) { scene.cleanup(); scene = null }
   $$('.screen').forEach(s => s.classList.remove('on'));
@@ -56,7 +56,7 @@ async function go(id) {
   else if (id === 'settings') { buildSettings(); scrollHint('#settings') }   // musik menu tetap berjalan
   else if (id === 'peta') { buildPeta(); scrollHint('#peta') }
   else { markSeen(id); if (id !== 'simpick' && id !== 'tutor' && id !== 'harian') { Journey.prev = Journey.last; Journey.last = id === 'simplus' ? 'simulasi' : id } const run = () => { SC[id](); Snd.music(Story.on && SM[id] || (M[id] ? M[id].music : /^sim(pick|plus)$/.test(id) ? M.simulasi.music : 'Lunchbox')) }; await Story.chap(id, run, f) }
-  curId = id; await wait(40); f.classList.remove('on'); busy = false;
+  curId = id; await wait(soft ? 160 : 40); f.classList.remove('on'); if (soft) f._st = setTimeout(() => f.classList.remove('soft'), 700); busy = false;
   if (pend && pend !== id) go(pend)
 }
 
