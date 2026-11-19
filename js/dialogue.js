@@ -6,11 +6,11 @@ const D = {
   /* SAYORI: ceria, hangat, sedikit ceroboh, suka melantur */
   sayori: {
     intro: [
-      [['Hai! Aku Sayori. Hari ini aku yang nemenin kamu belajar. Kalau nanti aku salah ngomong, pura-pura nggak dengar aja ya.', 'cheer'], ['Pelan-pelan aja ya. Kita mulai dari awal.', 'happy']],
-      [['Oh, kamu udah datang! Tadi aku hampir ketiduran nungguin. Nggak jadi sih, soalnya ada semut lewat.', 'happy'], ['Hari ini topiknya rangkaian logika. Kedengarannya serem, tapi nggak kok. Aku aja bisa ngikutin.', 'talk']],
-      [['Siap belajar? Aku siap. Setengahnya. Pokoknya kapurnya udah kubawa!', 'cheer'], ['Mulai dari yang paling dasar aja, yuk.', 'happy']]
+      [['Hai, aku Sayori. Hari ini aku yang nemenin kamu di Materi.', 'cheer'], ['Satu halaman cuma bahas satu hal, jadi bacanya cepat.', 'happy']],
+      [['Oh, kamu udah datang. Tadi aku hampir ketiduran nungguin, tapi ada semut lewat, jadi nggak jadi.', 'happy'], ['Hari ini rangkaian logika, dari pengertiannya sampai tabel kebenaran.', 'talk']],
+      [['Kapur udah kubawa. Kayaknya nggak kepakai sih, tapi udah telanjur.', 'cheer'], ['Kita baca bareng. Aku duluan, kamu nyusul.', 'happy']]
     ],
-    again: ['Balik lagi ke sini? Boleh banget. Aku juga sering baca ulang sampai hafal.', 'Mau diulang? Silakan. Kalau ada bagian yang tadi lewat gitu aja, nggak apa-apa.', 'Dicek lagi ya. Itu kebiasaan bagus, bikin lebih ingat.'],
+    again: ['Halaman ini lagi? Yang tadi kelewat ya?', 'Baca ulang ya. Aku juga sering baru nyambung di bacaan kedua.', 'Halaman ini lagi. Kuulang yang tadi.'],
     chat: [
       ['Tadi pagi aku nyaris pakai sepatu beda sebelah. Monika yang ngasih tau.', 'happy'],
       ['Kamu suka hujan? Aku suka suaranya. Kayak orang tepuk tangan pelan-pelan.', 'cheer'],
@@ -26,17 +26,17 @@ const D = {
       ['Ada lagu yang muter terus di kepalaku dari pagi. Kamu pernah gitu?', 'cheer']
     ],
     ex: [
-      ['Kalau ada kata yang bikin bingung, bilang aja. Kita pelan-pelan.', 'Rangkaian logika dipakai di robot dan mesin pabrik, lho. Keren, kan?'],
-      ['Gampangnya: input itu apa yang dirasakan sistem, output itu apa yang dilakukannya.', 'Kayak aku dengar bel istirahat. Inputnya bel, outputnya lari ke kantin.'],
-      ['Aku suka logika 1. Artinya "iya", jadi enak didengar.', 'Ingat, 0 bukan berarti kosong banget. Artinya mati atau salah.'],
-      ['Kayak aku sama es krim: aku mau DAN uangku ada. Dua-duanya harus ada.', 'Kalau salah satunya 0, AND langsung bilang "nggak jadi". Tegas banget.'],
-      ['OR itu gampang puas. Satu "ya" aja udah cukup buat dia bilang "ya".', 'Hujan ATAU macet, aku tetap telat. Itu OR. ...Contohnya jelek ya, hehe.'],
-      ['Kalau aku lagi sedih, NOT-nya aku itu senang. Kebalik, hehe.', 'NOT dipasang dua kali, hasilnya balik lagi ke awal. Coba bayangin.'],
-      ['Jangan ketuker sama AND, ya. NAND itu AND yang dibalik.', 'NAND bisa dipakai buat bikin gerbang lain. Serbaguna banget.'],
-      ['NOR itu kalem: baru menyala kalau semuanya mati. Aneh, tapi aku suka.', 'Kalau bingung, hitung OR dulu, terus balik hasilnya.'],
-      ['XOR itu pencari perbedaan. Kayak main cari beda dua gambar di majalah.', 'Lampu tangga bisa dinyalain dari atas atau dari bawah. Itu XOR.'],
-      ['XNOR senang kalau semuanya kompak. Kayak klub kita, kadang-kadang.', 'Gampang ingatnya: XNOR itu "sama-sama". Kalau sama, hasilnya 1.'],
-      ['Tabel ini boleh difoto. Eh, maksudku dicatat. Biar nggak lupa.', 'Kalau tabelnya udah hafal, soal latihan jadi jauh lebih enak.']
+      ['Isinya gerbang-gerbang kecil. Kita kenalan satu per satu sebentar lagi.', 'Pertama kali dengar namanya, kukira ini pelajaran filsafat.'],
+      ['Bel istirahat itu input. Aku langsung lari ke kantin, itu outputnya.', 'Sensor juga bisa jadi input. Lampu teras yang nyala sendiri waktu gelap pakai sensor cahaya.'],
+      ['Cara ngingetnya: 1 berdiri tegak, jadi hidup. 0 bulat kayak bohlam yang sudah mati.', 'Angka 0 tetap sinyal yang sah, sama pentingnya dengan 1.'],
+      ['Beli es krim itu AND: aku mau, dan uangku ada. Salah satunya nggak ada, ya pulang tangan kosong.', 'Kalau salah satu input sudah 0, nggak perlu cek yang lain. Hasilnya pasti 0.'],
+      ['Hujan atau macet, aku tetap telat. Jadi telat itu OR.', 'Kalau hujan dan macet barengan, hasilnya tetap 1. Telatnya nggak dihitung dobel.'],
+      ['Aku sempat salah paham, kukira NOT itu mematikan. Ternyata dia membalik. Masuknya 0, keluarnya malah 1.', 'NOT dipasang dua kali berurutan, hasilnya kembali seperti semula.'],
+      ['Jangan ketuker sama AND. Hasil NAND selalu kebalikan AND di tiap baris.', 'Bikin tabelnya gampang: salin tabel AND, terus balik semua hasilnya.'],
+      ['Kalau bingung, hitung OR dulu, terus balik hasilnya.', 'Aku ngapalinnya begini: NOR cuma nyala di baris 0 0. Baris lain mati semua.'],
+      ['Bedanya sama OR cuma di baris 1 1. OR bilang 1, XOR bilang 0.', 'Namanya Exclusive OR. Kira-kira artinya OR yang nggak mau dua-duanya.'],
+      ['XNOR itu kebalikan XOR. Kalau XOR sudah hafal, tinggal dibalik.', 'XNOR bernilai 1 di baris 0 0 dan 1 1. Cuma dua baris itu.'],
+      ['Aku bikin tabelnya di buku tulis, satu gerbang satu halaman. Capek, tapi jadi nempel di kepala.', 'Hafalin polanya aja, jangan angkanya satu-satu. AND itu cuma satu baris yang hasilnya 1.']
     ]
   },
 
@@ -199,9 +199,9 @@ Object.assign(D.sayori, {
     evaluasi: [['Habis diuji Monika? Gimana tadi? Jangan tegang, yang penting udah dicoba.', 'cheer'], ['Dari ruang evaluasi ya? Kalau nilainya belum sesuai, kita ulang bareng. Aku temenin, kayak dulu.', 'happy']]
   },
   poke: [['Hihi, geli. Jangan colek-colek terus.', 'happy'], ['Eh? Tadi aku lagi mikirin sesuatu... nah, lupa lagi gara-gara kamu.', 'happy'], ['Kamu iseng dari kecil, nggak berubah-ubah.', 'talk'], ['Iya, iya, aku di sini. Ada apa?', 'cheer']],
-  flipFast: ['Cepat banget. Aku belum selesai ngomong, lho.', 'Pelan-pelan, nanti ketinggalan. Aku juga sering lupa tadi udah sampai halaman berapa.', 'Kamu ngebut ya. Materinya nggak bakal kabur kok.'],
-  half: ['Udah separuh jalan. Mau istirahat sebentar? Aku mau. Perutku bunyi dari tadi.', 'Separuh materi udah lewat. Hebat. Aku dulu baru sampai halaman tiga udah ngantuk.'],
-  end: ['Kamu nggak ngantuk, kan? Kalau iya, jangan bilang siapa-siapa. Aku juga hampir.', 'Kalau masih ada yang bingung, balik aja ke halaman sebelumnya. Nggak ada yang ngelarang.']
+  flipFast: ['Eh, aku belum selesai ngomong.', 'Aku baru baca separuh halamannya, kamu udah ganti.', 'Halamannya nggak kabur kok. Santai aja bacanya.'],
+  half: ['Udah lewat setengah. Perutku bunyi dari tadi, tapi lanjut dulu.', 'Setengah materi udah lewat. Aku dulu baru sampai halaman tiga udah ngantuk.'],
+  end: ['Sampai sini kamu nggak ngantuk, kan? Aku sendiri tadi nguap dua kali.', 'Ada yang masih kabur? Balik aja ke halaman sebelumnya, nggak ada batasnya.']
 });
 D.sayori.chat.push(
   ['Yuri kalau udah ngomongin buku, matanya langsung berbinar. Aku suka lihatnya.', 'cheer'],

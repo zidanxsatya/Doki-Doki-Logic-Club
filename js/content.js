@@ -3,27 +3,27 @@ const gateBoard = (g, desc) => `<div class="gb"><div class="gl"><div class="card
 
 const MATERI = [
   { t: 'Pengertian Rangkaian Logika', e: 'talk', html: '<ul><li>Rangkaian logika = rangkaian <b>digital</b> yang memproses sinyal bernilai <b>0</b> atau <b>1</b>.</li><li>Dibangun dari <b>gerbang logika</b> yang mengambil keputusan.</li><li>Di mekatronika: PLC, interlock mesin, kontrol motor, alarm sensor.</li></ul>',
-    say: ['Mulai dari dasar ya. Rangkaian logika itu rangkaian digital yang mengambil keputusan dari sinyal 0 dan 1.', 'Di dalamnya ada gerbang-gerbang kecil yang kerjanya "memutuskan". Kedengarannya ribet, tapi nggak kok.'] },
+    say: ['Rangkaian logika itu rangkaian yang mengambil keputusan dari sinyal 0 dan 1.', 'Mesin cuci di rumahku nggak mau muter kalau pintunya belum ditutup. Dulu kukira rusak, ternyata memang begitu rancangannya.'] },
   { t: 'Konsep Input dan Output', e: 'happy', html: '<div class="flow"><div>INPUT<small>sensor, tombol, saklar</small></div><span>➜</span><div>PROSES<small>gerbang logika</small></div><span>➜</span><div>OUTPUT<small>lampu, motor, buzzer</small></div></div><p>Contoh: tombol START ditekan (input) → logika memutuskan → motor menyala (output).</p>',
-    say: ['Sistem kontrol apa pun punya input, proses, dan output.', 'Input itu telinganya, gerbang logika otaknya, output tangannya. Gitu cara aku ngebayanginnya.'] },
+    say: ['Tombol lift itu input, lift yang bergerak itu output. Di antaranya ada rangkaian yang memutuskan.', 'Di Simulasi nanti, A dan B itu input, lampu LED di ujungnya itu output.'] },
   { t: 'Logika 0 dan 1', e: 'calm', html: '<div class="flow"><div>LOGIKA 0<small>LOW · OFF · 0 V · salah</small></div><div>LOGIKA 1<small>HIGH · ON · +5 V · benar</small></div></div><p>Tombol ditekan = 1, dilepas = 0. Sensor mendeteksi benda = 1, tidak = 0.</p>',
-    say: ['Komputer cuma kenal dua keadaan, 0 yang mati dan 1 yang hidup. Kayak saklar lampu.', 'Catat ya: 1 itu HIGH, ON, benar. 0 itu LOW, OFF, salah.'] },
+    say: ['Cuma ada dua keadaan: 1 untuk hidup, 0 untuk mati. Sebutan lainnya HIGH dan LOW, atau ON dan OFF.', 'Saklar lampu juga cuma punya dua posisi. Nyala atau mati, nggak ada setengah nyala.'] },
   { t: 'Gerbang AND', e: 'talk', html: gateBoard('AND', 'Output <b>1</b> hanya jika <b>semua</b> input = 1. Seperti dua saklar yang dipasang <b>seri</b>.'),
-    say: ['AND itu tegas. Outputnya baru 1 kalau A dan B dua-duanya 1.', 'Contohnya mesin press yang baru jalan kalau tombol kiri dan kanan ditekan bareng. Tangan jadi aman.'] },
+    say: ['AND keluar 1 cuma kalau A dan B dua-duanya 1. Satu aja mati, hasilnya 0.', 'Mesin press pakai ini, dua tombolnya harus ditekan bareng. Aku sempat heran kenapa ribet, ternyata biar tangan nggak ada yang nyelip ke dalam.'] },
   { t: 'Gerbang OR', e: 'happy', html: gateBoard('OR', 'Output <b>1</b> jika <b>minimal satu</b> input = 1. Seperti saklar yang dipasang <b>paralel</b>.'),
-    say: ['OR lebih santai. Satu input 1 saja, outputnya langsung 1.', 'Contohnya alarm yang bunyi kalau sensor asap atau sensor panas aktif.'] },
+    say: ['OR keluar 1 kalau salah satu input 1, atau dua-duanya. Baru 0 kalau semuanya 0.', 'Alarm rumah bunyi kalau pintu depan kebuka atau jendela pecah. Satu aja udah cukup.'] },
   { t: 'Gerbang NOT', e: 'calm', html: gateBoard('NOT', 'Hanya <b>1 input</b>. Output adalah <b>kebalikan</b> input (inverter).'),
-    say: ['NOT tukang balik. Masuk 0 keluar 1, masuk 1 keluar 0.', 'Inputnya cuma satu, beda dari gerbang dasar yang lain.'] },
+    say: ['NOT cuma punya satu input. Masuk 0 keluar 1, masuk 1 keluar 0.', 'Dipakai buat lampu siaga yang nyala selama tombolnya nggak ditekan. Begitu tombol dilepas, lampunya hidup.'] },
   { t: 'Gerbang NAND', e: 'talk', html: gateBoard('NAND', 'NAND = <b>NOT AND</b>. Output 0 hanya jika semua input 1.'),
-    say: ['NAND itu AND yang hasilnya dibalik pakai NOT.', 'Katanya semua gerbang lain bisa dibuat dari NAND saja. Yuri yang cerita, aku cuma percaya.'] },
+    say: ['NAND itu AND yang hasilnya dibalik. Cuma keluar 0 kalau dua-duanya 1.', 'Memori flashdisk dan SSD disebut NAND flash, namanya diambil dari gerbang ini.'] },
   { t: 'Gerbang NOR', e: 'happy', html: gateBoard('NOR', 'NOR = <b>NOT OR</b>. Output 1 hanya jika semua input 0.'),
-    say: ['NOR itu OR yang dibalik. Outputnya 1 cuma kalau semua input 0.', 'Sama seperti NAND, NOR juga bisa dipakai membuat gerbang lain.'] },
+    say: ['NOR itu OR yang hasilnya dibalik. Keluar 1 cuma kalau semua input 0.', 'Lampu hijau "aman" di pabrik pakai ini. Nyalanya cuma kalau semua sensor bahaya mati.'] },
   { t: 'Gerbang XOR', e: 'talk', html: gateBoard('XOR', 'Exclusive OR: output <b>1</b> jika kedua input <b>berbeda</b>.'),
-    say: ['XOR itu pendeteksi beda. A dan B berbeda, outputnya 1. Sama, outputnya 0.', 'Contohnya lampu tangga yang bisa dinyalakan dari atas maupun dari bawah.'] },
+    say: ['XOR keluar 1 kalau kedua input berbeda. Sama-sama 0 atau sama-sama 1, hasilnya 0.', 'Lampu tangga di rumah nenekku punya saklar di atas dan di bawah. Dibalik yang mana pun, lampunya ikut berubah.'] },
   { t: 'Gerbang XNOR', e: 'calm', html: gateBoard('XNOR', 'XNOR = <b>NOT XOR</b>: output <b>1</b> jika kedua input <b>sama</b>.'),
-    say: ['XNOR kebalikan XOR. Outputnya 1 kalau A dan B sama.', 'Dipakai buat membandingkan dua sinyal, sama atau tidak.'] },
+    say: ['XNOR keluar 1 kalau kedua input sama, dua-duanya 0 atau dua-duanya 1.', 'Dipakai di rangkaian pembanding. Dua angka dimasukkan, kalau hasilnya 1 berarti angkanya sama.'] },
   { t: 'Tabel Kebenaran', e: 'cheer', html: `<table class="tt wide"><tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th><th>XNOR</th></tr>${[0, 1, 2, 3].map(i => `<tr><td>${i >> 1}</td><td>${i & 1}</td>${['AND', 'OR', 'NAND', 'NOR', 'XOR', 'XNOR'].map(g => `<td>${F[g](i >> 1, i & 1)}</td>`).join('')}</tr>`).join('')}</table><p>NOT: 0 → 1 dan 1 → 0. Dengan 2 input ada 2² = <b>4</b> kombinasi.</p>`,
-    say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dua input berarti empat baris.', 'Materinya selesai! Habis ini coba SIMULASI sama Yuri, terus LATIHAN dan EVALUASI.'] }
+    say: ['Tabel kebenaran mencatat output untuk semua kombinasi input. Dua input berarti empat baris.', 'Orang yang merancang rangkaian biasanya bikin tabel ini dulu, baru menggambar gerbangnya.'] }
 ];
 
 /* Flash Card Materi. f = sisi depan, b = sisi belakang, t = nama singkat di ringkasan. Semua isi bersumber dari halaman Materi. Tambah kartu = tambah objek. */
@@ -48,8 +48,8 @@ const FLASH = [
   { t: 'Baris tabel', f: 'Tabel kebenaran dengan 2 input punya berapa baris?', b: '<b>4 baris</b>: 00, 01, 10, 11 (2² kombinasi). Dengan n input, ada 2ⁿ baris.' }
 ];
 const FLASH_SAY = {
-  go: 'Mau ulang materinya? Ada FLASH CARD di tombol bawah.',
-  start: ['Ini Flash Card. Baca sisi depan, jawab dalam hati, lalu ketuk kartunya buat lihat jawaban.', 'Panah di bawah buat pindah kartu. Nggak ada nilai, jadi santai aja.']
+  go: 'Mau mengulang? FLASH CARD ada di tombol bawah. Kalau sudah paham, lanjut ke Simulasi bareng Yuri.',
+  start: ['Baca sisi depan, jawab dalam hati, terus ketuk kartunya buat lihat jawaban.', 'Panah di bawah buat pindah kartu. Nggak ada nilainya.']
 };
 
 const SIM_SAY = {

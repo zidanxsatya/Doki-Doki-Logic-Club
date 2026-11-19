@@ -4,11 +4,11 @@ let warm = Promise.resolve();
 const charP = {}, loadChar = k => charP[k] ??= Character.load(k).then(c => chars[k] = c);   // sprite tiap karakter dimuat saat dibutuhkan, bukan semuanya di awal
 let scene = null, together = null, busy = false;
 const M = {
-  materi: { id: 'materi', label: 'MATERI', key: 'sayori', music: 'sayoc', bg: 'DDLCbg', sub: 'Belajar dasar bersama kelas' },
-  simulasi: { id: 'simulasi', label: 'SIMULASI', key: 'yuri', music: 'yuric', bg: 'DDLCbg', sub: 'Coba gerbang logika' },
-  latihan: { id: 'latihan', label: 'LATIHAN', key: 'natsuki', music: 'natsc', bg: 'Music_Room', sub: 'Asah kemampuanmu' },
-  evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room', sub: '10 soal penilaian akhir' },
-  harian: { id: 'harian', label: 'HARIAN', key: 'monika', music: 'monic', bg: 'Music_Room', sub: 'Satu soal per hari' },   // bukan bagian dari MODES: dibuka dari menu (tombol HARIAN) dan Peta
+  materi: { id: 'materi', label: 'MATERI', key: 'sayori', music: 'sayoc', bg: 'DDLCbg' },
+  simulasi: { id: 'simulasi', label: 'SIMULASI', key: 'yuri', music: 'yuric', bg: 'DDLCbg' },
+  latihan: { id: 'latihan', label: 'LATIHAN', key: 'natsuki', music: 'natsc', bg: 'Music_Room' },
+  evaluasi: { id: 'evaluasi', label: 'EVALUASI', key: 'monika', music: 'monic', bg: 'Music_Room' },
+  harian: { id: 'harian', label: 'HARIAN', key: 'monika', music: 'monic', bg: 'Music_Room' },   // bukan bagian dari MODES: dibuka dari menu (tombol HARIAN) dan Peta
   tutor: { id: 'tutor', label: 'PANDUAN', key: 'sayori', music: 'freakyMenu', bg: 'DDLCbg' }   // bukan bagian dari MODES: dibuka otomatis sekali dan dari Pengaturan
 };
 const SM = { n_intro: 'A_Story_of_Everyday_Life', materi: 'A_Wonderful_Happening' };   // lagu khusus Mode Cerita: pembuka & diskusi materi
@@ -71,7 +71,7 @@ function buildMenu() {
   const sp = Story.prog(), cur = sp.step > 0 ? sp.step : sp.done ? STEPS.length : 0, nowI = CHAPI.find(x => x >= cur);
   const steps = ['Materi', 'Simulasi', 'Latihan', 'Evaluasi'].map((n, k) => { const x = CHAPI[k], c = x < cur ? 'done' : x === nowI ? 'cur' : ''; return `<span class="st ${c}"><i>${c === 'done' ? '✓' : k + 1}</i><em>${n}</em></span>` }).join('<span class="ln"></span>');
   const dd = Daily.data(), dday = Daily.day(), dOk = dd.h[dday] != null, dstr = Daily.streak(dd.h, dday);
-  const TAG = { materi: `${MATERI.length} halaman materi`, simulasi: 'Simulasi+', latihan: '3 mode latihan', evaluasi: 'Nilai & kategori' };
+  const TAG = { materi: `${MATERI.length} halaman`, simulasi: '2 jenis', latihan: '3 mode', evaluasi: `${EVAL_N} soal` };
   el.innerHTML = `<div class="mbg"></div><div class="mtitle"><h1>DOKI DOKI <br>LOGIC CLUB</h1></div>
   <div class="mlist"><div class="mstory${sp.step > 0 ? ' cont' : ''}"><button class="mbtn" data-i="s" data-k="story"><b>CERITA</b><span class="sub">${Story.menuSub()}</span><span class="steps">${steps}</span><span class="pbtn">${sp.step > 0 ? 'LANJUTKAN' : sp.done ? 'MAIN LAGI' : 'MULAI CERITA'}</span></button>${sp.step > 0 ? '<button class="btn sm mre" id="sre">ULANG</button>' : ''}</div><div class="mgrid">${MODES.map((m, i) => `<button class="mbtn" data-i="${i}" data-k="${m.key}"><img class="av" src="assets/img/credit/${m.key}.png" alt="" width="72" height="72"><b>${m.label}</b><span class="sub">${TAG[m.id]}</span></button>`).join('')}</div></div>
   <div class="mchar"></div>
@@ -576,7 +576,7 @@ SC.harian = () => {
   const hoursLeft = () => { const n = new Date(); return Math.max(1, Math.ceil((new Date(n.getFullYear(), n.getMonth(), n.getDate() + 1) - n) / 36e5)) };
   const result = fx => {
     const d = Daily.data(), st = Daily.streak(d.h, day), ok = d.h[day] === 1, k = Math.max(0, d.best - st);
-    S.panel.innerHTML = `<div class="startcard sc dq res"><h2>HARIAN</h2><div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${k ? ` · terbaik ${d.best}` : ''}</span></div>${dayDots(Daily.week(d.h, day))}<p class="dqr ${ok ? 'ok' : 'bad'}">${ok ? 'Jawabanmu benar.' : `Belum tepat. Jawaban benar: <b>${Q.opts[Q.a]}</b>`}</p><p class="rve">${Q.e}</p><p class="dqt">Soal berikutnya muncul besok, sekitar ${hoursLeft()} jam lagi.</p><div class="rbtn"><button class="btn" id="dqb">◀ MENU</button></div></div>`;
+    S.panel.innerHTML = `<div class="startcard sc dq res"><h2>HARIAN</h2><div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${k ? ` · terbaik ${d.best}` : ''}</span></div>${dayDots(Daily.week(d.h, day))}<p class="dqr ${ok ? 'ok' : 'bad'}">${ok ? 'Benar.' : `Belum tepat. Jawaban benar: <b>${Q.opts[Q.a]}</b>`}</p><p class="rve">${Q.e}</p><p class="dqt">Soal berikutnya ${hoursLeft()} jam lagi.</p><div class="rbtn"><button class="btn" id="dqb">◀ MENU</button></div></div>`;
     $('#dqb').onclick = () => { Snd.sfx('cancelMenu'); go('menu') };
     if (fx) { countUp($('.dqn', S.panel), st); if (ok) { confetti($('.startcard', S.panel), DQ_MILE.includes(st) ? 24 : 10); hop(1) } }
   };
@@ -597,7 +597,7 @@ SC.harian = () => {
   if (d0.h[day] != null) { result(false); S.d.say([['Soal hari ini sudah kamu jawab. Penjelasannya masih bisa dibaca di sini.', 'talk'], ['Besok ada soal baru.', 'happy']]) }
   else {
     const st = Daily.streak(d0.h, day);
-    startCard(S, 'TANTANGAN HARIAN', `${chipRow([['out', '1 soal sehari'], ['gate', 'Satu kali jawab'], ['clock', 'Ganti tiap tengah malam']])}<div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${d0.best > st ? ` · terbaik ${d0.best}` : ''}</span></div>${dayDots(Daily.week(d0.h, day))}<p class="bestp">${st ? 'Jawab hari ini supaya hari beruntunmu tidak putus.' : 'Jawab hari ini untuk memulai hari beruntun.'}</p>`, ask);
+    startCard(S, 'TANTANGAN HARIAN', `${chipRow([['gate', 'Satu kali jawab'], ['clock', 'Ganti tiap tengah malam']])}<div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${d0.best > st ? ` · terbaik ${d0.best}` : ''}</span></div>${dayDots(Daily.week(d0.h, day))}`, ask);
     S.d.say([[st ? `Kamu sudah ${st} hari beruntun. Ayo lanjutkan.` : 'Satu soal saja per hari. Cukup untuk menjaga ingatan tetap hangat.', st ? 'happy' : 'talk'], ['Soalnya cuma satu dan hanya bisa dijawab sekali. Pikirkan baik-baik.', 'wink']]);
   }
 };
