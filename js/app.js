@@ -541,7 +541,7 @@ SC.evaluasi = () => {
     else if (i === N / 2) S.d.say([[pick(DM.half), 'happy'], ...SL.eval('half')]);
     else if (Math.random() < .2) { const [t, e] = S.chat(); S.d.line(t, e) }
     else S.d.line(pick(DM.q), pick(['talk', 'wink', 'happy']));
-    if (late) { late = false; S.d.say([['Waktunya habis, lanjut ke soal berikutnya. Santai aja.', 'talk'], ...(Math.random() < .6 ? cameo('monika', 'time') : [])]) }
+    if (late) { late = false; S.d.say([['Waktunya habis, dan jawabannya dihitung salah. Soal berikutnya.', 'talk'], ...(Math.random() < .6 ? cameo('monika', 'time') : [])]) }
     let swaps = 0; // berapa kali pemain mengganti jawaban pada soal ini
     renderQ(S.panel, qs[i], i, N, { reveal: false, timer: EVAL_TIME, onTime: () => { late = true }, onAns: ok => { if (ok) right++; log.push({ Q: qs[i], k: lastK, ok }) }, next: () => ++i < N ? q() : end(),
       onPick: (k, prev) => { lastK = k; if (prev >= 0 && k !== prev) swaps++; if (swaps >= 3 && prev >= 0 && k !== prev) S.d.line(pick(DM.waver), 'wink'); else if (Story.on && swaps === 2 && prev >= 0 && k !== prev) S.d.say(ST.eval.swap); else if (k !== prev && Math.random() < (prev < 0 ? .4 : .85)) S.d.line(pick(prev < 0 ? DM.noted : DM.change), prev < 0 ? 'talk' : pick(['wink', 'talk'])) } });

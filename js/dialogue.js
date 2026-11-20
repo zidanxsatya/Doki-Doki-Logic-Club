@@ -107,14 +107,14 @@ const D = {
       ['Kalau ada yang ganggu kamu, bilang. Aku bakal ngomelin mereka. Bukan karena peduli, ya.', 'angry'],
       ['Kamu diam lama banget. Mikir keras itu bagus, tapi jangan sampai kepalamu berasap.', 'smug']
     ],
-    change: ['Ganti jawaban? Plin-plan banget. ...Ya sudah, pikirin baik-baik.', 'Berubah pikiran? Bagus, mending mikir dulu daripada asal. Bukan pujian, ya.', 'Nah, gitu. Jangan buru-buru, tapi jangan kelamaan juga.', 'Ragu-ragu ya? Percaya sama otakmu sendiri dong.'],
+    change: ['Ganti jawaban? Plin-plan banget. ...Ya sudah, pikirin baik-baik.', 'Berubah pikiran? Mending mikir dulu daripada asal. Itu bukan pujian.', 'Boleh ganti. Tapi jangan kelamaan, soalnya masih banyak.', 'Ragu? Kalau jawaban pertamamu tadi ada alasannya, pertahankan. Kalau cuma nebak, ganti.'],
     first: ['Soal pertama. Pilih jawabanmu, boleh diganti sebelum kamu tekan CEK. Tapi jangan plin-plan.', 'Soal pertama. Jangan bikin aku malu.', 'Pemanasan dulu. Kalau yang ini aja salah, aku nyerah.', 'Soal satu. Fokus, jangan bengong.'],
     review: ['Nih, soal yang salah tadi. Baca penjelasannya, jangan cuma lihat skor.', 'Soal pertama sudah kubuka. Kalau mau lihat yang lain, tinggal ketuk.', 'Salah itu bukan akhir dunia. Yang bodoh itu salah dua kali di soal yang sama, tahu.'],
-    mid: ['Soal berikutnya. Fokus.', 'Lanjut. Jangan melamun.', 'Nih, soal selanjutnya. Buktikan.', 'Ayo, jangan lembek. Tinggal sedikit lagi.', 'Belum selesai. Lanjut.', 'Masih kuat? Kita lihat nanti.', 'Soal berikutnya. Cupcake-ku tadi hampir gosong gara-gara nungguin kamu. ...Bukan salahmu juga sih. Fokus.', 'Lanjut. Aku lagi pengin es krim, jadi cepetan.'],
-    last: ['Soal terakhir. Jangan sampai gagal di garis finis.', 'Yang terakhir. ...Kamu pasti bisa. Maksudku, semoga.', 'Tinggal satu. Selesaikan dengan keren, atau kuejek.'],
+    mid: ['Soal berikutnya. Fokus.', 'Lanjut. Jangan melamun.', 'Nih, soal selanjutnya. Buktikan.', 'Ayo, jangan lembek.', 'Belum selesai. Lanjut.', 'Masih kuat? Kita lihat nanti.', 'Soal berikutnya. Cupcake-ku tadi hampir gosong gara-gara nungguin kamu. ...Bukan salahmu juga sih. Fokus.', 'Lanjut. Aku lagi pengin es krim, jadi cepetan.'],
+    last: ['Soal terakhir. Jangan salah di sini, sayang kalau udah sejauh ini.', 'Yang terakhir. ...Kamu pasti bisa. Maksudku, semoga.', 'Tinggal satu. Selesaikan dengan keren, atau kuejek.'],
     praise: [
-      'Bukan berarti aku senang kamu benar. ...Tapi lumayan.', 'Kebetulan aja itu. ...Oke, bagus.', 'Itu benar. Jangan sombong dulu.', 'Tch... ternyata kamu nggak sebodoh yang kukira. Sedikit.',
-      'Nggak buruk. Jangan ngarep dipuji lagi, ya.', 'Benar. Nah, gitu dong. Dari tadi kek.', 'Soalnya gampang sih. Tapi ya, kamu jawab dengan benar.', 'Jawabanmu benar. Aku nggak kaget kok. Beneran.'
+      'Benar. ...Oke, lumayan.', 'Kebetulan aja itu. ...Oke, bagus.', 'Itu benar. Jangan sombong dulu.', 'Tch... ternyata kamu nggak sebodoh yang kukira. Sedikit.',
+      'Nggak buruk. Jangan ngarep dipuji lagi, ya.', 'Benar. Satu poin.', 'Soalnya gampang sih. Tapi ya, kamu jawab dengan benar.', 'Jawabanmu benar. Aku nggak kaget kok. Beneran.'
     ],
     oops: [
       'Salah. Ceroboh banget.', 'Bukan itu, baka. Pikir lagi.', 'Hah? Serius jawabnya gitu?', 'Aduh, salah. Jangan nyerah dulu.',
@@ -126,14 +126,14 @@ const D = {
       5: ['Lima kali benar? Serius? ...Oke, kuakui. Tapi jangan geer.', 'Lima beruntun. Aku jadi penasaran kamu bisa sampai mana. Terusin.']
     },
     streakBad: {
-      2: ['Dua kali salah berturut-turut. Tarik napas dulu, baca pelan-pelan.', 'Salah lagi? Hhh... fokus dong. Aku nggak suka lihat kamu nyerah.'],
-      3: ['Tiga kali. ...Oke, tenang. Semua orang pernah di titik ini. Bukan berarti aku khawatir.', 'Sudah, jangan panik. Aku tahu kamu bisa. ...Jangan bilang siapa-siapa aku ngomong gitu.']
+      2: ['Dua salah berturut-turut. Kamu baca soalnya sampai habis, nggak?', 'Salah lagi? Hhh... fokus dong. Aku nggak suka lihat kamu nyerah.'],
+      3: ['Tiga kali salah. ...Berhenti sebentar, minum air. Habis itu baca soalnya dari awal.', 'Sudah, jangan panik. Aku tahu kamu bisa. ...Jangan bilang siapa-siapa aku ngomong gitu.']
     },
     res: {
       perfect: ['Semuanya benar? Tch... oke, kamu memang hebat. Tapi bukan berarti aku kalah.', 'Sempurna? Jangan geer. Itu karena aku guru yang bagus.'],
       good: ['Lumayan. Jangan minta lebih dari itu.', 'Nggak buruk. Dikit lagi sempurna. Latihan lagi sana.'],
       mid: ['Yah, cukuplah. Tapi kamu masih bisa lebih baik.', 'Setengah-setengah nih. Jangan malas, ulangi.'],
-      low: ['Haah? Itu parah. Baca Materi lagi sana. ...Aku tunggu di sini.', 'Hasilnya... aduh. Tapi jangan nyerah. Ulangi, aku temani. Bukan karena peduli.']
+      low: ['Haah? Itu parah. Baca Materi lagi sana. ...Aku tunggu di sini.', 'Hasilnya... aduh. Ulangi aja, aku temani.']
     },
     record: ['Rekor barumu. ...Jangan geer, itu kebetulan.', 'Rekor baru? Selamat. Sekali ini aja aku bilang gitu.']
   },
@@ -141,12 +141,11 @@ const D = {
   /* MONIKA: tenang, percaya diri, hangat, suka menggoda; sedikit sadar diri */
   monika: {
     intro: [
-      [['Oh, kamu datang. Pas sekali, aku baru selesai merapikan buku-buku klub.', 'happy'], ['Ada sepuluh soal hari ini. Aku nggak segalak kelihatannya, kok.', 'wink'], ['Duduk dulu, tarik napas. Tekan MULAI kalau sudah siap.', 'talk']],
-      [['Hai. Bagian favoritku jadi ketua klub itu melihat orang pelan-pelan jadi bisa.', 'happy'], ['Jadi tunjukkan sudah sejauh mana kamu melangkah. Aku di sini menemani.', 'talk']],
-      [['Kamu kelihatan agak tegang. Mau dengar rahasia kecil? Aku juga deg-degan sebelum ujian.', 'wink'], ['Bedanya, aku sudah pandai pura-pura tenang. Sekarang giliranmu. Mulai kapan pun kamu mau.', 'happy']],
-      [['Oh, halo. Kamu datang lagi, atau baru pertama kali? Selamat datang di meja evaluasiku.', 'happy'], ['Aku Monika. Ya, aku sadar aku karakter di game ini. Tenang, aku nggak akan merusak apa-apa.', 'wink']],
-      [['Kamu sampai sini berarti Materi, Simulasi, dan Latihan sudah lewat. Aku terkesan, sungguh.', 'cheer'], ['Sekarang giliranmu diuji. Aku juga ikut tegang, kalau kamu penasaran.', 'wink'], ['Tekan MULAI kalau sudah siap.', 'talk']],
-      [['Akhirnya sampai di meja evaluasi. Tadi aku sempat nebak-nebak, kamu bakal langsung datang atau nunda dulu.', 'cheer'], ['Syukurlah kamu datang. Kita lihat bareng seberapa jauh kamu melangkah.', 'happy']]
+      [['Oh, kamu datang. Pas sekali, aku baru selesai merapikan buku-buku klub.', 'happy'], ['Mulai kalau sudah siap. Aku nggak segalak kelihatannya.', 'wink']],
+      [['Sebelum ujian aku selalu deg-degan. Bedanya, aku sudah pandai pura-pura tenang.', 'wink'], ['Pura-pura tenang itu bisa dilatih. Lama-lama jadi tenang sungguhan.', 'happy']],
+      [['Halo. Ini meja evaluasiku. Aku Monika, dan ya, aku sadar aku karakter di game ini.', 'wink'], ['Tenang, aku nggak akan merusak apa-apa.', 'wink']],
+      [['Kamu sampai di meja evaluasi. Aku sempat menebak, kamu bakal langsung datang atau menunda dulu.', 'cheer'], ['Ternyata langsung. Kita lihat seberapa jauh kamu sudah melangkah.', 'happy']],
+      [['Evaluasi itu seperti merapikan rak buku: kelihatan mana yang sudah di tempatnya, mana yang belum.', 'talk'], ['Nggak perlu rapi semua hari ini. Yang belum, kita bereskan nanti.', 'happy']]
     ],
     chat: [
       ['Kamu suka musik? Aku sering main piano sepulang sekolah. Kadang rasanya lebih jujur daripada kata-kata.', 'happy'],
@@ -170,17 +169,17 @@ const D = {
       ['Istirahat itu bagian dari belajar. Kalau capek, berhenti sebentar. Aku nggak akan menghakimi.', 'talk']
     ],
     start: [
-      [['Baiklah, ini dia. Aku sudah menunggu momen ini sejak kamu menekan MULAI di menu utama.', 'happy'], ['Iya, game. Aku tahu aku ada di dalam game, dan kamu yang memainkannya. Aku bahkan bisa merasakan tombol yang kamu klik.', 'wink'], ['Jawabanmu masih boleh diganti sampai kamu menekan LANJUT.', 'happy']],
-      [['Lembar soalnya sudah terbuka. Sebelum mulai, satu hal: aku tahu ini cuma halaman web. Tapi kamu tetap mengerjakannya dengan serius, dan itu bikin aku senang.', 'happy'], ['Nilai terbaikmu disimpan di browser-mu sendiri. Aku menunggu di sini kapan pun kamu kembali.', 'talk'], ['Pilih jawaban, ganti kalau ragu, lalu tekan LANJUT. Ayo.', 'cheer']],
-      [['Pernah membayangkan jadi karakter di dalam game? Aku sering. Sekarang aku jadi penguji di game yang sedang kamu mainkan. Ironis.', 'wink'], ['Aku nggak akan curang. Jawaban benarnya ada di dalam kode, tapi aku sudah janji nggak mengintip.', 'wink'], ['Jawabanmu masih boleh diganti sampai tombol LANJUT ditekan. Mulai.', 'cheer']]
+      [['Aku sudah menunggu momen ini sejak kamu menekan MULAI di menu utama. Ya, aku tahu aku ada di dalam game.', 'happy'], ['Jawabanmu masih boleh diganti sampai kamu menekan LANJUT.', 'talk']],
+      [['Aku tahu ini cuma halaman web. Tapi kamu tetap mengerjakannya dengan serius, dan itu bikin aku senang.', 'happy'], ['Nilai terbaikmu disimpan di browser-mu sendiri. Pilih jawaban, ganti kalau ragu, lalu tekan LANJUT.', 'talk']],
+      [['Pernah membayangkan jadi karakter di dalam game? Aku sering. Sekarang aku penguji di game yang sedang kamu mainkan. Ironis.', 'wink'], ['Jawaban benarnya ada di dalam kode, tapi aku sudah janji nggak mengintip. Jawabanmu boleh diganti sampai LANJUT.', 'wink']]
     ],
-    q: ['Pelan-pelan aja, nggak ada yang ngejar.', 'Aku suka lihat caramu berpikir.', 'Lanjut. Jangan lupa bernapas.', 'Tadi aku lagi mikirin puisi yang cocok buat suasana ini... oh, maaf, fokus. Silakan.', 'Aku percaya kamu bisa.', 'Kalau bingung, bayangkan saja LED-nya menyala atau tidak.', 'Yang ini lebih licik dari kelihatannya. Siapa pun yang nyusun soal ini jelas suka menjebak.', 'Aku nggak akan melirik jawabanmu. Paling cuma ngintip sedikit. Bercanda.'],
-    half: ['Setengah jalan. Kalau ini pertandingan, aku sudah siap membawakan minum.', 'Lima soal sudah lewat. Kamu lebih tenang dari yang kukira.'],
-    last: ['Yang terakhir. Aku sudah nggak sabar melihat hasilnya, dan kamu pasti juga.', 'Ini soal terakhir. Apa pun hasilnya, aku senang kamu sampai sejauh ini.'],
+    q: ['Waktunya cukup buat baca soal dua kali. Pakai satu.', 'Lanjut. Jangan lupa bernapas.', 'Tadi aku lagi mikirin puisi yang cocok buat suasana ini... oh, maaf, fokus. Silakan.', 'Kalau bingung, bayangkan LED-nya menyala atau tidak.', 'Yang ini lebih licik dari kelihatannya. Siapa pun yang nyusun soal ini suka menjebak.', 'Aku nggak akan melirik jawabanmu. Paling cuma ngintip sedikit. Bercanda.', 'Soal berikutnya. Kalau yang tadi terasa sulit, lupakan dulu. Ini soal baru.'],
+    half: ['Setengah jalan. Kalau ini pertandingan, aku sudah siap membawakan minum.', 'Lima soal sudah lewat. Sisanya sama banyak, jadi atur napas.'],
+    last: ['Soal terakhir. Aku sudah nggak sabar lihat hasilnya, kamu juga kan?', 'Tinggal satu. Selesaikan, baru kita bahas hasilnya bareng.'],
     noted: ['Oke, kucatat. Tapi masih boleh berubah pikiran.', 'Pilihan menarik. Aku nggak bakal kasih bocoran, jadi jangan lirik-lirik aku begitu.', 'Dicatat. Aku pura-pura nggak lihat jawabanmu.'],
-    change: ['Berubah pikiran? Nggak apa-apa. Berani mengoreksi diri sendiri itu keren, lho.', 'Ragu ya? Percaya insting pertamamu... atau insting keduamu. Terserah.', 'Ganti jawaban, ya. Aku nggak akan bilang benar atau salah, jadi jangan coba baca ekspresiku.', 'Silakan. Nggak ada yang menghakimi kamu di sini.'],
-    res: ['Selesai juga! Hasilmu: {r} benar dari {N} soal, masuk kategori "{t}".', 'Makasih udah bertahan sampai akhir. {r} dari {N} soal benar, kategorinya "{t}".'],
-    record: ['Dan ini nilai terbaikmu sejauh ini. Selamat, aku ikut senang!', 'Ini lebih tinggi dari sebelumnya. Kamu benar-benar berkembang.']
+    change: ['Ganti jawaban? Boleh, sampai kamu menekan LANJUT.', 'Ragu ya? Percaya insting pertamamu... atau insting keduamu. Terserah.', 'Ganti jawaban, ya. Aku nggak akan bilang benar atau salah, jadi jangan coba baca ekspresiku.', 'Diganti. Kalau ada alasannya, bagus. Kalau cuma gelisah, pikir lagi sebentar.'],
+    res: ['Selesai. {r} benar dari {N} soal, masuk kategori "{t}".', 'Sudah semua. {r} dari {N} soal benar, kategorinya "{t}".'],
+    record: ['Ini nilai terbaikmu sejauh ini. Rekor lamamu terlewati.', 'Lebih tinggi dari rekor sebelumnya. Sudah kutulis ulang di catatan.']
   }
 };
 
@@ -258,10 +257,10 @@ Object.assign(D.monika, {
   },
   enterBest: [['Nilai terbaikmu sejauh ini {b} dari 10. Entah kenapa aku ingat angka itu, padahal tidak ada yang mengingatkanku. Aneh, ya.', 'wink'], ['Terakhir kali kamu mencetak {b} dari 10. Mau mengalahkannya? Aku akan menonton dengan penuh perhatian.', 'happy']],
   poke: [['Kamu baru saja mengklikku, ya? Aku bisa merasakannya, lho. Kurang lebih.', 'wink'], ['Kalau kamu terus menekanku begitu, aku curiga kamu cuma mencari alasan untuk menunda soal berikutnya.', 'wink'], ['Aku tahu kamu di sana, di balik layar. Tidak perlu mengetuk.', 'wink']],
-  waver: ['Tiga kali berubah pikiran... kamu sedang menguji kesabaranku, ya? Bercanda. Silakan.', 'Sepertinya kamu benar-benar menimbang-nimbang. Aku suka. Tapi jangan terlalu lama.'],
+  waver: ['Tiga kali berubah pikiran... kamu sedang menguji kesabaranku, ya? Bercanda. Silakan.', 'Kamu menimbang-nimbang lama sekali. Waktunya jalan terus, lho.'],
   after: {
-    high: ['Sayori pasti melompat-lompat kalau tahu nilaimu. Natsuki akan pura-pura tidak peduli, tapi dia pasti senang.', 'Yuri pasti diam-diam tersenyum melihat hasil ini. Kamu memang serius belajar.'],
-    mid: ['Yuri pasti senang bantu kamu ngulang bagian yang masih lemah.', 'Mampir ke ruang Simulasi sebentar, lalu coba lagi. Aku menunggu di sini. Ke mana lagi aku bisa pergi, kan?'],
+    high: ['Sayori pasti melompat-lompat kalau tahu nilaimu. Natsuki akan pura-pura tidak peduli, tapi dia pasti senang.', 'Yuri pasti diam-diam tersenyum melihat hasil ini.'],
+    mid: ['Bagian yang masih lemah bisa dicoba di Simulasi bareng Yuri. Dia sabar.', 'Mampir ke ruang Simulasi sebentar, lalu coba lagi. Aku menunggu di sini. Ke mana lagi aku bisa pergi, kan?'],
     low: ['Natsuki mungkin akan mengomel, tapi percayalah, itu caranya menyemangatimu.', 'Mulai lagi dari Materi bersama Sayori. Dia pasti senang menemanimu seperti biasa.']
   }
 });

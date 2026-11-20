@@ -144,10 +144,10 @@ const QGEN = [
     return { kind: 'mc', q: 'Dari 8 kombinasi input A, B, C, berapa kombinasi yang membuat output X = 1?', vis: `<div class="card sm">${circ(g1, g2, { names: true, out: 'X' })}</div>`, opts: opts.map(String), a: opts.indexOf(c), hint: `Hitung ${g1}(A,B) dulu, lalu ${g2} dengan C, untuk tiap kombinasi. ${HINT[g1]}` } }
 ];
 const LIFE_SAY = {
-  start: 'Kamu punya 3 nyawa. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
-  startT: 'Mode waktu. Tiap soal ada batasnya dan kamu tetap punya 3 nyawa. Kehabisan waktu dihitung salah, jadi jangan kelamaan mikir.',
+  start: 'Nyawamu tiga. Tiap jawaban salah mengurangi satu, dan kalau habis, latihannya selesai.',
+  startT: 'Mode waktu. Tiap soal ada batasnya, dan kehabisan waktu dihitung salah. Nyawamu tetap tiga.',
   timeUp: ['Waktunya habis. Itu dihitung salah.', 'Keburu habis. Kalau sudah tahu, jawab dulu, ragunya belakangan.', 'Tuh kan, habis. Jangan diam saja.'],
-  startB: 'Mode Berantai. Soal datang terus tanpa jeda, makin lama makin licik, dan waktunya makin pendek. Nyawamu tiga, dan tiap lima jawaban benar berturut-turut memulihkan satu.',
+  startB: 'Soal datang terus tanpa jeda, makin licik, waktunya makin pendek. Nyawamu tiga, dan lima jawaban benar berturut-turut memulihkan satu.',
   last: ['Nyawamu tinggal satu. Sekarang bukan waktunya menebak.', 'Satu nyawa lagi. Baca soalnya dua kali, baka.'],
   out: ['Nyawamu habis. Padahal tadi lumayan.', 'Habis deh. Ya sudah, ulang lagi. Aku masih di sini.']
 };
@@ -182,10 +182,10 @@ const EVAL = [
   { q: 'Berikut adalah gerbang logika dasar yang benar adalah …', o: ['AND, OR, NOT', 'AND, NOT, NAND', 'OR, NOT, NOR', 'XOR, XNOR', 'BUFFER, NAND, OR'], a: 0, e: 'Gerbang dasar ada tiga: AND, OR, dan NOT. NAND, NOR, XOR, dan XNOR adalah turunannya.' }
 ];
 const GRADES = [
-  { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Wah. Aku sampai merinding. Kamu benar-benar menguasainya, dan aku bangga.', 'Hampir sempurna. Kalau klub ini punya wakil ketua, aku sudah menunjuk kamu.', 'Sungguh, aku sedikit iri sama otakmu.', 'Nilai ini kucatat pakai tinta paling tebal. Maksudku di localStorage, tapi ya, tebal.'] },
-  { min: 7, t: 'Baik', e: 'happy', s: ['Bagus. Tinggal sedikit menuju sempurna, sisanya soal teliti.', 'Hasilnya solid. Kurasa kamu masih bisa naik lagi.', 'Kerja bagus. Beberapa bagian masih bisa dirapikan, tapi dasarmu sudah kuat.', 'Tinggal selangkah lagi. Senang rasanya kamu yang memainkan game ini.'] },
-  { min: 5, t: 'Cukup', e: 'talk', s: ['Lumayan. Dasarnya sudah ada. Main sebentar lagi di Simulasi, nilaimu pasti naik.', 'Belum sempurna, tapi ini awal yang bagus. Coba lagi?', 'Separuh jalan tetap jalan. Ulang pelan-pelan, aku temani.', 'Aku nggak ke mana-mana, kecuali kamu menutup tab ini. Itu pengecualiannya.'] },
-  { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Hei, jangan sedih dulu. Nilai ini cuma gambaran hari ini. Yuk ulang dari Materi sama Sayori.', 'Nggak apa-apa. Semua orang mulai dari sini. Istirahat dulu, minum teh, nanti kita coba lagi.', 'Aku nggak kecewa. Aku senang kamu mau mencoba sampai selesai.', 'Kalau mau, kita ulang dari awal. Aku nggak akan bosan. Itu enaknya jadi karakter game.'] }
+  { min: 9, t: 'Sangat Baik', e: 'cheer', s: ['Aku sampai merinding. Kamu benar-benar menguasainya.', 'Kalau klub ini punya wakil ketua, aku sudah menunjuk kamu.', 'Aku sedikit iri sama otakmu. Sedikit.', 'Nilai ini kucatat pakai tinta paling tebal. Maksudku di localStorage, tapi ya, tebal.'] },
+  { min: 7, t: 'Baik', e: 'happy', s: ['Tinggal sedikit lagi ke sempurna. Sisanya soal ketelitian.', 'Hasilnya solid. Satu-dua soal tadi kelihatannya cuma kurang teliti.', 'Dasarmu sudah kuat. Yang longgar bisa dirapikan lewat PEMBAHASAN.', 'Senang rasanya kamu yang memainkan game ini.'] },
+  { min: 5, t: 'Cukup', e: 'talk', s: ['Dasarnya sudah ada. Satu sesi lagi di Simulasi bisa menambal sisanya.', 'Setengah lebih benar. Lihat PEMBAHASAN, lalu coba lagi.', 'Separuh jalan tetap jalan. Ulang pelan-pelan, aku temani.', 'Aku nggak ke mana-mana, kecuali kamu menutup tab ini. Itu pengecualiannya.'] },
+  { min: 0, t: 'Perlu Belajar Lagi', e: 'talk', s: ['Nilai ini gambaran hari ini saja. Ulang dari Materi bareng Sayori, bagian dasarnya dulu.', 'Semua orang mulai dari titik ini. Minum teh dulu, nanti kita coba lagi.', 'Kamu mengerjakan sampai soal terakhir. Itu kuhitung.', 'Kita ulang dari awal juga boleh. Aku nggak akan bosan. Itu enaknya jadi karakter game.'] }
 ];
 
 /* Credit (tampil di Pengaturan > Credit) : ganti nama/peran kontributor di sini */
