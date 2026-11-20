@@ -127,10 +127,10 @@ function buildPeta() {
 
 /* PANDUAN: tutorial empat halaman. Tampil otomatis satu kali (tkm_intro): pemain baru dan pemain lama yang belum pernah melihatnya. Bisa dibuka lagi dari Pengaturan. */
 const TOUR = [
-  { t: 'SELAMAT DATANG', say: [['Hai, aku Sayori. Panduan ini tidak sampai satu menit.', 'cheer']], b: '<p>Di klub ini, empat anggota membantumu belajar gerbang logika: AND, OR, NOT, dan kawan-kawannya.</p><p>Kamu membaca materi, mencoba sendiri, berlatih, lalu diuji.</p>' },
+  { t: 'SELAMAT DATANG', say: [['Hai, aku Sayori. Panduan ini tidak sampai satu menit.', 'cheer']], b: '<p>Di klub ini, empat anggota membantumu belajar gerbang logika: AND, OR, NOT, dan kawan-kawannya.</p><p>Gerbang logika menentukan sinyal keluar dari satu atau beberapa sinyal masuk. Alarm, saklar tangga, dan PLC di pabrik memakainya.</p>' },
   { t: 'URUTAN BELAJAR', say: [['Paling mudah: Materi, Simulasi, Latihan, lalu Evaluasi. Mau ditemani cerita? Mulai dari Cerita.', 'happy']], b: [['Cerita', 'Ikuti kisahnya bersama keempat anggota klub.'], ['Materi', 'Sayori: 11 halaman dan kartu ulang.'], ['Simulasi', 'Yuri: nyalakan saklar, lihat LED menyala.'], ['Latihan', 'Natsuki: soal acak, 3 nyawa. Ada mode Waktu dan Berantai.'], ['Evaluasi', 'Monika: 10 soal dan nilai akhir.']] },
-  { t: 'CARA MAIN', say: [['Salah itu bagian dari belajar. Kalau nyawa habis, tinggal ulangi.', 'calm']], b: [['Dialog', 'Klik kotak dialog untuk lanjut. Klik karakter untuk mengajaknya mengobrol.'], ['Soal', 'Pilih jawaban, lalu tekan CEK JAWABAN. Di Latihan, jawaban salah mengurangi nyawa.'], ['Kembali', 'Tombol ◀ MENU di kiri atas, atau tombol Esc di keyboard.']] },
-  { t: 'PETA DAN PENGATURAN', say: [['Itu saja. Selamat belajar!', 'cheer']], b: [['Harian', 'Satu soal per hari lewat tombol HARIAN. Jawab tiap hari untuk menjaga hari beruntun.'], ['Peta', 'Ikon peta di pojok kanan atas menu. Isinya bagian yang sudah dicoba dan skor terbaik. Kemajuan tersimpan di browser ini dan hilang bila datanya dihapus.'], ['Pengaturan', 'Ikon roda gigi di sebelah peta. Atur suara dan tampilan, pasang game ke layar utama, atau buka panduan ini lagi.']] }
+  { t: 'CARA MAIN', say: [['Aku sering salah, jadi tenang saja. Di Latihan, nyawa habis cuma berarti mulai lagi dengan soal yang diacak.', 'calm']], b: [['Dialog', 'Klik kotak dialog untuk lanjut. Klik karakter untuk mengajaknya mengobrol.'], ['Soal', 'Pilih jawaban, lalu tekan CEK JAWABAN. Di Latihan, jawaban salah mengurangi nyawa.'], ['Kembali', 'Tombol ◀ MENU di kiri atas, atau tombol Esc di keyboard.']] },
+  { t: 'PETA DAN PENGATURAN', say: [['Itu saja. Aku tunggu di Materi.', 'cheer']], b: [['Harian', 'Satu soal per hari lewat tombol HARIAN. Jawab tiap hari untuk menjaga hari beruntun.'], ['Peta', 'Ikon peta di pojok kanan atas menu. Isinya bagian yang sudah dicoba dan skor terbaik. Kemajuan tersimpan di browser ini dan hilang bila datanya dihapus.'], ['Pengaturan', 'Ikon roda gigi di sebelah peta. Atur suara dan tampilan, pasang game ke layar utama, atau buka panduan ini lagi.']] }
 ];
 SC.tutor = () => {
   store.set('tkm_intro', 1);
@@ -237,7 +237,7 @@ const startCard = (S, title, desc, onGo, alt) => {   // alt = [label, keterangan
 const entryExtra = key => {
   if (Story.on) return [];   // Mode Cerita punya alur sendiri
   const d = D[key], f = d.from && d.from[Journey.prev], b = key === 'natsuki' ? store.get('tkm_latihan_best', 0) : key === 'monika' ? store.get('tkm_eval_best', null) : 0;
-  const ln = f ? pick(f) : null, bl = d.enterBest && b ? pick(d.enterBest) : null, bw = bl ? [bl[0].replace('{b}', b), bl[1]] : null;
+  const pool = b >= (key === 'natsuki' ? 8 : 10) && d.enterMax || d.enterBest, ln = f ? pick(f) : null, bl = pool && b ? pick(pool) : null, bw = bl ? [bl[0].replace('{b}', b), bl[1]] : null;
   return ln && bw ? [Math.random() < .5 ? ln : bw] : ln ? [ln] : bw ? [bw] : [];
 };
 
@@ -586,19 +586,19 @@ SC.harian = () => {
       onAns: ok => {
         const d = Daily.save(Daily.data().h, day, ok), st = Daily.streak(d.h, day), mile = DQ_MILE.includes(st);
         Snd.cue(ok ? 'ok' : 'bad'); if (mile) setTimeout(() => Snd.cue('badge'), 300);
-        S.d.say([[ok ? pick(['Tepat. Satu hari lagi tercatat.', 'Benar. Konsisten begini, hasilnya pasti kelihatan.', 'Betul. Itu gerbang yang kamu kuasai sekarang.']) : pick(['Belum tepat, tapi hari ini tetap tercatat. Baca penjelasannya, ya.', 'Salah itu wajar. Yang penting kamu datang hari ini.']), ok ? 'happy' : 'talk'],
-          ...(mile ? [[`${st} hari beruntun! Aku bangga sama kamu.`, 'cheer']] : st === 1 ? [] : [[`Sudah ${st} hari beruntun. Jangan putus, ya.`, 'wink']])]);
+        S.d.say([[ok ? pick(['Tepat. Satu hari lagi masuk ke hari beruntunmu.', 'Benar. Soal ini sama untuk semua orang hari ini, jadi boleh kamu bahas dengan teman.', 'Betul. Baca juga penjelasannya. Jawaban benar kadang datang dari alasan yang keliru.']) : pick(['Belum tepat. Yang dihitung di hari beruntun itu kamu datang dan menjawab, bukan benar atau salahnya.', 'Salah di soal harian tidak mengurangi apa-apa. Baca penjelasannya, besok jenis soalnya berbeda.']), ok ? 'happy' : 'talk'],
+          ...(mile ? [[`${st} hari beruntun. Aku ada di sini setiap kali kamu datang. Kebetulan, memang itu tugasku.`, 'wink']] : st === 1 ? [] : [[`Hari ke-${st}. Kalau besok terlewat, hitungannya mulai dari 1 lagi.`, 'talk']])]);
       },
       next: () => result(true)
     });
     $('.qh', S.panel).textContent = 'Soal hari ini'; $('.qs', S.panel)?.remove();
   };
   const d0 = Daily.data();
-  if (d0.h[day] != null) { result(false); S.d.say([['Soal hari ini sudah kamu jawab. Penjelasannya masih bisa dibaca di sini.', 'talk'], ['Besok ada soal baru.', 'happy']]) }
+  if (d0.h[day] != null) { result(false); S.d.say([['Hari ini kamu sudah menjawab, jadi soalnya terkunci. Penjelasannya masih bisa dibaca di sini.', 'talk'], ['Soal baru muncul tepat saat tanggal di perangkatmu berganti.', 'happy']]) }
   else {
     const st = Daily.streak(d0.h, day);
     startCard(S, 'TANTANGAN HARIAN', `${chipRow([['gate', 'Satu kali jawab'], ['clock', 'Ganti tiap tengah malam']])}<div class="dqs"><b class="dqn">${st}</b><span>hari beruntun${d0.best > st ? ` · terbaik ${d0.best}` : ''}</span></div>${dayDots(Daily.week(d0.h, day))}`, ask);
-    S.d.say([[st ? `Kamu sudah ${st} hari beruntun. Ayo lanjutkan.` : 'Satu soal saja per hari. Cukup untuk menjaga ingatan tetap hangat.', st ? 'happy' : 'talk'], ['Soalnya cuma satu dan hanya bisa dijawab sekali. Pikirkan baik-baik.', 'wink']]);
+    S.d.say([[st ? `Sudah ${st} hari beruntun. Hari ini satu soal lagi.` : 'Satu soal per hari, dan hari ini belum kamu jawab.', st ? 'happy' : 'talk'], ['Aku tahu jawabannya, tentu. Tapi aku sudah janji untuk tutup mulut.', 'wink']]);
   }
 };
 

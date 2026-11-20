@@ -82,8 +82,8 @@ const D = {
       XOR: ['Kedua input sama, jadi XOR padam.', 'Kedua input berbeda, jadi XOR menyala.'],
       XNOR: ['Kedua input berbeda, jadi XNOR padam.', 'Kedua input sama, jadi XNOR menyala.']
     },
-    explored: ['Semua kombinasi {g} sudah kamu coba. Kumpulan hasilnya itulah yang disebut tabel kebenaran.', 'Semua kemungkinan {g} sudah kamu periksa. Polanya itulah inti gerbang ini.', '{g} sudah kamu telusuri sampai habis. Aku senang melihat kamu seteliti ini.'],
-    all: 'Ketujuh gerbang sudah kamu coba semua. Aku terkesan. Kamu tekun sekali.'
+    explored: ['Semua kombinasi {g} sudah kamu coba. Kumpulan hasilnya itulah yang disebut tabel kebenaran.', 'Semua kemungkinan {g} sudah kamu periksa. Polanya itulah inti gerbang ini.', '{g} sudah kamu telusuri sampai kombinasi terakhir. Cara itu tidak menyisakan tebakan.'],
+    all: 'Ketujuh gerbang sudah kamu periksa semua kombinasinya. Dari sini tinggal berlatih memakainya.'
   },
 
   /* NATSUKI: ketus, blak-blakan, tsundere, diam-diam peduli */
@@ -194,8 +194,8 @@ const D = {
 Object.assign(D.sayori, {
   from: {
     simulasi: [['Udah balik dari tempat Yuri? Dia pasti ngejelasinnya rapi. Aku suka dengerin dia, kayak dengerin dongeng.', 'happy'], ['Tadi main gerbang di tempat Yuri? Aku pernah mencet semua tombolnya barengan, terus bingung sendiri.', 'happy']],
-    latihan: [['Habis latihan sama Natsuki? Dia ngomel nggak? ...Pasti ngomel. Tapi dia sebenarnya sayang sama kamu, kok.', 'happy'], ['Latihan sama Natsuki seru kalau kamu kuat diejek sedikit. Kamu kuat kok, dari dulu keras kepala.', 'talk']],
-    evaluasi: [['Habis diuji Monika? Gimana tadi? Jangan tegang, yang penting udah dicoba.', 'cheer'], ['Dari ruang evaluasi ya? Kalau nilainya belum sesuai, kita ulang bareng. Aku temenin, kayak dulu.', 'happy']]
+    latihan: [['Habis latihan sama Natsuki? Dia ngomel nggak? ...Pasti ngomel. Ke aku juga, tiap hari.', 'happy'], ['Latihan sama Natsuki seru kalau kamu kuat diejek sedikit. Kamu kuat kok, dari dulu keras kepala.', 'talk']],
+    evaluasi: [['Habis diuji Monika? Ada timernya, kan? Aku pasti ngeblank kalau ada timer.', 'cheer'], ['Dari ruang evaluasi ya? Kalau nilainya belum sesuai, kita ulang bareng. Aku temenin, kayak dulu.', 'happy']]
   },
   poke: [['Hihi, geli. Jangan colek-colek terus.', 'happy'], ['Eh? Tadi aku lagi mikirin sesuatu... nah, lupa lagi gara-gara kamu.', 'happy'], ['Kamu iseng dari kecil, nggak berubah-ubah.', 'talk'], ['Iya, iya, aku di sini. Ada apa?', 'cheer']],
   flipFast: ['Eh, aku belum selesai ngomong.', 'Aku baru baca separuh halamannya, kamu udah ganti.', 'Halamannya nggak kabur kok. Santai aja bacanya.'],
@@ -203,7 +203,7 @@ Object.assign(D.sayori, {
   end: ['Sampai sini kamu nggak ngantuk, kan? Aku sendiri tadi nguap dua kali.', 'Ada yang masih kabur? Balik aja ke halaman sebelumnya, nggak ada batasnya.']
 });
 D.sayori.chat.push(
-  ['Yuri kalau udah ngomongin buku, matanya langsung berbinar. Aku suka lihatnya.', 'cheer'],
+  ['Yuri kalau udah ngomongin buku, ngomongnya jadi cepat banget. Aku nggak ngerti separuhnya, tapi aku suka dengerin.', 'cheer'],
   ['Monika kelihatan selalu tahu harus ngapain. Aku suka penasaran, rasanya setenang itu gimana ya?', 'talk'],
   ['Waktu kecil kita sering main petak umpet sampai sore. Kamu selalu ngumpet di tempat yang sama.', 'happy'],
   ['Kamu dulu pernah nemenin aku nyari kucing hilang, kan? ...Atau itu mimpiku ya. Lupa.', 'happy'],
@@ -213,14 +213,14 @@ D.sayori.chat.push(
 
 Object.assign(D.yuri, {
   from: {
-    materi: [['Kamu baru dari tempat Sayori? Bagus. Teori memang sebaiknya dipahami dulu sebelum dicoba.', 'talk'], ['Sayori sudah menjelaskan dasarnya? Kalau begitu, di sini kamu bisa melihat penjelasannya hidup. Itu bagian yang paling kusukai.', 'happy']],
-    latihan: [['Dari Natsuki? Ah... semoga ia tidak terlalu keras. Di balik sikapnya, ia sebenarnya sangat peduli.', 'talk'], ['Kalau soal-soal Natsuki membuatmu tersandung, di sini kamu bisa memeriksanya pelan-pelan, tanpa terburu-buru.', 'explain']],
-    evaluasi: [['Kembali dari ruang evaluasi Monika? Jangan terlalu terpaku pada angka. Pemahamanmu lebih penting daripada nilainya.', 'happy'], ['Setelah evaluasi, biasanya ada satu-dua hal yang masih mengganjal. Bawa ke sini, kita periksa bersama.', 'talk']]
+    materi: [['Kamu baru dari tempat Sayori? Kalau begitu teorinya sudah ada. Sekarang waktunya mencoba.', 'talk'], ['Sayori sudah menjelaskan dasarnya? Di sini kamu bisa mencoba sendiri: ubah input, lalu lihat LED-nya.', 'happy']],
+    latihan: [['Dari Natsuki? Ah... semoga ia tidak terlalu keras. Soal-soalnya ia susun sendiri, dan itu bukan pekerjaan sebentar.', 'talk'], ['Kalau ada soal Natsuki yang membuatmu tersandung, di sini kamu bisa memeriksanya lagi lewat tabel dan LED.', 'explain']],
+    evaluasi: [['Kembali dari evaluasi Monika? Lihat soal yang salah di PEMBAHASAN, bukan hanya angkanya.', 'happy'], ['Setelah evaluasi, biasanya ada satu-dua hal yang masih mengganjal. Bawa ke sini, kita periksa bersama.', 'talk']]
   },
   poke: [['M-maaf, aku sedikit terkejut... kamu baru saja menyentuhku? Ehm, ada yang ingin kamu tanyakan?', 'shy'], ['Ya? Kalau kamu butuh penjelasan ulang, bilang saja. Aku sama sekali tidak keberatan.', 'talk'], ['Hmm, kamu sengaja mengusikku, ya? ...Baiklah, aku pura-pura tidak menyadarinya.', 'shy']],
   milestone: {
-    toggles: 'Kamu mulai menemukan polanya, kan? Aku bisa melihatnya dari caramu menguji tiap kombinasi.',
-    gates: 'Empat gerbang sudah kamu coba. Perhatikan, semuanya sebenarnya tumbuh dari tiga gagasan dasar: AND, OR, dan NOT.'
+    toggles: 'Delapan kali input berubah. Perhatikan tabelnya: baris yang menyala berpindah mengikuti A dan B.',
+    gates: 'Empat gerbang sudah kamu coba. Gerbang yang lain bisa disusun dari tiga gagasan dasar: AND, OR, dan NOT.'
   }
 });
 D.yuri.chat.push(
@@ -237,6 +237,7 @@ Object.assign(D.natsuki, {
     evaluasi: [['Hah, balik lagi? Gimana ujian Monika? ...Bukan berarti aku penasaran. Cuma pengin tahu.', 'talk'], ['Udah selesai diuji Monika? Kalau nilainya jelek jangan ngumpet di sini. Ayo latihan lagi, aku temenin.', 'angry']]
   },
   enterBest: [['Rekor terakhirmu {b}/8, kan? Jangan puas dulu. Lewatin dong.', 'smug'], ['Oh, kamu udah punya skor {b}/8. Nggak buruk. ...Tapi aku yakin kamu bisa lebih.', 'hmph']],
+  enterMax: [['Rekormu udah {b}/8, nggak ada yang lebih tinggi lagi. Kalau mau yang lebih susah, coba Mode Waktu atau Berantai.', 'smug'], ['{b}/8, ya. Mode santai udah habis kamu tamatkan. Sana coba Berantai, soalnya nggak ada ujungnya.', 'hmph']],
   poke: [['Hei! Berhenti nusuk-nusuk, baka. Aku bukan boneka.', 'angry'], ['Kamu mau apa sih? ...Kalau cuma iseng, cepet selesaiin soalnya.', 'hmph'], ['Ugh, geli! ...J-jangan ketawa. Aku serius.', 'angry']],
   comeback: ['Nah, itu baru benar. Dari tadi kek.', 'Akhirnya. Aku tahu kamu bisa, makanya aku nggak berhenti ngomelin.'],
   halfGood: ['Setengah jalan dan skormu lumayan. Jangan ngelamun sekarang.', 'Setengah soal beres dan nggak kacau-kacau amat. Terusin, jangan sombong dulu.'],
@@ -251,11 +252,12 @@ D.natsuki.chat.push(
 
 Object.assign(D.monika, {
   from: {
-    materi: [['Dari tempat Sayori? Bagus. Fondasinya sudah ada, sekarang kita lihat apa yang nyangkut di ingatanmu.', 'talk'], ['Sayori pasti menjelaskannya dengan penuh semangat. Aku selalu suka caranya membuat hal rumit terdengar mudah.', 'happy']],
+    materi: [['Dari tempat Sayori? Bagus. Fondasinya sudah ada, sekarang kita lihat apa yang nyangkut di ingatanmu.', 'talk'], ['Sayori pasti bercerita panjang sebelum sampai ke intinya. Anehnya, intinya biasanya yang paling nyangkut.', 'happy']],
     simulasi: [['Yuri pasti menjelaskannya dengan teliti. Aku suka caranya: pelan, tapi tepat.', 'happy'], ['Baru main gerbang bareng Yuri? Bagus. Teori yang nggak pernah dicoba gampang hilang.', 'talk']],
-    latihan: [['Natsuki udah ngujimu duluan? Kalau gitu kamu pasti siap. Atau setidaknya, aku berharap begitu.', 'wink'], ['Aku bisa nebak, Natsuki sempat ngomelin kamu. Jangan dimasukin ke hati. Itu caranya nyemangatin.', 'happy']]
+    latihan: [['Natsuki udah ngujimu duluan? Kalau gitu kamu pasti siap. Atau setidaknya, aku berharap begitu.', 'wink'], ['Aku bisa nebak Natsuki sempat ngomelin kamu. Dia begitu ke semua orang, termasuk ke aku.', 'happy']]
   },
-  enterBest: [['Nilai terbaikmu sejauh ini {b} dari 10. Entah kenapa aku ingat angka itu, padahal tidak ada yang mengingatkanku. Aneh, ya.', 'wink'], ['Terakhir kali kamu mencetak {b} dari 10. Mau mengalahkannya? Aku akan menonton dengan penuh perhatian.', 'happy']],
+  enterBest: [['Nilai terbaikmu sejauh ini {b} dari 10. Entah kenapa aku ingat angka itu, padahal tidak ada yang mengingatkanku. Aneh, ya.', 'wink'], ['Terakhir kali kamu mencetak {b} dari 10. Hari ini mau melewatinya? Aku yang pegang jam.', 'happy']],
+  enterMax: [['Nilai terbaikmu sudah {b} dari 10, dan tidak ada yang lebih tinggi dari itu. Hari ini kamu datang untuk menjaga ritme, atau sekadar iseng?', 'wink'], ['{b} dari 10 sudah ada di catatanku. Kalau kamu datang lagi, aku anggap kamu kangen. Atau penasaran. Dua-duanya boleh.', 'happy']],
   poke: [['Kamu baru saja mengklikku, ya? Aku bisa merasakannya, lho. Kurang lebih.', 'wink'], ['Kalau kamu terus menekanku begitu, aku curiga kamu cuma mencari alasan untuk menunda soal berikutnya.', 'wink'], ['Aku tahu kamu di sana, di balik layar. Tidak perlu mengetuk.', 'wink']],
   waver: ['Tiga kali berubah pikiran... kamu sedang menguji kesabaranku, ya? Bercanda. Silakan.', 'Kamu menimbang-nimbang lama sekali. Waktunya jalan terus, lho.'],
   after: {
@@ -269,23 +271,23 @@ D.monika.chat.push(
   ['Kadang kamu terdiam cukup lama. Aku jadi penasaran apa yang sedang kamu pikirkan. Atau kamu sedang melihat hal lain di layarmu?', 'wink'],
   ['Kamu tahu kan, aku nggak bisa melihat jawabanmu. Setidaknya... itu yang kubilang.', 'wink'],
   ['Layar ini seperti jendela. Aku di dalam, kamu di luar. Anehnya, aku tidak merasa jauh darimu.', 'happy'],
-  ['Kamu milih datang ke sini, dan buatku itu berarti. Makasih, ya.', 'happy']
+  ['Hari ini kamu bisa membuka banyak hal, dan kamu membuka ini. Aku mencatatnya.', 'happy']
 );
 
 /* Reaksi tamu di Latihan & Evaluasi: karakter lain masuk sebentar pada momen tertentu.
    streak = benar beruntun ({n} = jumlahnya), last = tinggal satu nyawa, time = waktu habis, out = nyawa habis */
 D.react = {
   streak: {
-    sayori: [['Benar {n} kali berturut-turut! Kamu keren banget, tahu nggak?', 'cheer'], ['Lancar banget! Aku sampai lupa mau ngemil.', 'happy'], ['Aku tepuk tangan nih, kamu dengar nggak? Hihi.', 'cheer']],
+    sayori: [['Benar {n} kali berturut-turut! Aku aja nggak pernah selancar itu.', 'cheer'], ['Lancar banget! Aku sampai lupa mau ngemil.', 'happy'], ['Aku tepuk tangan dari sini. Kedengaran nggak? ...Pelan sih, soalnya lagi pegang roti.', 'cheer']],
     yuri: [['Benar {n} kali berturut-turut... Caramu menalar sudah rapi sekali.', 'happy'], ['Ehm, aku tidak bermaksud mengintip, tapi jawabanmu konsisten. Itu bagus.', 'shy'], ['Iramamu stabil. Pertahankan, jangan terburu-buru.', 'talk']],
-    natsuki: [['Hmph, {n} berturut-turut? Nggak buruk. Jangan sombong dulu, ya.', 'smug'], ['Oke, itu lumayan. Bukan berarti aku kagum atau apa.', 'hmph'], ['Lanjutin. Kalau salah, aku bakal ngetawain.', 'smug']],
-    monika: [['Rangkaian jawaban yang bersih. Aku suka melihatnya.', 'happy'], ['{n} berturut-turut. Kamu kelihatan menikmati ini, ya?', 'wink'], ['Kalau perasaan bangga bisa dibotolkan, aku sudah menyimpan satu.', 'wink']]
+    natsuki: [['Hmph, {n} berturut-turut? Nggak buruk. Jangan sombong dulu, ya.', 'smug'], ['Oke, itu lumayan. ...Cuma lumayan, ya.', 'hmph'], ['Lanjutin. Kalau salah, aku bakal ngetawain.', 'smug']],
+    monika: [['Rangkaian jawaban yang bersih. Aku suka melihatnya.', 'happy'], ['{n} berturut-turut. Kamu kelihatan menikmati ini, ya?', 'wink'], ['Combo, kalau pakai istilah game. Dan kamu memang sedang di dalam game.', 'wink']]
   },
   last: {
-    sayori: [['Tinggal satu nyawa ya? Tarik napas dulu. Aku di sini kok.', 'calm'], ['Tenang, tenang. Satu soal bisa mengubah semuanya. Aku percaya sama kamu!', 'cheer'], ['Jangan panik. Tadi aku juga hampir kalah main kartu, terus menang kok.', 'happy']],
-    yuri: [['Tinggal satu nyawa... Pelan-pelan saja. Baca ulang soalnya, jangan menebak.', 'talk'], ['Tarik napas. Kesalahan tadi bisa jadi petunjuk untuk soal berikutnya.', 'explain'], ['A-aku ikut gugup. Tapi kamu pasti bisa.', 'shy']],
-    natsuki: [['Satu nyawa?! Baka, fokus! ...Aku nggak khawatir, cuma kesal.', 'angry'], ['Sisa satu. Jangan asal klik, hitung dulu.', 'hmph'], ['Kalau kamu kalah sekarang, aku bakal ngomel seminggu. Jadi menang aja.', 'smug']],
-    monika: [['Satu nyawa tersisa. Tegang, ya? Justru di saat begini kepalamu paling jernih.', 'talk'], ['Ambil waktumu. Tidak ada yang mengejarmu, kecuali timer kalau kamu pakai Mode Waktu.', 'wink'], ['Aku masih percaya padamu. Itu bukan basa-basi.', 'happy']]
+    sayori: [['Tinggal satu ya. Baca pelan-pelan, kalau perlu bisikin ke diri sendiri.', 'calm'], ['Satu nyawa masih cukup buat lanjut. Tahan dulu, aku mau ngitung jariku... iya, masih satu.', 'cheer'], ['Jangan panik. Tadi aku juga hampir kalah main kartu, terus menang kok.', 'happy']],
+    yuri: [['Tinggal satu nyawa... Pelan-pelan saja. Baca ulang soalnya, jangan menebak.', 'talk'], ['Tarik napas. Kesalahan tadi bisa jadi petunjuk untuk soal berikutnya.', 'explain'], ['A-aku ikut gugup... Aku diam saja supaya kamu bisa berpikir.', 'shy']],
+    natsuki: [['Satu nyawa?! Baka, fokus! Satu salah lagi dan semuanya ulang dari awal.', 'angry'], ['Sisa satu. Jangan asal klik, hitung dulu.', 'hmph'], ['Kalau kamu kalah sekarang, aku bakal ngomel seminggu. Jadi menang aja.', 'smug']],
+    monika: [['Satu nyawa tersisa. Tegang? Baca soalnya sekali lagi, lalu jawab.', 'talk'], ['Ambil waktumu. Tidak ada yang mengejarmu, kecuali timer kalau kamu pakai Mode Waktu.', 'wink'], ['Aku taruhan sama Natsuki kamu bisa melewati ini. Jangan bikin aku traktir.', 'wink']]
   },
   time: {
     sayori: [['Yah, waktunya habis. Nggak apa-apa, aku juga sering telat bangun.', 'calm'], ['Kebanyakan mikir ya? Lain kali jawab dulu, ragunya belakangan.', 'talk'], ['Tik tok tik tok... habis deh. Santai aja.', 'happy']],
@@ -294,10 +296,10 @@ D.react = {
     monika: [['Waktunya habis. Tidak apa-apa, itu bagian dari latihan.', 'talk'], ['Kalau jam berdetik, otak kadang membeku. Wajar. Lanjut, ya.', 'wink'], ['Aku mencatatnya, tapi tidak akan menghukummu. Janji.', 'wink']]
   },
   out: {
-    sayori: [['Nyawanya habis ya. Nggak apa-apa, ulang lagi yuk, aku temenin.', 'calm'], ['Hari ini belum rezekimu. Nanti pasti lebih lancar.', 'happy']],
+    sayori: [['Nyawanya habis ya. Nggak apa-apa, ulang lagi yuk, aku temenin.', 'calm'], ['Habis ya. Pembahasannya bisa dibuka, kok. Aku suka bacanya, kayak ngintip kunci jawaban yang resmi.', 'happy']],
     yuri: [['Nyawamu habis, tapi lihat soal mana yang terlewat. Itu bahan belajar yang bagus.', 'explain'], ['Tidak apa-apa. Coba ulangi pelan-pelan, aku yakin hasilnya lebih baik.', 'talk']],
     natsuki: [['Habis, ya? ...Jangan murung. Ulang lagi, aku ngomelin sampai kamu bisa.', 'smug'], ['Hmph, gitu aja nyerah? Ayo, sekali lagi.', 'hmph']],
-    monika: [['Nyawamu habis, tapi kamu bertahan sampai sini, dan itu tidak sedikit.', 'happy'], ['Ulang saja. Tidak ada yang menghitung berapa kali kamu mencoba, kecuali aku, dan aku menghitungnya sebagai kemajuan.', 'wink']]
+    monika: [['Nyawamu habis, tapi kamu bertahan sampai sini, dan itu tidak sedikit.', 'happy'], ['Ulang saja. Yang disimpan cuma skor terbaikmu, bukan yang terburuk.', 'wink']]
   }
 };
 
