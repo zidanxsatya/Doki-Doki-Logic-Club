@@ -156,16 +156,12 @@ class Dialogue {
     el.innerHTML = '<canvas class="box"></canvas><div class="tx"><span class="r"></span><span class="h"></span></div><div class="nx">▼</div>';
     this.tx = $('.tx', el); this.r = $('.r', el); this.hd = $('.h', el); this.nx = $('.nx', el);
     loadAtlas('assets/img/Text_Boxes').then(at => { if (this.dead) return; this.at = at; this.f = at.list.find(x => x.n === BOX[this.ch.key]); this.paint() });
-    this.onLayout = () => { this.paint(); this.fit() }; addEventListener('layoutchange', this.onLayout);
+    this.onLayout = () => this.fit(); addEventListener('layoutchange', this.onLayout);
     el.onclick = () => this.advance();
   }
-  // Layout potret (ponsel): bagian tengah kotak diregangkan secara vertikal agar teks muat; bagian label & tepi tetap proporsional
-  paint() {
+  paint() {   // kotak dialog digambar apa adanya dari atlas
     const f = this.f, c = $('.box', this.el); if (!f || !c) return;
-    const ctx = c.getContext('2d'), img = this.at.img, T = 52, B = 152, k = Layout.mobile && Layout.portrait ? 1.8 : 1;
-    if (k === 1) { c.width = f.w; c.height = f.h; ctx.drawImage(img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h); return }
-    const mh = Math.round((B - T) * k); c.width = f.w; c.height = T + mh + (f.h - B);
-    ctx.drawImage(img, f.x, f.y, f.w, T, 0, 0, f.w, T); ctx.drawImage(img, f.x, f.y + T, f.w, B - T, 0, T, f.w, mh); ctx.drawImage(img, f.x, f.y + B, f.w, f.h - B, 0, T + mh, f.w, f.h - B);
+    c.width = f.w; c.height = f.h; c.getContext('2d').drawImage(this.at.img, f.x, f.y, f.w, f.h, 0, 0, f.w, f.h);
   }
   say(lines, onDone) { this.q = lines.map(l => typeof l === 'string' ? [l] : l); this.onDone = onDone; this.next() }
   line(t, e) { this.say([[t, e]]) }
@@ -244,7 +240,7 @@ const tt = (g, hl = -1) => g === 'NOT'
 
 /* Efek sparkle */
 function spark(e, n = 6) {
-  const st = $('#stage'), r = st.getBoundingClientRect(), k = r.width / st.offsetWidth, x = (e.clientX - r.left) / k, y = (e.clientY - r.top) / k;
+  const st = $('#stage'), { x, y } = Layout.pt(e.clientX, e.clientY);
   for (let i = 0; i < n; i++) {
     const s = document.createElement('i'); s.className = 'sp'; s.textContent = '✦';
     s.style.cssText = `left:${x}px;top:${y}px;--dx:${(Math.random() - .5) * 130}px;--dy:${(Math.random() - .85) * 130}px;color:${pick(['#ffd54a', '#ff7eb6', '#8cd4ff', '#fff'])}`;

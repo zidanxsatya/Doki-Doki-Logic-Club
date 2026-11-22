@@ -21,26 +21,28 @@ const Full = {
 
 /* Layout adaptif: SATU game untuk desktop & Android.
    Desktop : kanvas logis 1280x720 diskalakan (tampilan asli, tidak berubah).
-   Mobile  : kanvas logis mengikuti rasio layar (landscape: tinggi 420; potret: lebar 400), isi diatur ulang lewat CSS body.m / body.p */
+   Mobile  : kanvas logis SELALU mendatar (tinggi 420, lebar >= 700); isi diatur ulang lewat CSS body.m.
+             HP dipegang tegak: kanvas yang sama diputar 90 derajat lewat CSS (tepi ATAS game = sisi KANAN layar), jadi pemain cukup memiringkan HP ke kiri, tanpa bergantung pada kunci rotasi OS.
+   Koordinat layar (clientX/Y) tidak boleh dikonversi sendiri dengan rect/offsetWidth: pakai Layout.pt() dan Layout.box(), yang paham rotasi. */
 const Layout = {
-  mobile: false, portrait: false,
+  mobile: false, rot: false, s: 1,
   resolve() {
     const m = Settings.data.layout; if (m === 'mobile') return true; if (m === 'desktop') return false;
     const small = Math.min(innerWidth, innerHeight), coarse = matchMedia('(pointer:coarse)').matches;
-    return (coarse && small < 820) || small < 480 || innerWidth < 768;
+    return coarse ? small < 820 : innerWidth >= innerHeight && (small < 480 || innerWidth < 768);   // jendela desktop yang tinggi-sempit tidak diputar: pakai tampilan desktop
   },
   apply() {
-    const st = $('#stage'), w = innerWidth, h = innerHeight, mob = this.resolve(), por = mob && h > w; let s;
-    if (!mob) { s = Math.min(w / 1280, h / 720); st.style.cssText = `width:1280px;height:720px;left:50%;top:50%;margin:-360px 0 0 -640px;transform-origin:center;transform:scale(${s})` }
-    else {
-      s = por ? Math.min(w / 400, h / 640) : Math.min(h / 420, w / 700);
-      st.style.cssText = `width:${w / s}px;height:${h / s}px;left:0;top:0;margin:0;transform-origin:0 0;transform:scale(${s})`;
-    }
-    const cz = por ? Math.max(0, Math.min(230, 181 + (h / s - 711) * 1.58)) : 230;   // tinggi jatah karakter di layar potret: menyusut dulu, lalu hilang, supaya panel soal tidak terpotong di layar pendek
-    st.style.setProperty('--cz', cz + 'px'); st.style.setProperty('--cf', Math.max(.5, cz / 230)); document.body.classList.toggle('nochar', por && cz < 100);
-    const changed = mob !== this.mobile || por !== this.portrait; this.mobile = mob; this.portrait = por;
-    document.body.classList.toggle('m', mob); document.body.classList.toggle('p', por);
+    const st = $('#stage'), w = innerWidth, h = innerHeight, mob = this.resolve(), rot = mob && h > w, vw = rot ? h : w, vh = rot ? w : h;   // vw x vh = layar mendatar yang dilihat pemain
+    const s = mob ? Math.min(vh / 420, vw / 700) : Math.min(w / 1280, h / 720);
+    st.style.cssText = mob
+      ? `width:${vw / s}px;height:${vh / s}px;left:0;top:0;margin:0;transform-origin:0 0;transform:${rot ? `translate(${w}px,0) rotate(90deg) ` : ''}scale(${s})`
+      : `width:1280px;height:720px;left:50%;top:50%;margin:-360px 0 0 -640px;transform-origin:center;transform:scale(${s})`;
+    st.style.setProperty('--vh', vh / 100 + 'px');   // pengganti satuan vh di CSS: 1% tinggi layar MENDATAR (vh asli = tinggi fisik, salah sumbu saat diputar)
+    const changed = mob !== this.mobile; this.mobile = mob; this.rot = rot; this.s = s;
+    document.body.classList.toggle('m', mob); document.body.classList.toggle('sh', mob && vh <= 400);   // sh = layar mendatar pendek (<= 400 px): soal dipadatkan
     if (changed) dispatchEvent(new Event('layoutchange'));
   },
+  pt(cx, cy) { const r = $('#stage').getBoundingClientRect(), s = this.s; return this.rot ? { x: (cy - r.top) / s, y: (r.right - cx) / s } : { x: (cx - r.left) / s, y: (cy - r.top) / s } },   // titik layar -> titik logis #stage
+  box(el) { const r = el.getBoundingClientRect(), a = this.pt(r.left, r.top), b = this.pt(r.right, r.bottom), t = Math.min(a.y, b.y), h = Math.abs(a.y - b.y); return { l: Math.min(a.x, b.x), t, w: Math.abs(a.x - b.x), h, b: t + h } },   // kotak elemen dalam piksel logis #stage
   init() { this.apply(); addEventListener('resize', () => this.apply()); addEventListener('orientationchange', () => setTimeout(() => this.apply(), 150)) }
 };

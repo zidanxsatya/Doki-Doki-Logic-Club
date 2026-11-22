@@ -171,6 +171,12 @@ function buildSettings() {
   mv.value = Math.round(cfg.music * 100); sv.value = Math.round(cfg.sfx * 100); paint(mv, '#mvv'); paint(sv, '#svv');
   mv.oninput = () => { paint(mv, '#mvv'); Snd.setMusic(mv.value / 100); Settings.set('music', Snd.mv) };   // hanya musik latar
   sv.oninput = () => { paint(sv, '#svv'); Snd.setSfx(sv.value / 100); Settings.set('sfx', Snd.sv) };       // hanya efek suara
+  [mv, sv].forEach(r => {   // Chromium salah memetakan seretan sentuh pada slider yang diputar (HP tegak): saat Layout.rot, nilai dihitung sendiri dari posisi jari
+    const set = e => { const b = Layout.box(r); r.value = Math.round(Math.max(0, Math.min(1, (Layout.pt(e.clientX, e.clientY).x - b.l - 15) / (b.w - 30))) * 100); r.oninput() };   // 15 = setengah lebar jempol (30px)
+    ['touchstart', 'touchmove'].forEach(t => r.addEventListener(t, e => { if (Layout.rot) e.preventDefault() }, { passive: false }));
+    r.addEventListener('pointerdown', e => { if (Layout.rot && e.pointerType === 'touch') { r.setPointerCapture(e.pointerId); set(e) } });
+    r.addEventListener('pointermove', e => { if (Layout.rot && e.pointerType === 'touch' && r.hasPointerCapture(e.pointerId)) set(e) });
+  });
   sv.onchange = () => Snd.sfx('select');                                                                  // contoh suara efek
   $('#stour').onclick = () => { Snd.sfx('select'); go('tutor') };
   const inst = $('#sinst'), insn = $('#insn'), paintInst = () => {
@@ -197,13 +203,11 @@ function scaffold(id) {
   if (Story.on) return Story.scaffold(id);   // Mode Cerita: potret kiri + area materi besar
   const m = M[id], el = $('#scene'), ch = chars[m.key];
   el.innerHTML = `<div class="bg" data-b="${m.bg}" style="background-image:url(assets/img/${m.bg}.webp)"></div><div class="top"><button class="btn sm" id="back">◀ MENU</button><b>${m.label}</b></div><div id="panel" class="panel"></div><div class="cw" data-k="${m.key}"></div><div class="dlg"></div>`;
-  ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch, id === 'latihan' || id === 'evaluasi' ? chars : null), chat = bag(D[m.key].chat); let cur = ch, hostH = 0;
+  ch.mount($('.cw', el)); const d = new Dialogue($('.dlg', el), ch, id === 'latihan' || id === 'evaluasi' ? chars : null), chat = bag(D[m.key].chat); let cur = ch;
   d.onSpeaker = k => {
     const n = chars[k], w = $('.cw', el); if (!n || n === cur) return;
-    if (cur === ch) hostH = cur.actor.canvas.getBoundingClientRect().height;   // tinggi tuan rumah = jatah karakter di layar potret
-    cur.unmount(); n.mount(w); w.dataset.k = k; cur = n; w.style.removeProperty('--cg');
+    cur.unmount(); n.mount(w); w.dataset.k = k; cur = n;
     const cv = w.firstElementChild; if (cv) { cv.classList.remove('gin'); void cv.offsetWidth; cv.classList.add('gin') }
-    if (n !== ch && hostH && Layout.mobile && Layout.portrait) { const gh = cv.getBoundingClientRect().height; if (gh > hostH) w.style.setProperty('--cg', (hostH / gh).toFixed(3)) }   // tamu lebih tinggi: diperkecil agar tidak menutupi panel soal
   };   // tamu: sprite & kotak dialog berganti sebentar, kembali ke tuan rumah di baris berikutnya
   // obrolan bebas: karakter bicara di luar topik saat pemain diam ~25 dtk, atau saat karakternya diklik
   let last = performance.now(); const act = () => { last = performance.now() }, talk = () => { const [t, e] = chat(); d.line(t, e) };

@@ -19,15 +19,15 @@ Proyek ini dibuat dengan HTML, CSS, dan JavaScript biasa. Tidak ada framework, d
 
 ## Fitur
 
-Menu utama punya lima bagian belajar, ditambah Tantangan Harian, Peta dan Pengaturan. Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
+Menu utama punya lima bagian belajar (Cerita, Materi, Simulasi, Latihan, Evaluasi), ditambah tombol HARIAN, Peta, Pengaturan, dan suara di bagian atas. Kartu Cerita menampilkan empat langkah belajar beserta kemajuannya dan tombol MULAI CERITA (LANJUTKAN dan ULANG setelah dimulai). Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
 
 | Bagian | Pemandu | Isi |
 |---|---|---|
-| Cerita | Keempat karakter | Tiga belas langkah dari materi sampai evaluasi, dengan adegan cerita di antaranya. Setelah Latihan ada tiga kasus nyata (alarm toko, lampu tangga, brankas klub) yang dikerjakan dengan gerbang yang sudah dipelajari. Beberapa adegan memberi pilihan jawaban. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
+| Cerita | Keempat karakter | Tiga belas langkah dari materi sampai evaluasi, dengan adegan cerita di antaranya. Tiap bab belajar (Materi, Simulasi, Latihan, Evaluasi) dibuka dengan kartu layar penuh yang berbeda rancangannya, bisa dilewati dengan ketukan atau Enter. Setelah Latihan ada tiga kasus nyata (alarm toko, lampu tangga, brankas klub) yang dikerjakan dengan gerbang yang sudah dipelajari. Beberapa adegan memberi pilihan jawaban. Kemajuan tersimpan dan bisa dilanjutkan atau diulang. |
 | Materi | Sayori | 11 halaman: pengertian rangkaian logika, input dan output, logika 0 dan 1, gerbang AND, OR, NOT, NAND, NOR, XOR, XNOR, dan tabel kebenaran. Setelah halaman terakhir ada Flash Card. |
-| Simulasi | Yuri | Simulasi Dasar untuk 7 gerbang dengan saklar input, LED output, dan tabel kebenaran. Simulasi+ untuk menyusun rangkaian sendiri dan mengerjakan 17 tantangan. |
+| Simulasi | Yuri | Simulasi Dasar untuk 7 gerbang dengan saklar input, LED output, dan tabel kebenaran. Simulasi+ untuk menyusun rangkaian sendiri dan mengerjakan 24 tantangan. |
 | Latihan | Natsuki | 16 jenis soal dalam tiga mode: Santai, Waktu, dan Berantai. Hasil berupa bintang, lencana, dan skor terbaik. Tombol PEMBAHASAN di layar hasil membuka soal yang salah beserta jawaban benar dan penjelasannya. |
-| Evaluasi | Monika | 10 soal acak dari bank 19 soal, 60 detik per soal, dengan empat kategori nilai dari "Perlu Belajar Lagi" sampai "Sangat Baik" dan pembahasan soal yang salah. |
+| Evaluasi | Monika | 10 soal acak dari bank 19 soal, 60 detik per soal tanpa petunjuk, dengan empat kategori nilai dari "Perlu Belajar Lagi" sampai "Sangat Baik" dan pembahasan soal yang salah. |
 
 ### Panduan sekali tampil
 
@@ -35,11 +35,11 @@ Saat game dibuka, Sayori membawakan panduan empat halaman (urutan belajar, cara 
 
 ### Tantangan Harian
 
-Tombol HARIAN di menu memberi satu soal per hari (Monika). Soal dibuat dari tanggal perangkat: sebagian dari generator soal Latihan (output gerbang, membaca rangkaian, persamaan Boolean, situasi nyata, dan jenis lain) dan sebagian dari bank soal Evaluasi, dengan siklus 14 hari yang tidak mengulang jenis soal. Soalnya sama seharian dan berganti tiap tengah malam menurut tanggal perangkat. Soal hanya bisa dijawab sekali; setelah itu muncul penjelasan dan jawaban benar. Menjawab, benar atau salah, menambah hari beruntun (streak). Melewatkan satu hari mengembalikan hitungan ke 0, sedangkan rekor terbaik tetap tersimpan. Titik kecil di tombol menandai bahwa soal hari ini belum dijawab, dan tujuh kotak menunjukkan tujuh hari terakhir. Tanggal diambil dari jam perangkat, jadi pemain yang mengubah jam bisa mengakali hitungan; game ini tidak punya server untuk memeriksanya.
+Tombol HARIAN di menu memberi satu soal per hari (Monika). Soal dibuat dari tanggal perangkat: sebagian dari generator soal Latihan (output gerbang, membaca rangkaian, persamaan Boolean, situasi nyata, dan jenis lain) dan sebagian dari bank soal Evaluasi, dengan siklus 14 hari yang tidak mengulang jenis soal. Soalnya sama seharian dan berganti tiap tengah malam menurut tanggal perangkat. Soal hanya bisa dijawab sekali; setelah itu muncul penjelasan dan jawaban benar. Menjawab, benar atau salah, menambah hari beruntun (streak). Melewatkan satu hari mengembalikan hitungan ke 0, sedangkan rekor terbaik tetap tersimpan. Tombol HARIAN berwarna pink selama soal hari ini belum dijawab dan berubah putih setelah dijawab; tujuh titik di tombol menunjukkan hasil tujuh hari terakhir. Tanggal diambil dari jam perangkat, jadi pemain yang mengubah jam bisa mengakali hitungan; game ini tidak punya server untuk memeriksanya.
 
 ### Peta Kemajuan
 
-Tombol Peta di menu membuka satu layar ringkas: langkah Cerita yang sudah dicapai, bagian yang sudah dicoba, tantangan Simulasi+ yang selesai (misalnya 9 dari 17), dan skor terbaik tiap mode Latihan serta Evaluasi. Peta juga menampilkan hari beruntun Harian dan baris Kasus Nyata. Setelah Cerita mencapai kasus pertama, ketiga kasus bisa dibuka ulang dari Peta tanpa mengulang Cerita; tombol akhirnya kembali ke Peta dan kemajuan Cerita tidak berubah. Tiap baris lain membuka bagiannya. Peta hanya membaca data yang sudah ada di browser.
+Tombol Peta di menu membuka satu layar ringkas: langkah Cerita yang sudah dicapai, bagian yang sudah dicoba, tantangan Simulasi+ yang selesai (misalnya 9 dari 24), dan skor terbaik tiap mode Latihan serta Evaluasi. Peta juga menampilkan hari beruntun Harian dan baris Kasus Nyata. Setelah Cerita mencapai kasus pertama, ketiga kasus bisa dibuka ulang dari Peta tanpa mengulang Cerita; tombol akhirnya kembali ke Peta dan kemajuan Cerita tidak berubah. Tiap baris lain membuka bagiannya. Peta hanya membaca data yang sudah ada di browser.
 
 ### Flash Card
 
@@ -50,12 +50,14 @@ Tombol Peta di menu membuka satu layar ringkas: langkah Cerita yang sudah dicapa
 - Seret kartu input dan gerbang ke kanvas, lalu tarik kabel di antaranya. Input bebas dari A sampai F, maksimal enam.
 - Tabel kebenaran dan ekspresi Boolean rangkaian dihitung otomatis.
 - Mode Langkah menelusuri rangkaian dari input ke output, satu gerbang per langkah.
-- 17 tantangan dalam tiga tingkat (Mudah, Sedang, Sulit), misalnya membuat NOT atau XOR hanya dari gerbang NAND. Tantangan yang selesai tersimpan.
+- 24 tantangan dalam lima tingkat (Pemanasan, Dua gerbang, Gerbang universal, Merakit gerbang baru, Tantangan akhir) dengan label Mudah, Sedang, atau Sulit, misalnya membuat NOT atau XOR hanya dari gerbang NAND. Daftar tantangan menampilkan jumlah yang selesai dan penanda tantangan berikutnya.
+- Tantangan dianggap selesai bila rangkaian cocok dengan seluruh tabel kebenaran dan pemain sudah menyetel input ke baris-baris yang diminta (lencana UJI menunjukkan kemajuannya). Tantangan yang selesai tersimpan.
+- Tombol HINT punya tiga tingkat (konsep, struktur, langkah lengkap), gratis dan tidak disimpan.
 - Undo dan redo dengan `Ctrl+Z` dan `Ctrl+Shift+Z` (atau `Ctrl+Y`). Di macOS pakai `Cmd`.
 
 ### Latihan
 
-Ada 16 jenis soal, antara lain output gerbang, tabel kebenaran, mengenali gerbang, membaca rangkaian, persamaan Boolean, menebak gerbang dari tabel, mencocokkan simbol dengan nama, dan menyalakan LED lewat saklar. Pemain punya 3 nyawa, dan setiap jawaban salah mengurangi satu.
+Ada 16 jenis soal, antara lain output gerbang, tabel kebenaran, mengenali gerbang, membaca rangkaian, persamaan Boolean, menebak gerbang dari tabel, mencocokkan simbol dengan nama, dan menyalakan LED lewat saklar. Pemain punya 3 nyawa, dan setiap jawaban salah mengurangi satu. Kartu mulai menampilkan skor terbaik dan tombol pilihan mode.
 
 | Mode | Cara kerja |
 |---|---|
@@ -75,7 +77,7 @@ Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulas
 
 - Volume musik dan volume efek suara punya slider sendiri.
 - Mode tampilan: jendela atau layar penuh (layar penuh tidak tersedia di Safari iPhone dan iPad).
-- Tata letak: otomatis, desktop, atau mobile. Mode mobile mendukung potret dan lanskap. Mode otomatis memilih mobile pada layar sentuh kecil dan pada jendela yang lebih sempit dari 768 px.
+- Tata letak: otomatis, desktop, atau mobile. Mode mobile selalu memakai tata letak mendatar. Kalau HP dipegang tegak, tampilan diputar 90 derajat lewat CSS (tepi atas game ada di sisi kanan layar), jadi cukup memiringkan HP ke kiri, dan kunci rotasi layar tidak mengganggu. Mode otomatis memilih mobile pada layar sentuh kecil dan pada jendela mendatar yang lebih sempit dari 768 px; jendela desktop yang tinggi dan sempit tetap memakai tata letak desktop.
 - Panduan dan Aplikasi: membuka panduan lagi dan, bila browser mendukung, memasang game ke perangkat.
 - Semua pengaturan tersimpan di browser.
 
@@ -96,7 +98,7 @@ Tombol lanjut baru muncul setelah halaman materi terakhir dibaca, syarat Simulas
 | ![Tantangan Harian](docs/screenshots/harian.webp) | |
 | Tantangan Harian | |
 
-Tampilan di HP (potret):
+Tampilan di HP (mendatar, sama saat HP tegak dan diputar):
 
 ![Tampilan di HP](docs/screenshots/mobile.webp)
 
@@ -133,12 +135,12 @@ Browser yang dipakai sebaiknya versi terbaru. Beberapa bagian tampilan memakai `
 index.html            kerangka halaman
 manifest.webmanifest  data aplikasi web (nama, ikon, warna) untuk pemasangan
 sw.js                 service worker untuk cache offline
-css/style.css         seluruh tampilan, termasuk tata letak mobile (kelas .m dan .p)
+css/style.css         seluruh tampilan, termasuk tata letak mobile (kelas .m dan .sh)
 js/core.js            utilitas, atlas karakter, audio, mesin dialog, gambar gerbang logika
 js/content.js         materi, Flash Card, bank soal Latihan dan Evaluasi, kategori nilai, data credit
 js/dialogue.js        dialog tiap karakter menurut kepribadiannya
-js/story.js           naskah dan alur Mode Cerita
-js/settings.js        pengaturan tersimpan dan penyesuaian layout
+js/story.js           naskah, alur, dan kartu bab Mode Cerita
+js/settings.js        pengaturan tersimpan dan penyesuaian layout (termasuk memutar tampilan saat HP tegak)
 js/simplus.js         pemilih mode Simulasi dan Simulasi+, daftar tantangan
 js/app.js             menu, navigasi, Peta, panduan, Materi, Simulasi Dasar, Latihan, Evaluasi
 assets/               gambar, audio, font, ikon aplikasi, dan konfigurasi karakter
@@ -154,7 +156,7 @@ CREDITS.md            daftar atribusi aset
 | Gaya bicara karakter | `js/dialogue.js` |
 | Naskah dan pilihan di Mode Cerita | `js/story.js` |
 | Kasus nyata (sinyal, tahap, gerbang jawaban, skenario) | `js/story.js` (konstanta `KASUS`) |
-| Tantangan Simulasi+ | `js/simplus.js` (konstanta `CH`) |
+| Tantangan Simulasi+ | `js/simplus.js` (konstanta `CH`; tiap tantangan punya `id` tetap dan kunci solusi `s` untuk hint tingkat 3) |
 | Isi panduan sekali tampil | `js/app.js` (konstanta `TOUR`) |
 | Jumlah dan durasi soal Evaluasi | `EVAL_N` di `js/content.js`, `EVAL_TIME` di `js/app.js` |
 | Kesulitan Mode Berantai (soal per level, penyusutan waktu, pemulihan nyawa) | `SC.latihan` di `js/app.js` (fungsi `lv`, `lim`, dan `good % 5`) |

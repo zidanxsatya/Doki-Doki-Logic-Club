@@ -114,9 +114,8 @@ SC.simplus = () => {
   const term = () => ({ Y: { x: cw - 78, y: ch / 2 } });
   const gp = n => { const o = gGeo(n.type), w = (o.xo - o.xi) * K, tx = n.x - w / 2; return { o, w, tx, ins: o.ys.map(y => ({ x: tx, y: n.y + (y - 50) * K })), out: { x: tx + w, y: n.y } } };
   const mob = () => document.body.classList.contains('m');
-  const goal2 = () => { const g = $('.xgoal', el); return g && !g.hidden ? Math.max(0, g.offsetHeight - 36) : 0 };   // bilah tujuan dua baris di ponsel tegak
-  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(112 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 88 + goal2() : 102) : 58, Math.min(ch - 40, n.y)) };
-  const clampI = n => { n.x = Math.max(84, Math.min(Math.max(84, cw - 190), n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 58 + goal2() : 70) : 30, Math.min(ch - 40, n.y)) };
+  const clampG = n => { const hw = gp(n).w / 2; n.x = Math.max(112 + hw, Math.min(cw - 104 - hw, n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 88 : 102) : 58, Math.min(ch - 40, n.y)) };
+  const clampI = n => { n.x = Math.max(84, Math.min(Math.max(84, cw - 190), n.x)); n.y = Math.max(chi >= 0 ? (mob() ? 58 : 70) : 30, Math.min(ch - 40, n.y)) };
   const pinMap = () => {
     const t = term(), m = { Y: { kind: 'dst', ...t.Y, d: { t: 'y' } } };
     I.forEach(n => m[n.name] = { kind: 'src', x: n.x, y: n.y, d: { t: 'in', id: n.id } });
@@ -148,7 +147,7 @@ SC.simplus = () => {
 
   /* edit */
   const freeSpot = () => { for (const fy of [.3, .55, .8]) for (const fx of [.32, .5, .68]) { const x = cw * fx, y = ch * fy; if (!G.some(n => Math.abs(n.x - x) < 100 && Math.abs(n.y - y) < 60)) return { x, y } } return { x: cw / 2 + Math.random() * 40, y: ch / 2 + Math.random() * 40 } };
-  const inSpot = () => { const top = chi >= 0 ? (mob() ? 58 + goal2() : 70) : 30, hit = (x, y) => I.some(n => Math.abs(n.x - x) < 80 && Math.abs(n.y - y) < 62) || G.some(g => Math.abs(g.x - 20 - x) < 110 && Math.abs(g.y - y) < 56); for (const x of [84, 170, 256, 342]) { if (x > Math.max(84, cw - 190)) break; for (const fy of [.3, .7, .5, .12, .9, .2, .8, .4, .6]) { const y = ch * fy; if (y >= top && y <= ch - 40 && !hit(x, y)) return { x, y } } } return { x: 84, y: ch / 2 } };   // slot kosong terdekat (tidak menimpa input/gerbang lain)
+  const inSpot = () => { const top = chi >= 0 ? (mob() ? 58 : 70) : 30, hit = (x, y) => I.some(n => Math.abs(n.x - x) < 80 && Math.abs(n.y - y) < 62) || G.some(g => Math.abs(g.x - 20 - x) < 110 && Math.abs(g.y - y) < 56); for (const x of [84, 170, 256, 342]) { if (x > Math.max(84, cw - 190)) break; for (const fy of [.3, .7, .5, .12, .9, .2, .8, .4, .6]) { const y = ch * fy; if (y >= top && y <= ch - 40 && !hit(x, y)) return { x, y } } } return { x: 84, y: ch / 2 } };   // slot kosong terdekat (tidak menimpa input/gerbang lain)
   const place = (type, x, y) => { if (!allowed(type)) return deny(type); const n = { id: ++nid, type, x, y }; clampG(n); G.push(n); sel = { k: 'g', id: n.id }; Sfx('place'); render() };
   const placeIn = (v, x, y) => {
     if (!allowed('in' + v)) return deny('in' + v);
@@ -187,7 +186,7 @@ SC.simplus = () => {
   };
   const startCh = i => {
     const had = G.length + I.length > 0, c = CH[i]; chi = i; solved = false; tested.clear(); req = []; wasB = false; resetHint(); G.length = 0; W.length = 0; I.length = 0; iid = 0; sel = null; list.hidden = true; hideTip();
-    const top = (mob() ? 58 + goal2() : 70), yIn = j => c.n >= 4 ? top + j * (ch - 40 - top) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
+    const top = (mob() ? 58 : 70), yIn = j => c.n >= 4 ? top + j * (ch - 40 - top) / (c.n - 1) : ch * (j + 1) / (c.n + 1);   // 4+ input: rata di seluruh tinggi kanvas
     for (let j = 0; j < c.n; j++) { const n = { id: ++iid, name: LET[j], v: 0, lock: true, x: 84, y: yIn(j) }; clampI(n); I.push(n) }   // tantangan: input A, B, ... disediakan dan terkunci
     if (c.n >= 4) requestAnimationFrame(() => requestAnimationFrame(() => { if (chi === i) { I.forEach((n, j) => { n.y = yIn(j); clampI(n) }); render() } }));   // tinggi kanvas berubah setelah bilah tujuan muncul
     Sfx('tick'); say(`Tantangan ${i + 1}: ${c.t}.${had ? ' Rangkaian lama dikosongkan.' : ''}`, 'info'); render();
@@ -318,7 +317,7 @@ SC.simplus = () => {
     });
     const showRow = r => {   // tabel panjang (banyak input): baris yang dibutuhkan selalu terlihat
       const w = $('.xtw', el), tr = $(`#xtt tr[data-r="${r}"]`, el);
-      if (tr && w.scrollHeight > w.clientHeight + 1) { const k = stg.getBoundingClientRect().width / stg.offsetWidth, wr = w.getBoundingClientRect(), tb = tr.getBoundingClientRect(), hh = $('#xtt th', el).getBoundingClientRect().height; if (tb.top < wr.top + hh) w.scrollTop += (tb.top - wr.top - hh) / k; else if (tb.bottom > wr.bottom) w.scrollTop += (tb.bottom - wr.bottom) / k }
+      if (tr && w.scrollHeight > w.clientHeight + 1) { const wr = Layout.box(w), tb = Layout.box(tr), hh = Layout.box($('#xtt th', el)).h; if (tb.t < wr.t + hh) w.scrollTop += tb.t - wr.t - hh; else if (tb.b > wr.b) w.scrollTop += tb.b - wr.b }
     };
     if (curR !== cur) { curR = cur; showRow(cur) }
     const msg = $('#xmsg', el), has = yw(), built = !!C && !!has && !nul && okN === rows && n === C.n;
@@ -379,7 +378,7 @@ SC.simplus = () => {
   /* pointer: palet -> kanvas (seret) atau ketuk untuk menambah */
   let pd = null;
   const ghost = type => { const g = document.createElement('div'); g.className = 'xghost' + (type[0] === 'i' ? ' xi' : ''); g.innerHTML = type[0] === 'i' ? `<svg viewBox="0 0 60 34">${pillG(+type[2], 2, 17, '+')}</svg>` : `<svg viewBox="0 0 130 70">${gGfx(type, 10, 36, .8)}</svg>`; stg.appendChild(g); return g };
-  const moveGhost = (g, e) => { const r = stg.getBoundingClientRect(), k = r.width / stg.offsetWidth; g.style.left = (e.clientX - r.left) / k + 'px'; g.style.top = (e.clientY - r.top) / k + 'px' };
+  const moveGhost = (g, e) => { const q = Layout.pt(e.clientX, e.clientY); g.style.left = q.x + 'px'; g.style.top = q.y + 'px' };
   pal.addEventListener('pointerdown', e => { const b = e.target.closest('.xpi'); if (!b || e.button > 0) return; if (!allowed(b.dataset.g)) return deny(b.dataset.g); pd = { type: b.dataset.g, id: e.pointerId, x: e.clientX, y: e.clientY, moved: false, gh: null }; pal.setPointerCapture(e.pointerId) });
   pal.addEventListener('pointermove', e => { if (!pd || e.pointerId !== pd.id) return; if (!pd.moved && Math.hypot(e.clientX - pd.x, e.clientY - pd.y) > 6) { pd.moved = true; pd.gh = ghost(pd.type) } if (pd.gh) moveGhost(pd.gh, e) });
   const palEnd = (e, ok) => {

@@ -44,16 +44,16 @@ Story.advance = () => { const p = Story.prog(); p.step = Math.min(p.step + 1, ST
    Kartu tampil SEBELUM adegan bab dibuat: go() menyerahkan run() ke sini, dan run() dipanggil tepat saat kartu mulai menutup,
    jadi dialog tidak mengetik di balik kartu. Lewati: klik, ketuk, Enter, Spasi atau Esc (setelah 0,5 dtk). */
 const chapImg = f => `<img class="c_cp" src="assets/img/portraits/${f}.webp" alt="" draggable="false">`;
-const chapSch = v => {   // rangkaian AND: saklar A dan B -> gerbang -> lampu. v = tegak (layar potret): alur arus turun, bukan ke kanan
-  const P = (x, y) => v ? `x="${y}" y="${x}"` : `x="${x}" y="${y}"`, W = { A: 'M20 14H58V23H73', B: 'M20 46H58V37H73', Y: 'M103 30H136' };
+const chapSch = () => {   // rangkaian AND: saklar A dan B -> gerbang -> lampu
+  const W = { A: 'M20 14H58V23H73', B: 'M20 46H58V37H73', Y: 'M103 30H136' };
   const rays = [0, 1, 2, 3, 5, 6, 7].map(k => { const a = k * Math.PI / 4, c = Math.cos(a), s = Math.sin(a); return `<path d="M${146 + c * 11.5} ${30 + s * 11.5}L${146 + c * 15} ${30 + s * 15}"/>` }).join('');
-  return `<svg class="c_sch ${v ? 'c_v' : 'c_h'}" viewBox="${v ? '0 0 60 174' : '0 0 160 60'}" aria-hidden="true"><g${v ? ' transform="matrix(0 1 1 0 0 0)"' : ''}>
+  return `<svg class="c_sch c_h" viewBox="0 0 160 60" aria-hidden="true"><g>
     ${Object.values(W).map((d, k) => `<path class="c_wd" style="--k:${k}" pathLength="1" d="${d}"/>`).join('')}
     <path class="c_gt" d="M73 15H88A15 15 0 0 1 88 45H73Z"/>
     ${[['a', 10, 14], ['b', 42, 46]].map(([k, y, cy]) => `<rect class="c_sw c_${k}" x="6" y="${y}" width="14" height="8" rx="4"/><circle class="c_kn c_${k}" cx="16" cy="${cy}" r="2.6"/>`).join('')}
     ${Object.entries(W).map(([k, d]) => `<path class="c_wl c_${k}" pathLength="1" d="${d}"/>`).join('')}
     <g class="c_ry">${rays}</g><circle class="c_lp" cx="146" cy="30" r="8"/></g>
-    <text ${P(13, 7.6)}>A</text><text ${P(13, 39.6)}>B</text><text ${v ? P(165, 30) : P(146, 49)}>Bab 2 dari 4</text></svg>`;
+    <text x="13" y="7.6">A</text><text x="13" y="39.6">B</text><text x="146" y="49">Bab 2 dari 4</text></svg>`;
 };
 const CHAPS = {
   materi: {
@@ -64,10 +64,10 @@ const CHAPS = {
   },
   simulasi: {
     hold: 2700, out: 650,
-    html: () => `${chapSch(0)}${chapSch(1)}<div class="c_tx"><h2 class="c_ct">Simulasi</h2><p class="c_cs">Yuri menyiapkan papan rangkaian. Ubah masukannya, lihat keluarannya.</p></div>${chapImg('yuri_smile')}`,
+    html: () => `${chapSch()}<div class="c_tx"><h2 class="c_ct">Simulasi</h2><p class="c_cs">Yuri menyiapkan papan rangkaian. Ubah masukannya, lihat keluarannya.</p></div>${chapImg('yuri_smile')}`,
     pre(c) {   // titik lampu: kartu menutup seperti diafragma ke arah lampu yang menyala
-      const l = $$('.c_lp', c).find(e => e.getBoundingClientRect().width), r = l.getBoundingClientRect(), s = c.getBoundingClientRect();
-      c.style.setProperty('--lx', ((r.left + r.width / 2 - s.left) / s.width * 100).toFixed(1) + '%'); c.style.setProperty('--ly', ((r.top + r.height / 2 - s.top) / s.height * 100).toFixed(1) + '%');
+      const r = Layout.box($('.c_lp', c)), s = Layout.box(c);
+      c.style.setProperty('--lx', ((r.l + r.w / 2 - s.l) / s.w * 100).toFixed(1) + '%'); c.style.setProperty('--ly', ((r.t + r.h / 2 - s.t) / s.h * 100).toFixed(1) + '%');
     }
   },
   latihan: {
@@ -450,8 +450,8 @@ function kasusCard(id, panel, d) {
   $('#khint', panel).onclick = () => { if (solved) return; Snd.sfx('select'); const s = c.st.find(x => pick[x.id] !== x.ans); s && d.say([s.hint]) };
   draw();
   const fit = () => {   // panel kasus tidak boleh melewati kotak dialog, berapa pun tinggi dialog di layar itu
-    const dl = $('.dlg'), r = panel.getBoundingClientRect(), k = panel.offsetHeight ? r.height / panel.offsetHeight : 1;
-    if (!dl || !r.height) return; panel.style.maxHeight = Math.max(120, (dl.getBoundingClientRect().top - r.top - 6) / k) + 'px'; panel.style.overflowY = 'auto'; const kc = $('.kz', panel); kc.classList.remove('tight'); if (panel.scrollHeight > panel.clientHeight + 2) kc.classList.add('tight'); upd();   // masih meluap: rapatkan dulu sebelum menggulir
+    const dl = $('.dlg');
+    if (!dl || !panel.offsetHeight) return; panel.style.maxHeight = Math.max(120, Layout.box(dl).t - Layout.box(panel).t - 6) + 'px'; panel.style.overflowY = 'auto'; const kc = $('.kz', panel); kc.classList.remove('tight'); if (panel.scrollHeight > panel.clientHeight + 2) kc.classList.add('tight'); upd();   // masih meluap: rapatkan dulu sebelum menggulir
   }, upd = () => panel.classList.toggle('scr', panel.scrollTop + panel.clientHeight < panel.scrollHeight - 4);   // bayangan di tepi bawah bila masih ada isi di bawah
   panel.addEventListener('scroll', upd);
   fit(); removeEventListener('resize', Story.kzFit); Story.kzFit = fit; addEventListener('resize', fit); setTimeout(fit, 400);
