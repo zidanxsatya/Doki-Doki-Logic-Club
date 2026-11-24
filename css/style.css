@@ -98,16 +98,10 @@ body.m{--pz:.72}
 .m #mute{font-size:15px;right:6px;top:6px}
 /* layar awal */
 .m #start{padding-top:64px}
-.m #start h1,.m .mtitle h1{font-size:44px;-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink)}
-
-/* menu utama */
-.m .mtitle{left:16px;top:10px}.m .mtitle h2{margin:4px 0 0}
-.m .mlist{left:16px;width:min(420px,calc(100% - 380px))}
-.m .mbtn{border-radius:12px}
+.m #start h1{font-size:44px;-webkit-text-stroke:2px var(--ink);text-shadow:3px 3px 0 var(--ink)}
 
 
-.m .mchar{right:0;top:0;bottom:0;width:calc(100% - 470px)}
-.m .mchar canvas{width:100%;height:100%;object-fit:contain;object-position:right bottom}
+
 /* kerangka scene: bar atas, karakter, panel, dialog */
 .m .top{left:8px;top:5px;gap:8px}.m .top b{-webkit-text-stroke:1.5px var(--ink);text-shadow:2px 2px 0 var(--ink)}.m .hintc{display:none}
 .m .cw{left:0;bottom:4px;transform:scale(var(--cs));transform-origin:0 100%}
@@ -279,8 +273,6 @@ html{scrollbar-color:var(--pink) transparent}
 .ngo{position:absolute;right:26px;bottom:232px;z-index:7;animation:nudge 1.6s ease-in-out 4}
 @media (prefers-reduced-motion:reduce){.contstory,.ngo{animation:none}}
 /* mobile / Android: tata ulang, bukan sekadar mengecilkan */
-.m .mtitle h1 br{display:none}
-.m .mlist{top:62px;gap:5px}.m .mbtn{padding:2px 12px 2px 36px}.m .mbtn b{font-size:19px;letter-spacing:1.5px}.m .mbtn i{top:8px;left:11px;font-size:15px}
 
 .m .pt{left:3px;top:auto;bottom:4px;width:182px;height:240px;border-width:3px;border-radius:14px;box-shadow:3px 3px 0 var(--ink)}
 .m .pt::after{border-radius:11px;box-shadow:inset 0 0 0 2px #ffffffb0}.m .pn{font-size:16px;left:6px;top:6px;padding:2px 9px 1px}
@@ -322,7 +314,7 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 
 .m .seg .btn{padding:9px 8px;font-size:14px}
 .m .opt{padding:11px 8px}
-.m .mbtn span{font-size:13px}.m .srow small{font-size:13px}.m .qh{font-size:14px}.m .credlink{font-size:13px;padding:6px 12px}
+.m .srow small{font-size:13px}.m .qh{font-size:14px}.m .credlink{font-size:13px;padding:6px 12px}
 .m .nav .btn{min-height:38px}
 
 .m .top .btn.sm{padding:5px 10px;min-height:0}
@@ -388,21 +380,6 @@ body:not(.m) .cw[data-k=sayori]{bottom:10px}
 .mbtn:focus-visible{outline:4px solid var(--blue);outline-offset:3px}
 .mchar{right:23px}.mchar canvas{height:640px}
 .setbtn{right:74px;top:22px}
-/* menu mobile: kartu ringkas satu kolom, grup karakter di tengah bawah */
-.m .mtitle{left:16px;top:52px}.m .mtitle h1{font-size:26px;margin-top:6px;-webkit-text-stroke:1.5px var(--ink);text-shadow:2px 2px 0 var(--ink)}.m .mtitle h2{font-size:13px;margin-top:6px}
-.m .setbtn{left:12px;right:auto;top:8px;font-size:13px}
-.m .mlist{left:14px;right:14px;width:auto;top:118px}
-.m .mstory{margin-bottom:8px}.m .mstory .mbtn{height:112px;padding:10px 14px}.m .mstory .mbtn b{font-size:22px}.m .mstory .mbtn .sub{font-size:11px}
-.m .pbtn{right:12px;top:10px;font-size:12px;padding:6px 12px;border-width:3px;box-shadow:0 3px 0 var(--ink)}.m .mstory.cont .pbtn{right:100px}
-.m .mre{right:16px;bottom:auto;top:13px;font-size:12px;height:36px;padding:0 10px;min-height:0;border-width:3px;box-shadow:0 3px 0 var(--ink)}
-.m .steps{left:14px;right:14px;bottom:6px}.m .st{font-size:9px;min-width:44px}.m .st i{width:22px;height:22px;font-size:11px;border-width:2px}.m .ln{margin-top:10px}
-.m .mgrid{grid-template-columns:1fr;gap:6px}.m .mgrid .mbtn{height:auto;min-height:66px;padding:6px 12px 6px 62px}
-.m .mgrid .mbtn b{font-size:20px;letter-spacing:1.5px}.m .mbtn .sub{font-size:11px}.m .av{left:10px;top:7px;width:42px;height:42px;border-width:2px}
-.m .mbtn{border-width:3px;box-shadow:0 4px 0 var(--ink)}
-.m .mbtn.sel,.m .mbtn:hover{transform:translateY(-2px)}
-.m:not(.p) .mgrid{grid-template-columns:1fr}.m:not(.p) .mstory .mbtn{height:56px}.m:not(.p) .steps,.m:not(.p) .mbtn .sub{display:none}
-.m:not(.p) .mgrid .mbtn{height:38px;padding:3px 10px 3px 52px}.m:not(.p) .av{width:30px;height:30px;top:3px}.m:not(.p) .mlist{top:62px;width:min(420px,calc(100% - 380px));right:auto}
-.m:not(.p) .mtitle{top:8px}.m:not(.p) .setbtn{left:auto;right:46px}
 /* kerangka scene */
 .top b{background:var(--ink);padding:3px 14px 1px;border-radius:10px;-webkit-text-stroke:0;text-shadow:none;letter-spacing:2px;font-size:32px;line-height:1.2}
 .m .top b{font-size:20px;padding:2px 9px 0;border-radius:8px}
@@ -710,7 +687,6 @@ body.m{--cs:.6}
 
 /* v13 polish */
 .m:not(.p) .sim{flex-wrap:nowrap}.m:not(.p) .sim .card{flex:1 1 0;min-width:0}
-.m:not(.p) .mgrid .mbtn,.m:not(.p) .mstory .mbtn{justify-content:center}
 .btn:disabled,.nav button:disabled{cursor:not-allowed}
 
 /* v14 animasi: transisi layar lebih cepat, LED menyala, tombol responsif */
@@ -839,7 +815,7 @@ body.m{--cs:.6}
 
 /* v20: audit desain. Teks HP >= 11px, area tap >= 44px, gerak dekoratif dibatasi */
 .m .xcnt{font-size:11px}.m .xlab{font-size:11px}.m .xmsg{font-size:12px}.m .top #xch{font-size:12px}.m .xpi b{font-size:11px}
-.m:not(.p) .xmsg{font-size:11px}.m:not(.p) .xpi b{font-size:11px}.m .tip,.m .mbtn .sub,.m .chip{font-size:12px}
+.m:not(.p) .xmsg{font-size:11px}.m:not(.p) .xpi b{font-size:11px}.m .tip,.m .chip{font-size:12px}
 .cell,.xlx,.setcard input[type=range]{position:relative}
 .cell::after,.xlx::after{content:"";position:absolute;inset:-8px -4px}
 .m .setcard input[type=range]{margin:14px 0}
@@ -854,8 +830,7 @@ body.m{--cs:.6}
 .m .heart{width:22px;height:22px}
 .mre{transition:transform .16s var(--ease),box-shadow .16s var(--ease),background-color .16s}
 .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translateY(-4px);box-shadow:0 8px 0 var(--ink)}
-.m .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translateY(-2px);box-shadow:0 5px 0 var(--ink)}
-@media (prefers-reduced-motion:reduce){.lives.hit{animation:none}.mstory:has(.mbtn:hover,.mbtn.sel) .mre,.m .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:none;box-shadow:0 4px 0 var(--ink)}}
+@media (prefers-reduced-motion:reduce){.lives.hit{animation:none}.mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:none;box-shadow:0 4px 0 var(--ink)}}
 .m:not(.p) .fcard.p1::after,.m:not(.p) .fcard.p2::after{transform:translate(4px,4px) rotate(.4deg)}.m:not(.p) .fcard.p2::before{transform:translate(-3px,6px) rotate(-.4deg)}
 /* kartu pendek (HP mendatar: panggung hanya 420px): kecilkan isi supaya tidak terpotong */
 .fcard{container-type:size}
@@ -869,7 +844,7 @@ body.m{--cs:.6}
 .m:not(.p) .xtools{flex-wrap:wrap}
 .m:not(.p) .xtools .btn,.m:not(.p) .n3 .xtools .btn{flex:1 1 44%;font-size:10px;letter-spacing:0;padding:3px 2px}
 .m:not(.p) .xtools .btn:last-child{flex-basis:100%}
-.m .chip,.m .tip,.m .xlab,.m .xcnt,.m .xpi b,.m .mbtn .sub,.m .sub,.m .tmr{font-size:13px}
+.m .chip,.m .tip,.m .xlab,.m .xcnt,.m .xpi b,.m .sub,.m .tmr{font-size:13px}
 .m:not(.p) .xpi:not(.xin) b{font-size:11px}
 .m .xpi.xin b{font-size:11px}
 .m:not(.p) .xin b{font-size:10px}
@@ -1185,9 +1160,6 @@ body:not(.m) .mtitle h1{margin-top:-2px}
 body:not(.m) .mchar canvas{height:615px;display:block;margin:0 auto}
 body:not(.m) .mgrid .mbtn{justify-content:center}
 
-/* v46b: rapikan menu utama di HP */
-.m:not(.p) .av{top:50%;translate:0 -50%}
-.m:not(.p) .mchar{top:48px}
 
 /* v48: menu utama. Header satu garis kanan (x=1240 di desktop), Harian beraksen dengan 7 hari terakhir,
    Pengaturan dan Peta berupa ikon, judul lebih besar, kartu dua tingkat teks (judul + satu baris) */
@@ -1212,8 +1184,8 @@ body:not(.m) #stage:has(#menu.on) #mute{right:40px;top:25px}
 .m .hdots{gap:3px}.m .hdots i{width:8px;height:8px}.m .hdots i.now{border-width:2px}
 .m .mtools .ibtn{width:36px;height:36px;padding:0;border-width:3px}.m .ibtn svg{width:20px;height:20px}
 .m .setbtn{top:8px}
-.m:not(.p) #stage:has(#menu.on) #mute{top:9px}
-.m:not(.p) .setbtn{right:48px}
+.m:not(.p) #stage:has(#menu.on) #mute{right:14px;top:9px}
+.m:not(.p) .setbtn{right:58px}
 
 /* v49: karakter menu desktop digeser sekitar 2% ke kanan (26 px) dan 1% ke atas (7 px) dari panggung 1280x720 */
 body:not(.m) .mchar{left:26px;bottom:7px}
@@ -1333,3 +1305,34 @@ body:not(.m) .mchar{left:26px;bottom:7px}
 #fade.soft,#fade.soft.on{clip-path:none;transition:opacity .42s cubic-bezier(.4,0,.2,1)}
 #fade.soft:not(.on){transition-duration:.55s}
 @media (prefers-reduced-motion:reduce){#fade.soft,#fade.soft.on,#fade.soft:not(.on){transition:opacity .01ms}}
+
+/* v62: menu utama HP = tata letak PC. Judul kiri atas, karakter di kiri, kartu Cerita (dengan langkah) dan empat kartu mode di kanan, dimiringkan ke dalam seperti v45.
+   Ukuran px di bawah ini adalah ukuran tampil pada kanvas logis HP (tinggi 420). Daftar digambar 4x lebih besar lalu diperkecil (zoom + scale),
+   alasan sama dengan v48: tekstur perspektif tidak tajam di layar rapat piksel (HP 2x sampai 3x). Daftar selebar 50% layar, tepi kanan 14px sejajar tombol suara.
+   Tepi kiri daftar tampak bergeser kira-kira 13% lebarnya ke kanan karena miring, jadi lebar jatah karakter = 56,25% - 14px. */
+.m .mtitle{left:16px;top:6px}
+.m .mtitle h1{font-size:38px;line-height:1;margin:0;-webkit-text-stroke:2.2px var(--ink);text-shadow:2px 2px 0 var(--ink),4px 4px 0 var(--pink),6px 6px 0 var(--ink)}
+.m .mchar{left:0;right:auto;top:52px;bottom:4px;width:calc(56.25% - 14px)}
+.m .mchar canvas{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+.m .mlist{left:auto;right:14px;top:56%;width:50%;translate:0 -50%;transform-origin:100% 50%;transform:perspective(600px) rotateY(-10deg);transform-style:preserve-3d}
+@supports (zoom:2) and (translate:0 -50%){.m .mlist{zoom:4;right:3.5px;width:200%;transform:perspective(150px) rotateY(-10deg) scale(.25)}}
+.m .mstory{margin-bottom:13px}
+.m .mbtn{border-width:3px;border-radius:12px;box-shadow:0 4px 0 var(--ink)}
+.m .mbtn b{letter-spacing:1.2px}
+.m .mbtn .sub{font-size:11px}
+.m .mstory .mbtn{height:112px;padding:14px 18px}
+.m .mstory .mbtn b{font-size:26px}
+.m .pbtn{right:18px;top:15px;font-size:12px;border-width:3px;border-radius:10px;padding:6px 14px;box-shadow:0 3px 0 var(--ink)}
+.m .mstory.cont .pbtn{right:98px}
+.m .mstory .mre{right:18px;top:15px;bottom:auto;height:33px;min-height:0;padding:0 14px;font-size:12px;border-width:3px;border-radius:10px;box-shadow:0 3px 0 var(--ink)}
+.m .steps{left:18px;right:18px;bottom:10px}
+.m .st{font-size:10px;min-width:46px;gap:2px}
+.m .st i{width:22px;height:22px;border-width:2px;font-size:11px}
+.m .ln{height:2px;margin:10px 5px 0}
+.m .mgrid{gap:12px}
+.m .mgrid .mbtn{height:86px;padding:8px 8px 8px 64px;justify-content:center}
+.m .mgrid .mbtn b{font-size:20px}
+.m .av{left:10px;top:50%;translate:0 -50%;width:46px;height:46px;border-width:2px}
+.m .mbtn.sel{transform:translate3d(0,-3px,24px);box-shadow:0 7px 0 var(--ink)}
+@media (hover:hover){.m .mbtn:hover{transform:translate3d(0,-3px,24px);box-shadow:0 7px 0 var(--ink)}}
+.m .mstory:has(.mbtn:hover,.mbtn.sel) .mre{transform:translate3d(0,-3px,24px);box-shadow:0 6px 0 var(--ink)}

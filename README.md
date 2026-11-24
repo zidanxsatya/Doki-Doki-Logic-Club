@@ -19,7 +19,7 @@ Proyek ini dibuat dengan HTML, CSS, dan JavaScript biasa. Tidak ada framework, d
 
 ## Fitur
 
-Menu utama punya lima bagian belajar (Cerita, Materi, Simulasi, Latihan, Evaluasi), ditambah tombol HARIAN, Peta, Pengaturan, dan suara di bagian atas. Kartu Cerita menampilkan empat langkah belajar beserta kemajuannya dan tombol MULAI CERITA (LANJUTKAN dan ULANG setelah dimulai). Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
+Menu utama punya lima bagian belajar (Cerita, Materi, Simulasi, Latihan, Evaluasi), ditambah tombol HARIAN, Peta, Pengaturan, dan suara di bagian atas. Susunan menu sama di komputer dan di HP: karakter di sebelah kiri, kartu menu di sebelah kanan dengan sedikit kemiringan. Kartu Cerita menampilkan empat langkah belajar beserta kemajuannya dan tombol MULAI CERITA (LANJUTKAN dan ULANG setelah dimulai). Tiap bagian dipandu satu karakter yang bereaksi terhadap jawaban dan perpindahan antarbagian.
 
 | Bagian | Pemandu | Isi |
 |---|---|---|

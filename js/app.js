@@ -156,7 +156,7 @@ function buildSettings() {
   <div class="setcard">
     <div class="srow"><label>Volume Musik <b id="mvv"></b></label><input type="range" id="mv" min="0" max="100" step="1" aria-label="Volume Musik"></div>
     <div class="srow"><label>Volume Efek Suara <b id="svv"></b></label><input type="range" id="sv" min="0" max="100" step="1" aria-label="Volume Efek Suara"></div>
-    <div class="srow"><label>Mode Tampilan</label><div class="seg" id="sdisp"><button class="btn sm" data-v="window">Jendela</button><button class="btn sm" data-v="full">Desktop Fullscreen</button></div><small id="fsn"></small></div>
+    <div class="srow"><label>Mode Tampilan</label><div class="seg" id="sdisp"><button class="btn sm" data-v="window">Jendela</button><button class="btn sm" data-v="full">Fullscreen</button></div><small id="fsn"></small></div>
     <div class="srow"><label>Tata Letak</label><div class="seg" id="slay"><button class="btn sm" data-v="auto">Otomatis</button><button class="btn sm" data-v="desktop">Desktop</button><button class="btn sm" data-v="mobile">Mobile / Android</button></div><small>Otomatis menyesuaikan ukuran layar. Pilih Mobile / Android untuk tampilan ponsel.</small></div>
     <div class="srow"><label>Panduan dan Aplikasi</label><div class="seg"><button class="btn sm" id="stour">Lihat panduan</button><button class="btn sm" id="sinst" hidden>Pasang di perangkat</button></div><small id="insn"></small></div>
   </div>
